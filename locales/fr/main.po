@@ -1,0 +1,6 @@
+msgid "Hosting Monitor Dashboard Module"
+msgstr "Module d'affichage des capacités serveur"
+
+msgid "Display server information on dashboard"
+msgstr "Affiche les capacités serveur sur le tableau de bord"
+
