@@ -22,6 +22,47 @@ $core->addBehavior('adminPreferencesForm',array('dmHostingMonitorBehaviors','adm
 # BEHAVIORS
 class dmHostingMonitorBehaviors
 {
+	static function getDbSize($core)
+	{
+		// Get current db size in Kbytes
+		$dbSize = 0;
+		switch ($core->con->driver())
+		{
+			case 'sqlite':
+				break;
+			case 'pgsql':
+				$sql = 'SELECT pg_database_size(\'.$core->con->database().\') AS size';
+				$rs = $core->con->select($sql);
+				while ($rs->fetch()) {
+					$dbSize += $rs->size;
+				}
+				break;
+			case 'mysql':
+				$sql = 'SHOW TABLE STATUS';
+				$rs = $core->con->select($sql);
+				while ($rs->fetch()) {
+					$dbSize += $rs->Data_length + $rs->Index_length;
+				}
+				break;
+		}
+		return $dbSize / 1024;
+	}
+	
+	static function getUsedSpace($core)
+	{
+		// Get current space used by the installation
+		// Take care about potential clean-install :
+		// Get size of Dotclear install
+		// + Size of outside plugins directories
+		// + Size of outside cache directory
+		// + Size of (public + themes directories for each blog)
+		// Beware of aliases ?
+
+		// du -k -s .. executed in the admin directory gives the Dotclear install
+		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
+		$hdUsed = substr(shell_exec('du -k -s ..'),0,-3);
+		return $hdUsed;
+	}
 	
 	public static function adminDashboardItems($core,$items)
 	{
@@ -40,6 +81,8 @@ class dmHostingMonitorBehaviors
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 		if ($core->auth->user_prefs->dmhostingmonitor->activated && $core->auth->user_prefs->dmhostingmonitor->large) {
 			$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
+			$ret .= '<p>'.__('Database size:').' '.dmHostingMonitorBehaviors::getDbSize($core).'</p>';
+			$ret .= '<p>'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::getUsedSpace($core).'</p>';
 			$ret .= '</div>';
 			$contents[] = new ArrayObject(array($ret));
 		}
