@@ -24,7 +24,7 @@ class dmHostingMonitorBehaviors
 {
 	static function getDbSize($core)
 	{
-		// Get current db size in Kbytes
+		// Get current db size in Kb
 		$dbSize = 0;
 		switch ($core->con->driver())
 		{
@@ -50,7 +50,7 @@ class dmHostingMonitorBehaviors
 	
 	static function getUsedSpace($core)
 	{
-		// Get current space used by the installation
+		// Get current space used by the installation in Kb
 		// Take care about potential clean-install :
 		// Get size of Dotclear install
 		// + Size of outside plugins directories
@@ -58,10 +58,48 @@ class dmHostingMonitorBehaviors
 		// + Size of (public + themes directories for each blog)
 		// Beware of aliases ?
 
+		$hdUsed = 0;
+		if (!function_exists('shell_exec')) return $hdUsed;
+
 		// du -k -s .. executed in the admin directory gives the Dotclear install
 		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
 		$hdUsed = substr(shell_exec('du -k -s ..'),0,-3);
+
 		return $hdUsed;
+	}
+	
+	static function getFreeSpace($core)
+	{
+		// Get current free space on Hard Disk in Kb
+		
+		$hdFree = 0;
+		if (!function_exists('disk_free_space')) return $hdFree;
+			
+		$hdFree = disk_free_space(".") / 1024;
+		return $hdFree;
+	}
+
+	static function getTotalSpace($core)
+	{
+		// Get current total space on Hard Disk in Kb
+		
+		$hdTotal = 0;
+		if (!function_exists('disk_total_space')) return $hdFree;
+			
+		$hdTotal = disk_total_space(".") / 1024;
+		return $hdTotal;
+	}
+	
+	static function getInfos($core)
+	{
+		$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
+		$ret .= '<p>'.__('Database size:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getDbSize($core)/1024).' '.__('Mb').'</p>';
+		$ret .= '<p>'.__('Hard-disk used:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getUsedSpace($core)/1024).' '.__('Mb').'</p>';
+		$ret .= '<p>'.__('Hard-disk free:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getFreeSpace($core)/1024).' '.__('Mb').'</p>';
+		$ret .= '<p>'.__('Hard-disk total:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getTotalSpace($core)/1024).' '.__('Mb').'</p>';
+		$ret .= '</div>';
+
+		return $ret;
 	}
 	
 	public static function adminDashboardItems($core,$items)
@@ -69,9 +107,7 @@ class dmHostingMonitorBehaviors
 		// Add small module to the items stack
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 		if ($core->auth->user_prefs->dmhostingmonitor->activated && !$core->auth->user_prefs->dmhostingmonitor->large) {
-			$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
-			$ret .= '</div>';
-			$items[] = new ArrayObject(array($ret));
+			$items[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
 		}
 	}
 
@@ -80,11 +116,7 @@ class dmHostingMonitorBehaviors
 		// Add large modules to the contents stack
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 		if ($core->auth->user_prefs->dmhostingmonitor->activated && $core->auth->user_prefs->dmhostingmonitor->large) {
-			$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
-			$ret .= '<p>'.__('Database size:').' '.dmHostingMonitorBehaviors::getDbSize($core).'</p>';
-			$ret .= '<p>'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::getUsedSpace($core).'</p>';
-			$ret .= '</div>';
-			$contents[] = new ArrayObject(array($ret));
+			$contents[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
 		}
 	}
 
