@@ -31,7 +31,7 @@ class dmHostingMonitorBehaviors
 			case 'sqlite':
 				break;
 			case 'pgsql':
-				$sql = 'SELECT pg_database_size(\'.$core->con->database().\') AS size';
+				$sql = 'SELECT pg_database_size(\''.$core->con->database().'\') AS size';
 				$rs = $core->con->select($sql);
 				while ($rs->fetch()) {
 					$dbSize += $rs->size;
