@@ -12,6 +12,7 @@
 if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
 // Dashboard behaviours
+$core->addBehavior('adminPageHTMLHead',array('dmHostingMonitorBehaviors','adminPageHTMLHead'));
 $core->addBehavior('adminDashboardItems',array('dmHostingMonitorBehaviors','adminDashboardItems'));
 $core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));
 
@@ -22,9 +23,35 @@ $core->addBehavior('adminPreferencesForm',array('dmHostingMonitorBehaviors','adm
 # BEHAVIORS
 class dmHostingMonitorBehaviors
 {
+	static function readableSize($size)
+    {
+        switch (true)
+        {
+            case ($size > 1000000000000):
+                $size /= 1000000000000;
+                $suffix = __('TB');
+                break;
+            case ($size > 1000000000):
+                $size /= 1000000000;
+                $suffix = __('GB');
+                break;
+            case ($size > 1000000):
+                $size /= 1000000;
+                $suffix = __('MB');
+                break;
+            case ($size > 1000):
+                $size /= 1000;
+                $suffix = __('KB');
+                break;
+            default:
+                $suffix = __('B');
+        }
+        return round($size, 2).' '.$suffix;
+    }
+	
 	static function getDbSize($core)
 	{
-		// Get current db size in Kb
+		// Get current db size in bytes
 		$dbSize = 0;
 		switch ($core->con->driver())
 		{
@@ -45,12 +72,12 @@ class dmHostingMonitorBehaviors
 				}
 				break;
 		}
-		return $dbSize / 1024;
+		return $dbSize;
 	}
 	
 	static function getUsedSpace($core)
 	{
-		// Get current space used by the installation in Kb
+		// Get current space used by the installation in bytes
 		// Take care about potential clean-install :
 		// Get size of Dotclear install
 		// + Size of outside plugins directories
@@ -64,39 +91,104 @@ class dmHostingMonitorBehaviors
 		// du -k -s .. executed in the admin directory gives the Dotclear install
 		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
 		$hdUsed = substr(shell_exec('du -k -s ..'),0,-3);
+		$hdUsed *= 1024;
 
 		return $hdUsed;
 	}
 	
 	static function getFreeSpace($core)
 	{
-		// Get current free space on Hard Disk in Kb
+		// Get current free space on Hard Disk in bytes
 		
 		$hdFree = 0;
 		if (!function_exists('disk_free_space')) return $hdFree;
 			
-		$hdFree = disk_free_space(".") / 1024;
+		$hdFree = @disk_free_space(".");
 		return $hdFree;
 	}
 
 	static function getTotalSpace($core)
 	{
-		// Get current total space on Hard Disk in Kb
+		// Get current total space on Hard Disk in bytes
 		
 		$hdTotal = 0;
 		if (!function_exists('disk_total_space')) return $hdFree;
 			
-		$hdTotal = disk_total_space(".") / 1024;
+		$hdTotal = disk_total_space(".");
 		return $hdTotal;
+	}
+	
+	static function getPercentageOf($part,$total)
+	{
+		$percentage = -1;
+		if (($part > 0) && ($total > 0)) {
+			$percentage = round($part / $total, 2) * 100;
+		}
+		return $percentage;
 	}
 	
 	static function getInfos($core)
 	{
+		$dbSize = dmHostingMonitorBehaviors::getDbSize($core);
+		$dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
+		$dbMaxSize *= 1000 * 1000;
+		$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
+		
+		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+
+		$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
+		$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
+		$hdMaxSize *= 1000 * 1000;
+		$hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed,$hdMaxSize);
+
+		$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
+		$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
+		$hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree,$hdTotal);
+		
 		$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
-		$ret .= '<p>'.__('Database size:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getDbSize($core)/1024).' '.__('Mb').'</p>';
-		$ret .= '<p>'.__('Hard-disk used:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getUsedSpace($core)/1024).' '.__('Mb').'</p>';
-		$ret .= '<p>'.__('Hard-disk free:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getFreeSpace($core)/1024).' '.__('Mb').'</p>';
-		$ret .= '<p>'.__('Hard-disk total:').' '.sprintf('%.2f',dmHostingMonitorBehaviors::getTotalSpace($core)/1024).' '.__('Mb').'</p>';
+
+		/* Database information */
+		if (($dbMaxSize > 0) && ($dbMaxPercent > 0)) {
+			$ret .= '<div class="graphe"><strong class="barre '.($dbMaxPercent < 80 ? 'percent_cool' : ($dbMaxPercent < 90 ? 'percent_warning' : 'percent_alert')).
+				'" style="width: '.$dbMaxPercent.'%;">'.$dbMaxPercent.'%</strong></div>';
+		}
+		$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
+		if ($dbMaxSize > 0) {
+			if ($dbMaxPercent > 0) {
+				$ret .= ' ('.$dbMaxPercent.'% of '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
+			} else {
+				$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+			}
+		}
+		$ret .= '</p>';
+
+		/* Dotclear used vs allocated space information */
+		if (($hdMaxSize > 0) && ($hdMaxPercent > 0)) {
+			$ret .= '<div class="graphe"><strong class="barre '.($hdMaxPercent < 80 ? 'percent_cool' : ($hdMaxPercent < 90 ? 'percent_warning' : 'percent_alert')).
+				'" style="width: '.$hdMaxPercent.'%;">'.$hdMaxPercent.'%</strong></div>';
+		}
+		$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
+		if ($hdMaxSize > 0) {
+			if ($hdMaxPercent > 0) {
+				$ret .= ' ('.$hdMaxPercent.'% of '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
+			} else {
+				$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+			}
+		}
+		$ret .= '</p>';
+		/* Hard-disk free vs total information */
+		if (($hdTotal > 0) && ($hdPercent > 0)) {
+			$ret .= '<div class="graphe"><strong class="barre '.($hdPercent < 80 ? 'percent_cool' : ($hdPercent < 90 ? 'percent_warning' : 'percent_alert')).
+				'" style="width: '.$hdPercent.'%;">'.$hdPercent.'%</strong></div>';
+		}
+		$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
+		if ($hdPercent > 0) {
+			$ret .= ' ('.$hdPercent.'% of '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
+		} else {
+			$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+		}
+		$ret .= '</p>';
+
 		$ret .= '</div>';
 
 		return $ret;
@@ -118,6 +210,11 @@ class dmHostingMonitorBehaviors
 		if ($core->auth->user_prefs->dmhostingmonitor->activated && $core->auth->user_prefs->dmhostingmonitor->large) {
 			$contents[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
 		}
+	}
+
+	public static function adminPageHTMLHead()
+	{
+		echo '<link rel="stylesheet" href="index.php?pf=dmHostingMonitor/style.css" type="text/css" media="screen" />'."\n";
 	}
 
 	public static function adminBeforeUserUpdate($cur,$userID)

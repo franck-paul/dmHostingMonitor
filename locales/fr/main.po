@@ -4,3 +4,17 @@ msgstr "Module d'affichage des capacités serveur"
 msgid "Display server information on dashboard"
 msgstr "Affiche les capacités serveur sur le tableau de bord"
 
+msgid "TB"
+msgstr "To"
+
+msgid "GB"
+msgstr "Go"
+
+msgid "MB"
+msgstr "Mo"
+
+msgid "KB"
+msgstr "Ko"
+
+msgid "B"
+msgstr "o"
