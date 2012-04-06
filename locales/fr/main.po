@@ -18,3 +18,48 @@ msgstr "Ko"
 
 msgid "B"
 msgstr "o"
+
+msgid "Hosting Monitor"
+msgstr "Capacités serveur"
+
+msgid "of"
+msgstr "de"
+
+msgid "Hard-disk free:"
+msgstr "Place libre sur le disque :"
+
+msgid "Hard-disk total:"
+msgstr "Taille totale du disque :"
+
+msgid "Hard-disk used:"
+msgstr "Place occupée sur le disque :"
+
+msgid "Hard-disk limit:"
+msgstr "Place allouée sur le disque :"
+
+msgid "Database size:"
+msgstr "Taille de la base de données :"
+
+msgid "Database limit:"
+msgstr "Place allouée pour la base de données :"
+
+msgid "Hosting monitor on dashboard"
+msgstr "Capacités serveur sur le tableau de bord"
+
+msgid "Activate module"
+msgstr "Activer le module"
+
+msgid "Display hosting monitor module in large section (under favorites)"
+msgstr "Afficher le module dans la partie large (sous les favoris)"
+
+msgid "Show hard-disk information"
+msgstr "Afficher les informations concernant le disque"
+
+msgid "Allocated hard-disk size (in Mb, leave empty for unlimited):"
+msgstr "Taille allouée sur le disque dur (en Mo, laisser vide pour illimitée) :"
+
+msgid "Show database information"
+msgstr "Afficher les informations concernant la base de données"
+
+msgid "Allocated database size (in Mb, leave empty for unlimited):"
+msgstr "Taille allouée pour la base de données (en Mo, laisser vide pour illimitée) :"
