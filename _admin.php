@@ -88,9 +88,81 @@ class dmHostingMonitorBehaviors
 		$hdUsed = 0;
 		if (!function_exists('shell_exec')) return $hdUsed;
 
-		// du -k -s .. executed in the admin directory gives the Dotclear install
+		// Stack of paths
+		$stack = array();
+
+		// Dotclear installation
+		$stack[] = '..';
+
+		// Plugins
+		$plugins = explode(PATH_SEPARATOR,DC_PLUGINS_ROOT);
+		$stack = array_merge($stack,$plugins);
+
+		// Cache
+		$stack[] = DC_TPL_CACHE;
+
+		// For each blog : public and theme folder
+		// If not absolute (1st char <> /) then prefix with ../
+		$rs = $core->getBlogs();
+		while ($rs->fetch()) {
+			$settings = new dcSettings($core,$rs->blog_id);
+			$settings->addNamespace('system');
+			$publicPath = $settings->system->public_path;
+			$themesPath = $settings->system->themes_path;
+			$stack[] = (substr($publicPath,0,1) == '/' ? $publicPath : '../'.$publicPath);
+			$stack[] = (substr($themesPath,0,1) == '/' ? $themesPath : '../'.$themesPath);
+		}
+
+/* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
+		echo '<h3>Paths</h3>';
+		foreach ($stack as $folder) {
+			echo '<p>'.$folder.'</p>';
+		}
+//*/
+
+		// Stack of real directories
+		$dir = array();
+		foreach ($stack as $path) {
+			// Get real path
+			$realPath = path::real($path);
+			if (!$realPath) {
+				continue;
+			}
+			// Check if not already counted
+			$index = 0;
+			foreach ($dir as $folder) {
+				if (substr($realPath,0,strlen($folder)) == $folder) {
+					// Parent folder found in stack : ignore it
+					$realPath = '';
+					break;
+				} elseif (substr($folder,0,strlen($realPath)) == $realPath) {
+					// Child folder found in stack : replace it by parent
+					$dir[$index] = $realPath;
+					$realPath = '';
+					break;
+				}
+				$index++;
+			}
+			if ($realPath != '') {
+				$dir[] = $realPath;
+				sort($dir);
+			}
+		}
+		
+/* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
+		echo '<h3>Folders</h3>';
+		foreach ($dir as $folder) {
+			echo '<p>'.$folder.'</p>';
+		}
+//*/
+		
+		// Command : du -k -s <path>
 		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
-		$hdUsed = substr(shell_exec('du -k -s ..'),0,-3);
+		foreach ($dir as $folder) {
+			if ($folder != '') {
+				$hdUsed += substr(shell_exec('du -k -s '.$folder),0,-3);
+			}
+		}
 		$hdUsed *= 1024;
 
 		return $hdUsed;
