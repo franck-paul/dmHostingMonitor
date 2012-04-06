@@ -1,3 +1,7 @@
+#hosting-monitor {
+	margin-bottom: 1em;
+}
+
 .graphe {
      position: relative; /* IE hack */
      width: 80%; /* 200px; */
@@ -7,7 +11,7 @@
 }
 
 .graphe.text {
-	margin-left: 1em;
+	margin: 0 0 0 1em;
 	border: none;
 }
 
@@ -32,4 +36,9 @@
 .graphe .barre.percent_alert {
     color: #fff;
 	background: #ff2221;
+}
+
+.graphe .barre.percent_explode {
+    color: #fff;
+	background: #b91aff;
 }

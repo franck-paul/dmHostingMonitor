@@ -127,67 +127,92 @@ class dmHostingMonitorBehaviors
 		return $percentage;
 	}
 	
+	static function getLevelClass($value)
+	{
+		if ($value < 80) {
+			return 'percent_cool';
+		} elseif ($value < 90) {
+			return 'percent_warning';
+		} elseif ($value <= 100) {
+			return 'percent_alert';
+		} else {
+			return 'percent_explode';
+		}
+	}
+	
 	static function getInfos($core)
 	{
-		$dbSize = dmHostingMonitorBehaviors::getDbSize($core);
-		$dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
-		$dbMaxSize *= 1000 * 1000;
-		$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
-		
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-
-		$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
-		$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
-		$hdMaxSize *= 1000 * 1000;
-		$hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed,$hdMaxSize);
 
 		$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
 		$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
 		$hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree,$hdTotal);
 		
+		$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
+		$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
+		if ($hdMaxSize == 0) {
+			// Use total size of hard-disk
+			$hdMaxSize = $hdTotal;
+		} else {
+			$hdMaxSize *= 1000 * 1000;
+		}
+		$hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed,$hdMaxSize);
+
+		$dbSize = dmHostingMonitorBehaviors::getDbSize($core);
+		$dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
+		$dbMaxSize *= 1000 * 1000;
+		$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
+		
 		$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 
-		/* Database information */
-		if (($dbMaxSize > 0) && ($dbMaxPercent > 0)) {
-			$ret .= '<div class="graphe"><strong class="barre '.($dbMaxPercent < 80 ? 'percent_cool' : ($dbMaxPercent < 90 ? 'percent_warning' : 'percent_alert')).
-				'" style="width: '.$dbMaxPercent.'%;">'.$dbMaxPercent.'%</strong></div>';
-		}
-		$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
-		if ($dbMaxSize > 0) {
-			if ($dbMaxPercent > 0) {
-				$ret .= ' ('.$dbMaxPercent.'% of '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
-			} else {
-				$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
+			/* Hard-disk free vs total information */
+			if (($hdTotal > 0) && ($hdPercent >= 0)) {
+				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdPercent).
+					'" style="width: '.min($hdPercent,100).'%;">'.$hdPercent.'%</strong></div>';
 			}
+			$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
+			if ($hdPercent > 0) {
+				$ret .= ' ('.$hdPercent.'% of '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
+			} else {
+				$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+			}
+			$ret .= '</p>';
+			/* Dotclear used vs allocated space information */
+			if (($hdMaxSize > 0) && ($hdMaxPercent >= 0)) {
+				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent).
+					'" style="width: '.min($hdMaxPercent,100).'%;">'.$hdMaxPercent.'%</strong></div>';
+			}
+			$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
+			if ($hdMaxSize > 0) {
+				if ($hdMaxPercent > 0) {
+					$ret .= ' ('.$hdMaxPercent.'% of '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
+				} else {
+					if ($hdMaxSize != $hdTotal) {
+						$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+					}
+				}
+			}
+			$ret .= '</p>';
 		}
-		$ret .= '</p>';
 
-		/* Dotclear used vs allocated space information */
-		if (($hdMaxSize > 0) && ($hdMaxPercent > 0)) {
-			$ret .= '<div class="graphe"><strong class="barre '.($hdMaxPercent < 80 ? 'percent_cool' : ($hdMaxPercent < 90 ? 'percent_warning' : 'percent_alert')).
-				'" style="width: '.$hdMaxPercent.'%;">'.$hdMaxPercent.'%</strong></div>';
-		}
-		$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
-		if ($hdMaxSize > 0) {
-			if ($hdMaxPercent > 0) {
-				$ret .= ' ('.$hdMaxPercent.'% of '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
-			} else {
-				$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+		if ($core->auth->user_prefs->dmhostingmonitor->show_db_info)
+		{
+			/* Database information */
+			if (($dbMaxSize > 0) && ($dbMaxPercent >= 0)) {
+				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent).
+					'" style="width: '.min($dbMaxPercent,100).'%;">'.$dbMaxPercent.'%</strong></div>';
 			}
+			$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
+			if ($dbMaxSize > 0) {
+				if ($dbMaxPercent > 0) {
+					$ret .= ' ('.$dbMaxPercent.'% of '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
+				} else {
+					$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+				}
+			}
+			$ret .= '</p>';
 		}
-		$ret .= '</p>';
-		/* Hard-disk free vs total information */
-		if (($hdTotal > 0) && ($hdPercent > 0)) {
-			$ret .= '<div class="graphe"><strong class="barre '.($hdPercent < 80 ? 'percent_cool' : ($hdPercent < 90 ? 'percent_warning' : 'percent_alert')).
-				'" style="width: '.$hdPercent.'%;">'.$hdPercent.'%</strong></div>';
-		}
-		$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
-		if ($hdPercent > 0) {
-			$ret .= ' ('.$hdPercent.'% of '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
-		} else {
-			$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
-		}
-		$ret .= '</p>';
 
 		$ret .= '</div>';
 
