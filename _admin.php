@@ -216,24 +216,29 @@ class dmHostingMonitorBehaviors
 	{
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-		$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
-		$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
-		$hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree,$hdTotal);
+		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
+			$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
+			$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
+			$hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree,$hdTotal);
 		
-		$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
-		$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
-		if ($hdMaxSize == 0) {
-			// Use total size of hard-disk
-			$hdMaxSize = $hdTotal;
-		} else {
-			$hdMaxSize *= 1000 * 1000;
+			$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
+			$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
+			if ($hdMaxSize == 0) {
+				// Use total size of hard-disk
+				$hdMaxSize = $hdTotal;
+			} else {
+				$hdMaxSize *= 1000 * 1000;
+			}
+			$hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed,$hdMaxSize);
 		}
-		$hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed,$hdMaxSize);
 
-		$dbSize = dmHostingMonitorBehaviors::getDbSize($core);
-		$dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
-		$dbMaxSize *= 1000 * 1000;
-		$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
+		if ($core->auth->user_prefs->dmhostingmonitor->show_db_info)
+		{
+			$dbSize = dmHostingMonitorBehaviors::getDbSize($core);
+			$dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
+			$dbMaxSize *= 1000 * 1000;
+			$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
+		}
 		
 		$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 
