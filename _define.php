@@ -15,6 +15,6 @@ $this->registerModule(
 	/* Name */			"Hosting Monitor Dashboard Module",
 	/* Description*/		"Display server information on dashboard",
 	/* Author */			"Franck Paul",
-	/* Version */			'0.1'
+	/* Version */			'0.2'
 );
 ?>
