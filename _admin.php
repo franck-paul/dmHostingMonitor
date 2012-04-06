@@ -103,7 +103,7 @@ class dmHostingMonitorBehaviors
 		$hdFree = 0;
 		if (!function_exists('disk_free_space')) return $hdFree;
 			
-		$hdFree = @disk_free_space(".");
+		$hdFree = (float)@disk_free_space(".");
 		return $hdFree;
 	}
 
@@ -112,9 +112,9 @@ class dmHostingMonitorBehaviors
 		// Get current total space on Hard Disk in bytes
 		
 		$hdTotal = 0;
-		if (!function_exists('disk_total_space')) return $hdFree;
+		if (!function_exists('disk_total_space')) return $hdTotal;
 			
-		$hdTotal = disk_total_space(".");
+		$hdTotal = (float)@disk_total_space(".");
 		return $hdTotal;
 	}
 	
@@ -168,7 +168,7 @@ class dmHostingMonitorBehaviors
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
 			/* Hard-disk free vs total information */
 			if (($hdTotal > 0) && ($hdPercent >= 0)) {
-				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdPercent,80,90).
+				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,80,90).
 					'" style="width: '.min($hdPercent,100).'%;">'.$hdPercent.'%</strong></div>';
 			}
 			$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
