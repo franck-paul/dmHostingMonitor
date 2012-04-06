@@ -160,7 +160,7 @@ class dmHostingMonitorBehaviors
 		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
 		foreach ($dir as $folder) {
 			if ($folder != '') {
-				$hdUsed += substr(shell_exec('du -k -s '.$folder),0,-3);
+				$hdUsed += substr(shell_exec('du -k -s -L '.$folder),0,-3);
 			}
 		}
 		$hdUsed *= 1024;
