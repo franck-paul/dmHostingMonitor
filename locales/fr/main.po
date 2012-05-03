@@ -63,3 +63,9 @@ msgstr "Afficher les informations concernant la base de données"
 
 msgid "Allocated database size (in Mb, leave empty for unlimited):"
 msgstr "Taille allouée pour la base de données (en Mo, laisser vide pour illimitée) :"
+
+msgid "1st threshold (in %, leave empty to ignore):"
+msgstr "1er seuil (en %, laisser vide pour ignorer) :"
+
+msgid "2nd threshold (in %, leave empty to ignore):"
+msgstr "2e seuil (en %, laisser vide pour ignorer) :"

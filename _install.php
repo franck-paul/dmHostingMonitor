@@ -28,6 +28,8 @@ try
 	$core->auth->user_prefs->dmhostingmonitor->put('max_hd_size',0,'integer','Size of allocated hard-disk (in Mb)',false,true);
 	$core->auth->user_prefs->dmhostingmonitor->put('show_db_info',true,'boolean','Show database information',false,true);
 	$core->auth->user_prefs->dmhostingmonitor->put('max_db_size',0,'integer','Size of allocated database file (in Mb)',false,true);
+	$core->auth->user_prefs->dmhostingmonitor->put('first_threshold',80,'integer','1st alert threshold (in %)',false,true);
+	$core->auth->user_prefs->dmhostingmonitor->put('second_threshold',90,'integer','2nd alert threshold (in %)',false,true);
 
 	$core->setVersion('dmHostingMonitor',$new_version);
 	
