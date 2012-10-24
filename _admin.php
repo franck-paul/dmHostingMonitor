@@ -17,6 +17,9 @@ $core->addBehavior('adminDashboardItems',array('dmHostingMonitorBehaviors','admi
 $core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));
 
 // User-preferecences behaviours
+if (version_compare(DC_VERSION,'2.4.4','<=')) {
+	$core->addBehavior('adminBeforeUserUpdate',array('dmHostingMonitorBehaviors','adminBeforeUserUpdate'));
+}
 $core->addBehavior('adminBeforeUserOptionsUpdate',array('dmHostingMonitorBehaviors','adminBeforeUserUpdate'));
 $core->addBehavior('adminPreferencesForm',array('dmHostingMonitorBehaviors','adminPreferencesForm'));
 
