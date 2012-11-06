@@ -12,8 +12,8 @@
 if (!defined('DC_RC_PATH')) { return; }
 
 $this->registerModule(
-	/* Name */				__("Hosting Monitor Dashboard Module"),
-	/* Description*/		__("Display server information on dashboard"),
+	/* Name */			"Hosting Monitor Dashboard Module",
+	/* Description*/		"Display server information on dashboard",
 	/* Author */			"Franck Paul",
 	/* Version */			'0.4'
 );
