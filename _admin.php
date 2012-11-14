@@ -372,37 +372,37 @@ class dmHostingMonitorBehaviors
 
 		echo '<fieldset><legend>'.__('Hosting monitor on dashboard').'</legend>'.
 		
-		'<p><label for="activated" class="classic">'.
+		'<p>'.
 		form::checkbox('activated',1,$core->auth->user_prefs->dmhostingmonitor->activated).' '.
-		__('Activate module').'</label></p>'.
+		'<label for="activated" class="classic">'.__('Activate module').'</label></p>'.
 
-		'<p><label for="large" class="classic">'.
+		'<p>'.
 		form::checkbox('large',1,$core->auth->user_prefs->dmhostingmonitor->large).' '.
-		__('Display hosting monitor module in large section (under favorites)').'</label></p>'.
+		'<label for="large" class="classic">'.__('Display hosting monitor module in large section (under favorites)').'</label></p>'.
 
-		'<p><label for="show_hd_info" class="classic">'.
+		'<p>'.
 		form::checkbox('show_hd_info',1,$core->auth->user_prefs->dmhostingmonitor->show_hd_info).' '.
-		__('Show hard-disk information').'</label></p>'.
+		'<label for="show_hd_info" class="classic">'.__('Show hard-disk information').'</label></p>'.
 
-		'<p><label for="max_hd_size">'.__('Allocated hard-disk size (in Mb, leave empty for unlimited):').
+		'<p><label for="max_hd_size">'.__('Allocated hard-disk size (in Mb, leave empty for unlimited):').'</label>'.
 		form::field('max_hd_size',7,10,(integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size).
-		'</label></p>'.
+		'</p>'.
 
-		'<p><label for="show_db_info" class="classic">'.
+		'<p>'.
 		form::checkbox('show_db_info',1,$core->auth->user_prefs->dmhostingmonitor->show_db_info).' '.
-		__('Show database information').'</label></p>'.
+		'<label for="show_db_info" class="classic">'.__('Show database information').'</label></p>'.
 
-		'<p><label for="max_db_size">'.__('Allocated database size (in Mb, leave empty for unlimited):').
+		'<p><label for="max_db_size">'.__('Allocated database size (in Mb, leave empty for unlimited):').'</label>'.
 		form::field('max_db_size',7,10,(integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size).
-		'</label></p>'.
+		'</p>'.
 
-		'<p><label for="first_threshold">'.__('1st threshold (in %, leave empty to ignore):').
+		'<p><label for="first_threshold">'.__('1st threshold (in %, leave empty to ignore):').'</label>'.
 		form::field('first_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold).
-		'</label></p>'.
+		'</p>'.
 
-		'<p><label for="second_threshold">'.__('2nd threshold (in %, leave empty to ignore):').
+		'<p><label for="second_threshold">'.__('2nd threshold (in %, leave empty to ignore):').'</label>'.
 		form::field('second_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold).
-		'</label></p>'.
+		'</p>'.
 
 		'<br class="clear" />'. //Opera sucks
 		'</fieldset>';
