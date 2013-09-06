@@ -68,6 +68,7 @@ class dmHostingMonitorBehaviors
 				}
 				break;
 			case 'mysql':
+			case 'mysqli':
 				$sql = 'SHOW TABLE STATUS';
 				$rs = $core->con->select($sql);
 				while ($rs->fetch()) {
