@@ -13,7 +13,6 @@ if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
 // Dashboard behaviours
 $core->addBehavior('adminPageHTMLHead',array('dmHostingMonitorBehaviors','adminPageHTMLHead'));
-$core->addBehavior('adminDashboardItems',array('dmHostingMonitorBehaviors','adminDashboardItems'));
 $core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));
 
 $core->addBehavior('adminAfterDashboardOptionsUpdate',array('dmHostingMonitorBehaviors','adminAfterDashboardOptionsUpdate'));
@@ -314,20 +313,11 @@ class dmHostingMonitorBehaviors
 		return $ret;
 	}
 	
-	public static function adminDashboardItems($core,$items)
-	{
-		// Add small module to the items stack
-		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-		if ($core->auth->user_prefs->dmhostingmonitor->activated && !$core->auth->user_prefs->dmhostingmonitor->large) {
-			$items[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
-		}
-	}
-
 	public static function adminDashboardContents($core,$contents)
 	{
-		// Add large modules to the contents stack
+		// Add module to the contents stack
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-		if ($core->auth->user_prefs->dmhostingmonitor->activated && $core->auth->user_prefs->dmhostingmonitor->large) {
+		if ($core->auth->user_prefs->dmhostingmonitor->activated) {
 			$contents[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
 		}
 	}
@@ -346,7 +336,6 @@ class dmHostingMonitorBehaviors
 		try {
 			// Hosting monitor options
 			$core->auth->user_prefs->dmhostingmonitor->put('activated',!empty($_POST['activated']),'boolean');
-			$core->auth->user_prefs->dmhostingmonitor->put('large',!empty($_POST['large']),'boolean');
 			$core->auth->user_prefs->dmhostingmonitor->put('show_hd_info',!empty($_POST['show_hd_info']),'boolean');
 			$core->auth->user_prefs->dmhostingmonitor->put('max_hd_size',(integer)$_POST['max_hd_size'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('show_db_info',!empty($_POST['show_db_info']),'boolean');
@@ -370,10 +359,6 @@ class dmHostingMonitorBehaviors
 		'<p>'.
 		form::checkbox('activated',1,$core->auth->user_prefs->dmhostingmonitor->activated).' '.
 		'<label for="activated" class="classic">'.__('Activate module').'</label></p>'.
-
-		'<p>'.
-		form::checkbox('large',1,$core->auth->user_prefs->dmhostingmonitor->large).' '.
-		'<label for="large" class="classic">'.__('Display hosting monitor module in large section (under favorites)').'</label></p>'.
 
 		'<p>'.
 		form::checkbox('show_hd_info',1,$core->auth->user_prefs->dmhostingmonitor->show_hd_info).' '.

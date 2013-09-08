@@ -54,22 +54,20 @@ msgstr "Capacités serveur sur le tableau de bord"
 msgid "Activate module"
 msgstr "Activer le module"
 
-msgid "Display hosting monitor module in large section (under favorites)"
-msgstr "Afficher le module dans la partie large (sous les favoris)"
+msgid "Large screen"
+msgstr "Affichage large"
 
 msgid "Show hard-disk information"
 msgstr "Afficher les informations concernant le disque"
 
 msgid "Allocated hard-disk size (in Mb, leave empty for unlimited):"
-msgstr ""
-"Taille allouée sur le disque dur (en Mo, laisser vide pour illimitée) :"
+msgstr "Taille allouée sur le disque dur (en Mo, laisser vide pour illimitée) :"
 
 msgid "Show database information"
 msgstr "Afficher les informations concernant la base de données"
 
 msgid "Allocated database size (in Mb, leave empty for unlimited):"
-msgstr ""
-"Taille allouée pour la base de données (en Mo, laisser vide pour illimitée) :"
+msgstr "Taille allouée pour la base de données (en Mo, laisser vide pour illimitée) :"
 
 msgid "1st threshold (in %, leave empty to ignore):"
 msgstr "1er seuil (en %, laisser vide pour ignorer) :"
@@ -83,5 +81,3 @@ msgstr "Module d'affichage des capacités serveur"
 msgid "Display server information on dashboard"
 msgstr "Affiche les capacités serveur sur le tableau de bord"
 
-#~ msgid "of"
-#~ msgstr "de"
