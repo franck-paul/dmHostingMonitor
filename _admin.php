@@ -365,9 +365,7 @@ class dmHostingMonitorBehaviors
 		// Add fieldset for plugin options
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-		echo '<div class="box">';
-
-		echo '<div class="fieldset"><h5>'.__('Hosting monitor on dashboard').'</h5>'.
+		echo '<div class="fieldset"><h4>'.__('Hosting monitor on dashboard').'</h4>'.
 		
 		'<p>'.
 		form::checkbox('activated',1,$core->auth->user_prefs->dmhostingmonitor->activated).' '.
@@ -402,8 +400,6 @@ class dmHostingMonitorBehaviors
 		'</p>'.
 
 		'</div>';
-
-		echo '</div>';
 	}
 }
 ?>
