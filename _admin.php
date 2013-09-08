@@ -16,12 +16,8 @@ $core->addBehavior('adminPageHTMLHead',array('dmHostingMonitorBehaviors','adminP
 $core->addBehavior('adminDashboardItems',array('dmHostingMonitorBehaviors','adminDashboardItems'));
 $core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));
 
-// User-preferecences behaviours
-if (version_compare(DC_VERSION,'2.4.4','<=')) {
-	$core->addBehavior('adminBeforeUserUpdate',array('dmHostingMonitorBehaviors','adminBeforeUserUpdate'));
-}
-$core->addBehavior('adminBeforeUserOptionsUpdate',array('dmHostingMonitorBehaviors','adminBeforeUserUpdate'));
-$core->addBehavior('adminPreferencesForm',array('dmHostingMonitorBehaviors','adminPreferencesForm'));
+$core->addBehavior('adminAfterDashboardOptionsUpdate',array('dmHostingMonitorBehaviors','adminAfterDashboardOptionsUpdate'));
+$core->addBehavior('adminDashboardOptionsForm',array('dmHostingMonitorBehaviors','adminDashboardOptionsForm'));
 
 # BEHAVIORS
 class dmHostingMonitorBehaviors
@@ -341,7 +337,7 @@ class dmHostingMonitorBehaviors
 		echo '<link rel="stylesheet" href="index.php?pf=dmHostingMonitor/style.css" type="text/css" media="screen" />'."\n";
 	}
 
-	public static function adminBeforeUserUpdate($cur,$userID)
+	public static function adminAfterDashboardOptionsUpdate($userID)
 	{
 		global $core;
 
@@ -364,14 +360,14 @@ class dmHostingMonitorBehaviors
 		}
 	}
 	
-	public static function adminPreferencesForm($core)
+	public static function adminDashboardOptionsForm($core)
 	{
 		// Add fieldset for plugin options
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-		echo '<div class="col">';
+		echo '<div class="box">';
 
-		echo '<fieldset><legend>'.__('Hosting monitor on dashboard').'</legend>'.
+		echo '<div class="fieldset"><h5>'.__('Hosting monitor on dashboard').'</h5>'.
 		
 		'<p>'.
 		form::checkbox('activated',1,$core->auth->user_prefs->dmhostingmonitor->activated).' '.
@@ -405,8 +401,7 @@ class dmHostingMonitorBehaviors
 		form::field('second_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold).
 		'</p>'.
 
-		'<br class="clear" />'. //Opera sucks
-		'</fieldset>';
+		'</div>';
 
 		echo '</div>';
 	}
