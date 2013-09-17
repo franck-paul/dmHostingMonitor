@@ -23,7 +23,6 @@ try
 
 	// Default prefs for last comments
 	$core->auth->user_prefs->dmhostingmonitor->put('activated',false,'boolean','Activate Hosting Monitor',false,true);
-	$core->auth->user_prefs->dmhostingmonitor->put('large',true,'boolean','Show module in large section',false,true);
 	$core->auth->user_prefs->dmhostingmonitor->put('show_hd_info',true,'boolean','Show hard-disk information',false,true);
 	$core->auth->user_prefs->dmhostingmonitor->put('max_hd_size',0,'integer','Size of allocated hard-disk (in Mb)',false,true);
 	$core->auth->user_prefs->dmhostingmonitor->put('show_db_info',true,'boolean','Show database information',false,true);

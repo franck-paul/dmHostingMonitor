@@ -46,7 +46,7 @@ class dmHostingMonitorBehaviors
         }
         return round($size, 2).' '.$suffix;
     }
-	
+
 	static function getDbSize($core)
 	{
 		// Get current db size in bytes
@@ -73,7 +73,7 @@ class dmHostingMonitorBehaviors
 		}
 		return $dbSize;
 	}
-	
+
 	static function getUsedSpace($core)
 	{
 		// Get current space used by the installation in bytes
@@ -147,14 +147,14 @@ class dmHostingMonitorBehaviors
 				sort($dir);
 			}
 		}
-		
+
 /* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
 		echo '<h3>Folders</h3>';
 		foreach ($dir as $folder) {
 			echo '<p>'.$folder.'</p>';
 		}
 //*/
-		
+
 		// Command : du -k -s <path>
 		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
 		foreach ($dir as $folder) {
@@ -166,14 +166,14 @@ class dmHostingMonitorBehaviors
 
 		return $hdUsed;
 	}
-	
+
 	static function getFreeSpace($core)
 	{
 		// Get current free space on Hard Disk in bytes
-		
+
 		$hdFree = 0;
 		if (!function_exists('disk_free_space')) return $hdFree;
-			
+
 		$hdFree = (float)@disk_free_space(".");
 		return $hdFree;
 	}
@@ -181,14 +181,14 @@ class dmHostingMonitorBehaviors
 	static function getTotalSpace($core)
 	{
 		// Get current total space on Hard Disk in bytes
-		
+
 		$hdTotal = 0;
 		if (!function_exists('disk_total_space')) return $hdTotal;
-			
+
 		$hdTotal = (float)@disk_total_space(".");
 		return $hdTotal;
 	}
-	
+
 	static function getPercentageOf($part,$total)
 	{
 		$percentage = -1;
@@ -197,7 +197,7 @@ class dmHostingMonitorBehaviors
 		}
 		return $percentage;
 	}
-	
+
 	static function getLevelClass($value,$firstLevel,$secondLevel)
 	{
 		if ($firstLevel == 0 && $secondLevel == 0) {
@@ -225,7 +225,7 @@ class dmHostingMonitorBehaviors
 			return 'percent_explode';
 		}
 	}
-	
+
 	static function getInfos($core)
 	{
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
@@ -237,7 +237,7 @@ class dmHostingMonitorBehaviors
 			$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
 			$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
 			$hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree,$hdTotal);
-		
+
 			$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
 			$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
 			if ($hdMaxSize == 0) {
@@ -256,7 +256,7 @@ class dmHostingMonitorBehaviors
 			$dbMaxSize *= 1000 * 1000;
 			$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
 		}
-		
+
 		$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
@@ -312,7 +312,7 @@ class dmHostingMonitorBehaviors
 
 		return $ret;
 	}
-	
+
 	public static function adminDashboardContents($core,$contents)
 	{
 		// Add module to the contents stack
@@ -342,20 +342,20 @@ class dmHostingMonitorBehaviors
 			$core->auth->user_prefs->dmhostingmonitor->put('max_db_size',(integer)$_POST['max_db_size'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('first_threshold',(integer)$_POST['first_threshold'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('second_threshold',(integer)$_POST['second_threshold'],'integer');
-		} 
+		}
 		catch (Exception $e)
 		{
 			$core->error->add($e->getMessage());
 		}
 	}
-	
+
 	public static function adminDashboardOptionsForm($core)
 	{
 		// Add fieldset for plugin options
 		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
 		echo '<div class="fieldset"><h4>'.__('Hosting monitor on dashboard').'</h4>'.
-		
+
 		'<p>'.
 		form::checkbox('activated',1,$core->auth->user_prefs->dmhostingmonitor->activated).' '.
 		'<label for="activated" class="classic">'.__('Activate module').'</label></p>'.

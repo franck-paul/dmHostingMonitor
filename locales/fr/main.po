@@ -54,8 +54,8 @@ msgstr "Capacités serveur sur le tableau de bord"
 msgid "Activate module"
 msgstr "Activer le module"
 
-msgid "Large screen"
-msgstr "Affichage large"
+msgid "Small screen"
+msgstr "Affichage abrégé"
 
 msgid "Show hard-disk information"
 msgstr "Afficher les informations concernant le disque"
