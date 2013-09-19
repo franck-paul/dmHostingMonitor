@@ -234,6 +234,8 @@ class dmHostingMonitorBehaviors
 		$first_threshold = (integer)$core->auth->user_prefs->dmhostingmonitor->first_threshold;
 		$second_threshold = (integer)$core->auth->user_prefs->dmhostingmonitor->second_threshold;
 
+		$large = $core->auth->user_prefs->dmhostingmonitor->large;
+
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
 			$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
 			$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
@@ -258,55 +260,62 @@ class dmHostingMonitorBehaviors
 			$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
 		}
 
-		$ret = '<div id="hosting-monitor">'.'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
+		$ret = '<div id="hosting-monitor"'.($large ? '' : 'class="dm_hm_short_info"').'>'.
+			'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
 			/* Hard-disk free vs total information */
 			if (($hdTotal > 0) && ($hdPercent >= 0)) {
-				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,$first_threshold,$second_threshold).
+				$ret .= '<div class="graphe" title="'.__('Hard-disk free').'"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($hdPercent,100).'%;">'.$hdPercent.'%</strong></div>';
 			}
-			$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
-			if ($hdPercent > 0) {
-				$ret .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
-			} else {
-				$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+			if ($large) {
+				$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
+				if ($hdPercent > 0) {
+					$ret .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
+				} else {
+					$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+				}
+				$ret .= '</p>';
 			}
-			$ret .= '</p>';
 			/* Dotclear used vs allocated space information */
 			if (($hdMaxSize > 0) && ($hdMaxPercent >= 0)) {
-				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent,$first_threshold,$second_threshold).
+				$ret .= '<div class="graphe" title="'.__('Hard-disk used').'"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($hdMaxPercent,100).'%;">'.$hdMaxPercent.'%</strong></div>';
 			}
-			$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
-			if ($hdMaxSize > 0) {
-				if ($hdMaxPercent > 0) {
-					$ret .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
-				} else {
-					if ($hdMaxSize != $hdTotal) {
-						$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+			if ($large) {
+				$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
+				if ($hdMaxSize > 0) {
+					if ($hdMaxPercent > 0) {
+						$ret .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
+					} else {
+						if ($hdMaxSize != $hdTotal) {
+							$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+						}
 					}
 				}
+				$ret .= '</p>';
 			}
-			$ret .= '</p>';
 		}
 
 		if ($core->auth->user_prefs->dmhostingmonitor->show_db_info)
 		{
 			/* Database information */
 			if (($dbMaxSize > 0) && ($dbMaxPercent >= 0)) {
-				$ret .= '<div class="graphe"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent,$first_threshold,$second_threshold).
+				$ret .= '<div class="graphe" title="'.__('Database size').'"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($dbMaxPercent,100).'%;">'.$dbMaxPercent.'%</strong></div>';
 			}
-			$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
-			if ($dbMaxSize > 0) {
-				if ($dbMaxPercent > 0) {
-					$ret .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
-				} else {
-					$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+			if ($large) {
+				$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
+				if ($dbMaxSize > 0) {
+					if ($dbMaxPercent > 0) {
+						$ret .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
+					} else {
+						$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+					}
 				}
+				$ret .= '</p>';
 			}
-			$ret .= '</p>';
 		}
 
 		$ret .= '</div>';
@@ -343,6 +352,7 @@ class dmHostingMonitorBehaviors
 			$core->auth->user_prefs->dmhostingmonitor->put('max_db_size',(integer)$_POST['max_db_size'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('first_threshold',(integer)$_POST['first_threshold'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('second_threshold',(integer)$_POST['second_threshold'],'integer');
+			$core->auth->user_prefs->dmhostingmonitor->put('large',empty($_POST['small']),'boolean');
 		}
 		catch (Exception $e)
 		{
@@ -365,7 +375,7 @@ class dmHostingMonitorBehaviors
 		form::checkbox('show_hd_info',1,$core->auth->user_prefs->dmhostingmonitor->show_hd_info).' '.
 		'<label for="show_hd_info" class="classic">'.__('Show hard-disk information').'</label></p>'.
 
-		'<p><label for="max_hd_size">'.__('Allocated hard-disk size (in Mb, leave empty for unlimited):').'</label>'.
+		'<p><label for="max_hd_size" class="classic">'.__('Allocated hard-disk size (in Mb, leave empty for unlimited):').'</label> '.
 		form::field('max_hd_size',7,10,(integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size).
 		'</p>'.
 
@@ -373,17 +383,21 @@ class dmHostingMonitorBehaviors
 		form::checkbox('show_db_info',1,$core->auth->user_prefs->dmhostingmonitor->show_db_info).' '.
 		'<label for="show_db_info" class="classic">'.__('Show database information').'</label></p>'.
 
-		'<p><label for="max_db_size">'.__('Allocated database size (in Mb, leave empty for unlimited):').'</label>'.
+		'<p><label for="max_db_size" class="classic">'.__('Allocated database size (in Mb, leave empty for unlimited):').'</label> '.
 		form::field('max_db_size',7,10,(integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size).
 		'</p>'.
 
-		'<p><label for="first_threshold">'.__('1st threshold (in %, leave empty to ignore):').'</label>'.
+		'<p><label for="first_threshold" class="classic">'.__('1st threshold (in %, leave empty to ignore):').'</label> '.
 		form::field('first_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold).
 		'</p>'.
 
-		'<p><label for="second_threshold">'.__('2nd threshold (in %, leave empty to ignore):').'</label>'.
+		'<p><label for="second_threshold" class="classic">'.__('2nd threshold (in %, leave empty to ignore):').'</label> '.
 		form::field('second_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold).
 		'</p>'.
+
+		'<p>'.
+		form::checkbox('small',1,!$core->auth->user_prefs->dmhostingmonitor->large).' '.
+		'<label for="small" class="classic">'.__('Small screen').'</label></p>'.
 
 		'</div>';
 	}

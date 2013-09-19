@@ -1,44 +1,41 @@
 #hosting-monitor {
 	margin-bottom: 1em;
 }
+#hosting-monitor.dm_hm_short_info div {
+	margin-bottom: 0.5em;
+}
 
 .graphe {
-     position: relative; /* IE hack */
-     width: 80%; /* 200px; */
-     border: 1px solid #ccc;
-     padding: 2px;
-     margin-left: 1em;
-}
-
-.graphe.text {
-	margin: 0 0 0 1em;
-	border: none;
-}
-
-.graphe .barre {
-     display: block;
-     position: relative;
-     background: #B1D632;
-     text-align: center;
-     color: #333;
-     height: 2em;
-     line-height: 2em;
-}
-
-.graphe .barre.percent_cool {
-	background: #B1D632;
-}
-
-.graphe .barre.percent_warning {
-	background: #ff9034;
-}
-
-.graphe .barre.percent_alert {
-    color: #fff;
-	background: #ff2221;
-}
-
-.graphe .barre.percent_explode {
-    color: #fff;
-	background: #b91aff;
-}
+	position: relative; /* IE hack */
+	width: 80%; /* 200px; */
+	border: 1px solid #ccc;
+	padding: 2px;
+	margin-left: 1em;
+	}
+	.graphe.text {
+		margin: 0 0 0 1em;
+		border: none;
+		}
+	.graphe .barre {
+		display: block;
+		position: relative;
+		background: #B1D632;
+		text-align: center;
+		color: #333;
+		height: 2em;
+		line-height: 2em;
+		}
+		.graphe .barre.percent_cool {
+			background: #B1D632;
+		}
+		.graphe .barre.percent_warning {
+			background: #ff9034;
+		}
+		.graphe .barre.percent_alert {
+			color: #fff;
+			background: #ff2221;
+		}
+		.graphe .barre.percent_explode {
+			color: #fff;
+			background: #b91aff;
+		}
