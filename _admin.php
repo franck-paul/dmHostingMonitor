@@ -12,6 +12,9 @@
 
 if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
+// dead but useful code, in order to have translations
+__('Hosting Monitor Dashboard Module').__('Display server information on dashboard');
+
 // Dashboard behaviours
 $core->addBehavior('adminPageHTMLHead',array('dmHostingMonitorBehaviors','adminPageHTMLHead'));
 $core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));

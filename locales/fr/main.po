@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 dmHostingMonitor module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-19 15:40+0200\n"
+"POT-Creation-Date: 2013-09-24 13:30+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Franck Paul <carnet.franck.paul@gmail.com>\n"
 "Language-Team: \n"
@@ -11,6 +11,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
+
+msgid "Display server information on dashboard"
+msgstr "Affiche les capacités serveur sur le tableau de bord"
+
+msgid "Hosting Monitor Dashboard Module"
+msgstr "Module d'affichage des capacités serveur"
 
 msgid "TB"
 msgstr "To"
@@ -83,9 +89,3 @@ msgstr "2e seuil (en %, laisser vide pour ignorer) :"
 
 msgid "Small screen"
 msgstr "Affichage abrégé"
-
-msgid "Hosting Monitor Dashboard Module"
-msgstr "Module d'affichage des capacités serveur"
-
-msgid "Display server information on dashboard"
-msgstr "Affiche les capacités serveur sur le tableau de bord"
