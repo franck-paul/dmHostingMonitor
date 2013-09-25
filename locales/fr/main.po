@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 dmHostingMonitor module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-24 13:30+0200\n"
+"POT-Creation-Date: 2013-09-25 08:36+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Franck Paul <carnet.franck.paul@gmail.com>\n"
 "Language-Team: \n"
@@ -45,6 +45,9 @@ msgstr "Place libre sur le disque :"
 msgid "Hard-disk total:"
 msgstr "Taille totale du disque :"
 
+msgid "HD Free"
+msgstr "DD Libre"
+
 msgid "Hard-disk used"
 msgstr "Place occupée sur le disque"
 
@@ -54,6 +57,9 @@ msgstr "Place occupée sur le disque :"
 msgid "Hard-disk limit:"
 msgstr "Place allouée sur le disque :"
 
+msgid "HD Used"
+msgstr "DD Utilisé"
+
 msgid "Database size"
 msgstr "Taille de la base de données"
 
@@ -62,6 +68,9 @@ msgstr "Taille de la base de données :"
 
 msgid "Database limit:"
 msgstr "Place allouée pour la base de données :"
+
+msgid "DB Size"
+msgstr "BD utilisée"
 
 msgid "Hosting monitor on dashboard"
 msgstr "Capacités serveur sur le tableau de bord"

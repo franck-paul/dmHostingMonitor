@@ -265,39 +265,46 @@ class dmHostingMonitorBehaviors
 
 		$ret = '<div id="hosting-monitor" class="box '.($large ? 'medium' : 'small dm_hm_short_info').'"">'.
 			'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
+		$legend = array();
 
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
 			/* Hard-disk free vs total information */
 			if (($hdTotal > 0) && ($hdPercent >= 0)) {
-				$ret .= '<div class="graphe" title="'.__('Hard-disk free').'"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,$first_threshold,$second_threshold).
+				$ret .= '<div class="graphe" title="'.__('Hard-disk free').'">'.
+					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($hdPercent,100).'%;">'.$hdPercent.'%</strong></div>';
-			}
-			if ($large) {
-				$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
-				if ($hdPercent > 0) {
-					$ret .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
+				if ($large) {
+					$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
+					if ($hdPercent > 0) {
+						$ret .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
+					} else {
+						$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+					}
+					$ret .= '</p>';
 				} else {
-					$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+					$legend[] = __('HD Free');
 				}
-				$ret .= '</p>';
 			}
 			/* Dotclear used vs allocated space information */
 			if (($hdMaxSize > 0) && ($hdMaxPercent >= 0)) {
-				$ret .= '<div class="graphe" title="'.__('Hard-disk used').'"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent,$first_threshold,$second_threshold).
+				$ret .= '<div class="graphe" title="'.__('Hard-disk used').'">'.
+					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($hdMaxPercent,100).'%;">'.$hdMaxPercent.'%</strong></div>';
-			}
-			if ($large) {
-				$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
-				if ($hdMaxSize > 0) {
-					if ($hdMaxPercent > 0) {
-						$ret .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
-					} else {
-						if ($hdMaxSize != $hdTotal) {
-							$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+				if ($large) {
+					$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
+					if ($hdMaxSize > 0) {
+						if ($hdMaxPercent > 0) {
+							$ret .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
+						} else {
+							if ($hdMaxSize != $hdTotal) {
+								$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+							}
 						}
 					}
+					$ret .= '</p>';
+				} else {
+					$legend[] = __('HD Used');
 				}
-				$ret .= '</p>';
 			}
 		}
 
@@ -305,22 +312,28 @@ class dmHostingMonitorBehaviors
 		{
 			/* Database information */
 			if (($dbMaxSize > 0) && ($dbMaxPercent >= 0)) {
-				$ret .= '<div class="graphe" title="'.__('Database size').'"><strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent,$first_threshold,$second_threshold).
+				$ret .= '<div class="graphe" title="'.__('Database size').'">'.
+					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($dbMaxPercent,100).'%;">'.$dbMaxPercent.'%</strong></div>';
-			}
-			if ($large) {
-				$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
-				if ($dbMaxSize > 0) {
-					if ($dbMaxPercent > 0) {
-						$ret .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
-					} else {
-						$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+				if ($large) {
+					$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
+					if ($dbMaxSize > 0) {
+						if ($dbMaxPercent > 0) {
+							$ret .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
+						} else {
+							$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+						}
 					}
+					$ret .= '</p>';
+				} else {
+					$legend[] = __('DB Size');
 				}
-				$ret .= '</p>';
 			}
 		}
 
+		if (count($legend)) {
+			$ret .= '<p class="graphe-legend">'.implode("; ", $legend).'</p>';
+		}
 		$ret .= '</div>';
 
 		return $ret;

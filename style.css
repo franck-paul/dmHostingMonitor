@@ -39,3 +39,7 @@
 			color: #fff;
 			background: #b91aff;
 		}
+.graphe-legend {
+	margin-left: 1em;
+	color: rgb(103, 110, 120);
+}

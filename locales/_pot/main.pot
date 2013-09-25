@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 dmHostingMonitor module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-24 13:30+0200\n"
+"POT-Creation-Date: 2013-09-25 08:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,74 +48,86 @@ msgstr ""
 msgid "Hosting Monitor"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:272
+#: ../hg-plugins/dmHostingMonitor//_admin.php:273
 msgid "Hard-disk free"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:276
+#: ../hg-plugins/dmHostingMonitor//_admin.php:277
 msgid "Hard-disk free:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:280
+#: ../hg-plugins/dmHostingMonitor//_admin.php:281
 msgid "Hard-disk total:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:286
-msgid "Hard-disk used"
+#: ../hg-plugins/dmHostingMonitor//_admin.php:285
+msgid "HD Free"
 msgstr ""
 
 #: ../hg-plugins/dmHostingMonitor//_admin.php:290
+msgid "Hard-disk used"
+msgstr ""
+
+#: ../hg-plugins/dmHostingMonitor//_admin.php:294
 msgid "Hard-disk used:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:296
+#: ../hg-plugins/dmHostingMonitor//_admin.php:300
 msgid "Hard-disk limit:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:308
+#: ../hg-plugins/dmHostingMonitor//_admin.php:306
+msgid "HD Used"
+msgstr ""
+
+#: ../hg-plugins/dmHostingMonitor//_admin.php:315
 msgid "Database size"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:312
+#: ../hg-plugins/dmHostingMonitor//_admin.php:319
 msgid "Database size:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:317
+#: ../hg-plugins/dmHostingMonitor//_admin.php:324
 msgid "Database limit:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:371
+#: ../hg-plugins/dmHostingMonitor//_admin.php:329
+msgid "DB Size"
+msgstr ""
+
+#: ../hg-plugins/dmHostingMonitor//_admin.php:384
 msgid "Hosting monitor on dashboard"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:375
+#: ../hg-plugins/dmHostingMonitor//_admin.php:388
 msgid "Activate module"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:379
+#: ../hg-plugins/dmHostingMonitor//_admin.php:392
 msgid "Show hard-disk information"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:381
+#: ../hg-plugins/dmHostingMonitor//_admin.php:394
 msgid "Allocated hard-disk size (in Mb, leave empty for unlimited):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:387
+#: ../hg-plugins/dmHostingMonitor//_admin.php:400
 msgid "Show database information"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:389
+#: ../hg-plugins/dmHostingMonitor//_admin.php:402
 msgid "Allocated database size (in Mb, leave empty for unlimited):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:393
+#: ../hg-plugins/dmHostingMonitor//_admin.php:406
 msgid "1st threshold (in %, leave empty to ignore):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:397
+#: ../hg-plugins/dmHostingMonitor//_admin.php:410
 msgid "2nd threshold (in %, leave empty to ignore):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor//_admin.php:403
+#: ../hg-plugins/dmHostingMonitor//_admin.php:416
 msgid "Small screen"
 msgstr ""
