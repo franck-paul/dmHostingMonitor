@@ -40,5 +40,3 @@ catch (Exception $e)
 	$core->error->add($e->getMessage());
 }
 return false;
-
-?>

@@ -18,4 +18,3 @@ $this->registerModule(
 	/* Author */			"Franck Paul",
 	/* Version */			'0.6'
 );
-?>
