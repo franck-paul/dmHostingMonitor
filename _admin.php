@@ -195,7 +195,7 @@ class dmHostingMonitorBehaviors
 
 	static function getPercentageOf($part,$total)
 	{
-		$percentage = -1;
+		$percentage = 0;
 		if (($part > 0) && ($total > 0)) {
 			$percentage = round($part / $total, 2) * 100;
 		}
@@ -237,6 +237,7 @@ class dmHostingMonitorBehaviors
 		$first_threshold = (integer)$core->auth->user_prefs->dmhostingmonitor->first_threshold;
 		$second_threshold = (integer)$core->auth->user_prefs->dmhostingmonitor->second_threshold;
 
+		$bargraph = $core->auth->user_prefs->dmhostingmonitor->show_gauges ? false : true;
 		$large = $core->auth->user_prefs->dmhostingmonitor->large;
 
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
@@ -267,73 +268,105 @@ class dmHostingMonitorBehaviors
 			'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 		$legend = array();
 
+		$bar = '';
+		$pie = '';
+
 		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
 			/* Hard-disk free vs total information */
-			if (($hdTotal > 0) && ($hdPercent >= 0)) {
-				$ret .= '<div class="graphe" title="'.__('Hard-disk free').'">'.
+			if ($hdTotal > 0) {
+				$bar .= '<div class="graphe" title="'.__('Hard-disk free').'">'.
 					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($hdPercent,100).'%;">'.$hdPercent.'%</strong></div>';
 				if ($large) {
-					$ret .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
+					$bar .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
 					if ($hdPercent > 0) {
-						$ret .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
+						$bar .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
 					} else {
-						$ret .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
+						$bar .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
 					}
-					$ret .= '</p>';
+					$bar .= '</p>';
 				} else {
 					$legend[] = __('HD Free');
 				}
+				$pie .=
+				'<div id="hd-free" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
+				"<script type=\"text/javascript\">\n".
+				"//<![CDATA[\n".
+				'var gauge_hd_free = new JustGage({id: "hd-free",value: '.$hdPercent.
+					',min: 0,max: 100,label: "%",title: "'.__('HD Free').' ('.dmHostingMonitorBehaviors::readableSize($hdFree).
+					')",showInnerShadow: false});'."\n".
+				"\n//]]>\n".
+				"</script>\n";
 			}
 			/* Dotclear used vs allocated space information */
-			if (($hdMaxSize > 0) && ($hdMaxPercent >= 0)) {
-				$ret .= '<div class="graphe" title="'.__('Hard-disk used').'">'.
+			if ($hdUsed > 0) {
+				$bar .= '<div class="graphe" title="'.__('Hard-disk used').'">'.
 					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($hdMaxPercent,100).'%;">'.$hdMaxPercent.'%</strong></div>';
 				if ($large) {
-					$ret .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
+					$bar .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
 					if ($hdMaxSize > 0) {
 						if ($hdMaxPercent > 0) {
-							$ret .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
+							$bar .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
 						} else {
 							if ($hdMaxSize != $hdTotal) {
-								$ret .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+								$bar .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
 							}
 						}
 					}
-					$ret .= '</p>';
+					$bar .= '</p>';
 				} else {
 					$legend[] = __('HD Used');
 				}
+				$pie .=
+				'<div id="hd-used" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
+				"<script type=\"text/javascript\">\n".
+				"//<![CDATA[\n".
+				'var gauge_hd_used = new JustGage({id: "hd-used",value: '.($hdMaxSize > 0 ? $hdMaxPercent : 0).
+					',min: 0,max: 100,label: "%",title: "'.__('HD Used').' ('.dmHostingMonitorBehaviors::readableSize($hdUsed).
+					')",showInnerShadow: false});'."\n".
+				"\n//]]>\n".
+				"</script>\n";
 			}
 		}
 
 		if ($core->auth->user_prefs->dmhostingmonitor->show_db_info)
 		{
 			/* Database information */
-			if (($dbMaxSize > 0) && ($dbMaxPercent >= 0)) {
-				$ret .= '<div class="graphe" title="'.__('Database size').'">'.
+			if ($dbSize > 0) {
+				$bar .= '<div class="graphe" title="'.__('Database size').'">'.
 					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent,$first_threshold,$second_threshold).
 					'" style="width: '.min($dbMaxPercent,100).'%;">'.$dbMaxPercent.'%</strong></div>';
 				if ($large) {
-					$ret .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
+					$bar .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
 					if ($dbMaxSize > 0) {
 						if ($dbMaxPercent > 0) {
-							$ret .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
+							$bar .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
 						} else {
-							$ret .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+							$bar .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
 						}
 					}
-					$ret .= '</p>';
+					$bar .= '</p>';
 				} else {
 					$legend[] = __('DB Size');
 				}
+				$pie .=
+				'<div id="db-used" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
+				"<script type=\"text/javascript\">\n".
+				"//<![CDATA[\n".
+				'var gauge_db_used = new JustGage({id: "db-used",value: '.($dbMaxSize > 0 ? $dbMaxPercent : 0).
+					',min: 0,max: 100,label: "%",title: "'.__('DB Size').' ('.dmHostingMonitorBehaviors::readableSize($dbSize).
+					')",showInnerShadow: false});'."\n".
+				"\n//]]>\n".
+				"</script>\n";
 			}
 		}
 
 		if (count($legend)) {
-			$ret .= '<p class="graphe-legend">'.implode("; ", $legend).'</p>';
+			$bar .= '<p class="graphe-legend">'.implode("; ", $legend).'</p>';
 		}
+
+		$ret .= ($bargraph ? $bar : $pie);
 		$ret .= '</div>';
 
 		return $ret;
@@ -350,7 +383,10 @@ class dmHostingMonitorBehaviors
 
 	public static function adminPageHTMLHead()
 	{
-		echo '<link rel="stylesheet" href="index.php?pf=dmHostingMonitor/style.css" type="text/css" media="screen" />'."\n";
+		echo
+		'<link rel="stylesheet" href="index.php?pf=dmHostingMonitor/style.css" type="text/css" media="screen" />'."\n".
+		'<script type="text/JavaScript" src="index.php?pf=dmHostingMonitor/js/raphael.2.1.0.min.js"></script>'."\n".
+		'<script type="text/JavaScript" src="index.php?pf=dmHostingMonitor/js/justgage.1.0.1.min.js"></script>';
 	}
 
 	public static function adminAfterDashboardOptionsUpdate($userID)
@@ -369,6 +405,7 @@ class dmHostingMonitorBehaviors
 			$core->auth->user_prefs->dmhostingmonitor->put('first_threshold',(integer)$_POST['first_threshold'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('second_threshold',(integer)$_POST['second_threshold'],'integer');
 			$core->auth->user_prefs->dmhostingmonitor->put('large',empty($_POST['small']),'boolean');
+			$core->auth->user_prefs->dmhostingmonitor->put('show_gauges',!empty($_POST['show_gauges']),'boolean');
 		}
 		catch (Exception $e)
 		{
@@ -414,6 +451,10 @@ class dmHostingMonitorBehaviors
 		'<p>'.
 		form::checkbox('small',1,!$core->auth->user_prefs->dmhostingmonitor->large).' '.
 		'<label for="small" class="classic">'.__('Small screen').'</label></p>'.
+
+		'<p>'.
+		form::checkbox('show_gauges',1,$core->auth->user_prefs->dmhostingmonitor->show_gauges).' '.
+		'<label for="show_gauges" class="classic">'.__('Show gauges instead of bar graph').'</label></p>'.
 
 		'</div>';
 	}

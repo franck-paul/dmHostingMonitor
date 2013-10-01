@@ -4,7 +4,16 @@
 #hosting-monitor.dm_hm_short_info div {
 	margin-bottom: 0.5em;
 }
-
+.pie-small {
+	width: 140px;
+	height: 90px;
+	display: inline-block;
+}
+.pie-large {
+	width: 200px;
+	height: 160px;
+	display: inline-block;
+}
 .graphe {
 	position: relative; /* IE hack */
 	width: 80%; /* 200px; */
