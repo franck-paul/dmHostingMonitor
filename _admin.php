@@ -292,7 +292,7 @@ class dmHostingMonitorBehaviors
 				'<div id="hd-free" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
 				"<script type=\"text/javascript\">\n".
 				"//<![CDATA[\n".
-				'var gauge_hd_free = new JustGage({id: "hd-free",value: '.$hdPercent.
+				'var gauge_hd_free = new JustGage({id: "hd-free",value: '.(100 - $hdPercent).
 					',min: 0,max: 100,label: "%",title: "'.__('HD Free').' ('.dmHostingMonitorBehaviors::readableSize($hdFree).
 					')",showInnerShadow: false});'."\n".
 				"\n//]]>\n".
