@@ -16,7 +16,7 @@ if (!defined('DC_CONTEXT_ADMIN')) { return; }
 __('Hosting Monitor Dashboard Module').__('Display server information on dashboard');
 
 // Dashboard behaviours
-$core->addBehavior('adminPageHTMLHead',array('dmHostingMonitorBehaviors','adminPageHTMLHead'));
+$core->addBehavior('adminDashboardHeaders',array('dmHostingMonitorBehaviors','adminDashboardHeaders'));
 $core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));
 
 $core->addBehavior('adminAfterDashboardOptionsUpdate',array('dmHostingMonitorBehaviors','adminAfterDashboardOptionsUpdate'));
@@ -381,9 +381,9 @@ class dmHostingMonitorBehaviors
 		}
 	}
 
-	public static function adminPageHTMLHead()
+	public static function adminDashboardHeaders()
 	{
-		echo
+		return
 		'<link rel="stylesheet" href="index.php?pf=dmHostingMonitor/style.css" type="text/css" media="screen" />'."\n".
 		'<script type="text/JavaScript" src="index.php?pf=dmHostingMonitor/js/raphael.2.1.0.min.js"></script>'."\n".
 		'<script type="text/JavaScript" src="index.php?pf=dmHostingMonitor/js/justgage.1.0.1.min.js"></script>';
