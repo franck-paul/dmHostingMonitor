@@ -264,7 +264,7 @@ class dmHostingMonitorBehaviors
 			$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
 		}
 
-		$ret = '<div id="hosting-monitor" class="box '.($large ? 'medium' : 'small dm_hm_short_info').'"">'.
+		$ret = '<div id="hosting-monitor" class="box '.($large ? 'medium' : 'small dm_hm_short_info').'">'.
 			'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 		$legend = array();
 
