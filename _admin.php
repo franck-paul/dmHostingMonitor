@@ -265,7 +265,7 @@ class dmHostingMonitorBehaviors
 		}
 
 		$ret = '<div id="hosting-monitor" class="box '.($large ? 'medium' : 'small dm_hm_short_info').'">'.
-			'<h3>'.'<img src="index.php?pf=dmHostingMonitor/icon.png" alt="" />'.' '.__('Hosting Monitor').'</h3>';
+			'<h3>'.'<img src="'.urldecode(dcPage::getPF('dmHostingMonitor/icon.png')).'" alt="" />'.' '.__('Hosting Monitor').'</h3>';
 		$legend = array();
 
 		$bar = '';
@@ -383,10 +383,12 @@ class dmHostingMonitorBehaviors
 
 	public static function adminDashboardHeaders()
 	{
+		global $core;
+
 		return
-		'<link rel="stylesheet" href="index.php?pf=dmHostingMonitor/style.css" type="text/css" media="screen" />'."\n".
-		'<script type="text/JavaScript" src="index.php?pf=dmHostingMonitor/js/raphael.2.1.0.min.js"></script>'."\n".
-		'<script type="text/JavaScript" src="index.php?pf=dmHostingMonitor/js/justgage.1.0.1.min.js"></script>';
+		dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')),'screen',$core->getVersion('dmHostingMonitor'))."\n".
+		dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),$core->getVersion('dmHostingMonitor'))."\n".
+		dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),$core->getVersion('dmHostingMonitor'))."\n";
 	}
 
 	public static function adminAfterDashboardOptionsUpdate($userID)
