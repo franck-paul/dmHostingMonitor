@@ -385,10 +385,16 @@ class dmHostingMonitorBehaviors
 	{
 		global $core;
 
-		return
-		dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')),'screen',$core->getVersion('dmHostingMonitor'))."\n".
-		dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),$core->getVersion('dmHostingMonitor'))."\n".
-		dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),$core->getVersion('dmHostingMonitor'))."\n";
+		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+		if ($core->auth->user_prefs->dmhostingmonitor->activated) {
+			return
+				dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')),'screen',
+					$core->getVersion('dmHostingMonitor'))."\n".
+				dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
+					$core->getVersion('dmHostingMonitor'))."\n".
+				dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
+					$core->getVersion('dmHostingMonitor'))."\n";
+		}
 	}
 
 	public static function adminAfterDashboardOptionsUpdate($userID)
