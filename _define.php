@@ -16,7 +16,7 @@ $this->registerModule(
 	/* Name */			"Hosting Monitor Dashboard Module",
 	/* Description*/		"Display server information on dashboard",
 	/* Author */			"Franck Paul",
-	/* Version */			'0.6',
+	/* Version */			'0.6.1',
 	array(
 		/* Permissions */	'permissions' =>	'admin',
 		/* Type */			'type' =>			'plugin'

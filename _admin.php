@@ -163,7 +163,7 @@ class dmHostingMonitorBehaviors
 		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
 		foreach ($dir as $folder) {
 			if ($folder != '') {
-				$hdUsed += substr(shell_exec('du -k -s -L '.$folder),0,-3);
+				$hdUsed += (int)shell_exec('du -k -s -L '.$folder);
 			}
 		}
 		$hdUsed *= 1024;
@@ -291,11 +291,9 @@ class dmHostingMonitorBehaviors
 				$pie .=
 				'<div id="hd-free" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
 				"<script type=\"text/javascript\">\n".
-				"//<![CDATA[\n".
 				'var gauge_hd_free = new JustGage({id: "hd-free",value: '.(100 - $hdPercent).
 					',min: 0,max: 100,label: "%",title: "'.__('HD Free').' ('.dmHostingMonitorBehaviors::readableSize($hdFree).
 					')",showInnerShadow: false});'."\n".
-				"\n//]]>\n".
 				"</script>\n";
 			}
 			/* Dotclear used vs allocated space information */
@@ -321,11 +319,9 @@ class dmHostingMonitorBehaviors
 				$pie .=
 				'<div id="hd-used" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
 				"<script type=\"text/javascript\">\n".
-				"//<![CDATA[\n".
 				'var gauge_hd_used = new JustGage({id: "hd-used",value: '.($hdMaxSize > 0 ? $hdMaxPercent : 0).
 					',min: 0,max: 100,label: "%",title: "'.__('HD Used').' ('.dmHostingMonitorBehaviors::readableSize($hdUsed).
 					')",showInnerShadow: false});'."\n".
-				"\n//]]>\n".
 				"</script>\n";
 			}
 		}
@@ -353,11 +349,9 @@ class dmHostingMonitorBehaviors
 				$pie .=
 				'<div id="db-used" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
 				"<script type=\"text/javascript\">\n".
-				"//<![CDATA[\n".
 				'var gauge_db_used = new JustGage({id: "db-used",value: '.($dbMaxSize > 0 ? $dbMaxPercent : 0).
 					',min: 0,max: 100,label: "%",title: "'.__('DB Size').' ('.dmHostingMonitorBehaviors::readableSize($dbSize).
 					')",showInnerShadow: false});'."\n".
-				"\n//]]>\n".
 				"</script>\n";
 			}
 		}
