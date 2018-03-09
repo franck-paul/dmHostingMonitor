@@ -1,34 +1,34 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-# This file is part of dmHostingMonitor, a plugin for Dotclear 2.
-#
-# Copyright (c) Franck Paul and contributors
-# carnet.franck.paul@gmail.com
-#
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief dmHostingMonitor, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Franck Paul and contributors
+ *
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
-if (!defined('DC_CONTEXT_ADMIN')) { return; }
+if (!defined('DC_CONTEXT_ADMIN')) {return;}
 
 // dead but useful code, in order to have translations
-__('Hosting Monitor Dashboard Module').__('Display server information on dashboard');
+__('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
 
 // Dashboard behaviours
-$core->addBehavior('adminDashboardHeaders',array('dmHostingMonitorBehaviors','adminDashboardHeaders'));
-$core->addBehavior('adminDashboardContents',array('dmHostingMonitorBehaviors','adminDashboardContents'));
+$core->addBehavior('adminDashboardHeaders', array('dmHostingMonitorBehaviors', 'adminDashboardHeaders'));
+$core->addBehavior('adminDashboardContents', array('dmHostingMonitorBehaviors', 'adminDashboardContents'));
 
-$core->addBehavior('adminAfterDashboardOptionsUpdate',array('dmHostingMonitorBehaviors','adminAfterDashboardOptionsUpdate'));
-$core->addBehavior('adminDashboardOptionsForm',array('dmHostingMonitorBehaviors','adminDashboardOptionsForm'));
+$core->addBehavior('adminAfterDashboardOptionsUpdate', array('dmHostingMonitorBehaviors', 'adminAfterDashboardOptionsUpdate'));
+$core->addBehavior('adminDashboardOptionsForm', array('dmHostingMonitorBehaviors', 'adminDashboardOptionsForm'));
 
 # BEHAVIORS
 class dmHostingMonitorBehaviors
 {
-	static function readableSize($size)
+    public static function readableSize($size)
     {
-        switch (true)
-        {
+        switch (true) {
             case ($size > 1000000000000):
                 $size /= 1000000000000;
                 $suffix = __('TB');
@@ -48,416 +48,418 @@ class dmHostingMonitorBehaviors
             default:
                 $suffix = __('B');
         }
-        return round($size, 2).' '.$suffix;
+        return round($size, 2) . ' ' . $suffix;
     }
 
-	static function getDbSize($core)
-	{
-		// Get current db size in bytes
-		$dbSize = 0;
-		switch ($core->con->driver())
-		{
-			case 'sqlite':
-				break;
-			case 'pgsql':
-				$sql = 'SELECT pg_database_size(\''.$core->con->database().'\') AS size';
-				$rs = $core->con->select($sql);
-				while ($rs->fetch()) {
-					$dbSize += $rs->size;
-				}
-				break;
-			case 'mysql':
-			case 'mysqli':
-				$sql = 'SHOW TABLE STATUS';
-				$rs = $core->con->select($sql);
-				while ($rs->fetch()) {
-					$dbSize += $rs->Data_length + $rs->Index_length;
-				}
-				break;
-		}
-		return $dbSize;
-	}
+    public static function getDbSize($core)
+    {
+        // Get current db size in bytes
+        $dbSize = 0;
+        switch ($core->con->driver()) {
+            case 'sqlite':
+                break;
+            case 'pgsql':
+                $sql = 'SELECT pg_database_size(\'' . $core->con->database() . '\') AS size';
+                $rs  = $core->con->select($sql);
+                while ($rs->fetch()) {
+                    $dbSize += $rs->size;
+                }
+                break;
+            case 'mysql':
+            case 'mysqli':
+            case 'mysqlimb4':
+                $sql = 'SHOW TABLE STATUS';
+                $rs  = $core->con->select($sql);
+                while ($rs->fetch()) {
+                    $dbSize += $rs->Data_length + $rs->Index_length;
+                }
+                break;
+        }
+        return $dbSize;
+    }
 
-	static function getUsedSpace($core)
-	{
-		// Get current space used by the installation in bytes
-		// Take care about potential clean-install :
-		// Get size of Dotclear install
-		// + Size of outside plugins directories
-		// + Size of outside cache directory
-		// + Size of (public + themes directories for each blog)
-		// Beware of aliases ?
+    public static function getUsedSpace($core)
+    {
+        // Get current space used by the installation in bytes
+        // Take care about potential clean-install :
+        // Get size of Dotclear install
+        // + Size of outside plugins directories
+        // + Size of outside cache directory
+        // + Size of (public + themes directories for each blog)
+        // Beware of aliases ?
 
-		$hdUsed = 0;
-		if (!function_exists('shell_exec')) return $hdUsed;
+        $hdUsed = 0;
+        if (!function_exists('shell_exec')) {
+            return $hdUsed;
+        }
 
-		// Stack of paths
-		$stack = array();
+        // Stack of paths
+        $stack = array();
 
-		// Dotclear installation
-		$stack[] = '..';
+        // Dotclear installation
+        $stack[] = '..';
 
-		// Plugins
-		$plugins = explode(PATH_SEPARATOR,DC_PLUGINS_ROOT);
-		$stack = array_merge($stack,$plugins);
+        // Plugins
+        $plugins = explode(PATH_SEPARATOR, DC_PLUGINS_ROOT);
+        $stack   = array_merge($stack, $plugins);
 
-		// Cache
-		$stack[] = DC_TPL_CACHE;
+        // Cache
+        $stack[] = DC_TPL_CACHE;
 
-		// For each blog : public and theme folder
-		// If not absolute (1st char <> /) then prefix with ../
-		$rs = $core->getBlogs();
-		while ($rs->fetch()) {
-			$settings = new dcSettings($core,$rs->blog_id);
-			$settings->addNamespace('system');
-			$publicPath = $settings->system->public_path;
-			$themesPath = $settings->system->themes_path;
-			$stack[] = (substr($publicPath,0,1) == '/' ? $publicPath : '../'.$publicPath);
-			$stack[] = (substr($themesPath,0,1) == '/' ? $themesPath : '../'.$themesPath);
-		}
-
-/* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
-		echo '<h3>Paths</h3>';
-		foreach ($stack as $folder) {
-			echo '<p>'.$folder.'</p>';
-		}
-//*/
-
-		// Stack of real directories
-		$dir = array();
-		foreach ($stack as $path) {
-			// Get real path
-			$realPath = path::real($path);
-			if (!$realPath) {
-				continue;
-			}
-			// Check if not already counted
-			$index = 0;
-			foreach ($dir as $folder) {
-				if (substr($realPath,0,strlen($folder)) == $folder) {
-					// Parent folder found in stack : ignore it
-					$realPath = '';
-					break;
-				} elseif (substr($folder,0,strlen($realPath)) == $realPath) {
-					// Child folder found in stack : replace it by parent
-					$dir[$index] = $realPath;
-					$realPath = '';
-					break;
-				}
-				$index++;
-			}
-			if ($realPath != '') {
-				$dir[] = $realPath;
-				sort($dir);
-			}
-		}
+        // For each blog : public and theme folder
+        // If not absolute (1st char <> /) then prefix with ../
+        $rs = $core->getBlogs();
+        while ($rs->fetch()) {
+            $settings = new dcSettings($core, $rs->blog_id);
+            $settings->addNamespace('system');
+            $publicPath = $settings->system->public_path;
+            $themesPath = $settings->system->themes_path;
+            $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
+            $stack[]    = (substr($themesPath, 0, 1) == '/' ? $themesPath : '../' . $themesPath);
+        }
 
 /* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
-		echo '<h3>Folders</h3>';
-		foreach ($dir as $folder) {
-			echo '<p>'.$folder.'</p>';
-		}
+echo '<h3>Paths</h3>';
+foreach ($stack as $folder) {
+echo '<p>'.$folder.'</p>';
+}
 //*/
 
-		// Command : du -k -s <path>
-		// Runs only on unix-like systems (Mac OS X, Unix, Linux)
-		foreach ($dir as $folder) {
-			if ($folder != '') {
-				$hdUsed += (int)shell_exec('du -k -s -L '.$folder);
-			}
-		}
-		$hdUsed *= 1024;
+        // Stack of real directories
+        $dir = array();
+        foreach ($stack as $path) {
+            // Get real path
+            $realPath = path::real($path);
+            if (!$realPath) {
+                continue;
+            }
+            // Check if not already counted
+            $index = 0;
+            foreach ($dir as $folder) {
+                if (substr($realPath, 0, strlen($folder)) == $folder) {
+                    // Parent folder found in stack : ignore it
+                    $realPath = '';
+                    break;
+                } elseif (substr($folder, 0, strlen($realPath)) == $realPath) {
+                    // Child folder found in stack : replace it by parent
+                    $dir[$index] = $realPath;
+                    $realPath    = '';
+                    break;
+                }
+                $index++;
+            }
+            if ($realPath != '') {
+                $dir[] = $realPath;
+                sort($dir);
+            }
+        }
 
-		return $hdUsed;
-	}
+/* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
+echo '<h3>Folders</h3>';
+foreach ($dir as $folder) {
+echo '<p>'.$folder.'</p>';
+}
+//*/
 
-	static function getFreeSpace($core)
-	{
-		// Get current free space on Hard Disk in bytes
+        // Command : du -k -s <path>
+        // Runs only on unix-like systems (Mac OS X, Unix, Linux)
+        foreach ($dir as $folder) {
+            if ($folder != '') {
+                $hdUsed += (int) shell_exec('du -k -s -L ' . $folder);
+            }
+        }
+        $hdUsed *= 1024;
 
-		$hdFree = 0;
-		if (!function_exists('disk_free_space')) return $hdFree;
+        return $hdUsed;
+    }
 
-		$hdFree = (float)@disk_free_space(".");
-		return $hdFree;
-	}
+    public static function getFreeSpace($core)
+    {
+        // Get current free space on Hard Disk in bytes
 
-	static function getTotalSpace($core)
-	{
-		// Get current total space on Hard Disk in bytes
+        $hdFree = 0;
+        if (!function_exists('disk_free_space')) {
+            return $hdFree;
+        }
 
-		$hdTotal = 0;
-		if (!function_exists('disk_total_space')) return $hdTotal;
+        $hdFree = (float) @disk_free_space(".");
+        return $hdFree;
+    }
 
-		$hdTotal = (float)@disk_total_space(".");
-		return $hdTotal;
-	}
+    public static function getTotalSpace($core)
+    {
+        // Get current total space on Hard Disk in bytes
 
-	static function getPercentageOf($part,$total)
-	{
-		$percentage = 0;
-		if (($part > 0) && ($total > 0)) {
-			$percentage = round($part / $total, 2) * 100;
-		}
-		return $percentage;
-	}
+        $hdTotal = 0;
+        if (!function_exists('disk_total_space')) {
+            return $hdTotal;
+        }
 
-	static function getLevelClass($value,$firstLevel,$secondLevel)
-	{
-		if ($firstLevel == 0 && $secondLevel == 0) {
-			// No threshold -> always cool
-			return 'percent_cool';
-		}
-		if ($secondLevel == 0) {
-			$secondLevel = $firstLevel;
-		}
-		if ($firstLevel == 0) {
-			$firstLevel = $secondLevel;
-		}
-		if ($secondLevel < $firstLevel) {
-			$temp = $firstLevel;
-			$firstLevel = $secondLevel;
-			$secondLevel = $firstLevel;
-		}
-		if ($value < $firstLevel) {
-			return 'percent_cool';
-		} elseif ($value < $secondLevel) {
-			return 'percent_warning';
-		} elseif ($value <= 100) {
-			return 'percent_alert';
-		} else {
-			return 'percent_explode';
-		}
-	}
+        $hdTotal = (float) @disk_total_space(".");
+        return $hdTotal;
+    }
 
-	static function getInfos($core)
-	{
-		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+    public static function getPercentageOf($part, $total)
+    {
+        $percentage = 0;
+        if (($part > 0) && ($total > 0)) {
+            $percentage = round($part / $total, 2) * 100;
+        }
+        return $percentage;
+    }
 
-		$first_threshold = (integer)$core->auth->user_prefs->dmhostingmonitor->first_threshold;
-		$second_threshold = (integer)$core->auth->user_prefs->dmhostingmonitor->second_threshold;
+    public static function getLevelClass($value, $firstLevel, $secondLevel)
+    {
+        if ($firstLevel == 0 && $secondLevel == 0) {
+            // No threshold -> always cool
+            return 'percent_cool';
+        }
+        if ($secondLevel == 0) {
+            $secondLevel = $firstLevel;
+        }
+        if ($firstLevel == 0) {
+            $firstLevel = $secondLevel;
+        }
+        if ($secondLevel < $firstLevel) {
+            $temp        = $firstLevel;
+            $firstLevel  = $secondLevel;
+            $secondLevel = $firstLevel;
+        }
+        if ($value < $firstLevel) {
+            return 'percent_cool';
+        } elseif ($value < $secondLevel) {
+            return 'percent_warning';
+        } elseif ($value <= 100) {
+            return 'percent_alert';
+        } else {
+            return 'percent_explode';
+        }
+    }
 
-		$bargraph = $core->auth->user_prefs->dmhostingmonitor->show_gauges ? false : true;
-		$large = $core->auth->user_prefs->dmhostingmonitor->large;
+    public static function getInfos($core)
+    {
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
-			$hdTotal = dmHostingMonitorBehaviors::getTotalSpace($core);
-			$hdFree = dmHostingMonitorBehaviors::getFreeSpace($core);
-			$hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree,$hdTotal);
+        $first_threshold  = (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold;
+        $second_threshold = (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold;
 
-			$hdUsed = dmHostingMonitorBehaviors::getUsedSpace($core);
-			$hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
-			if ($hdMaxSize == 0) {
-				// Use total size of hard-disk
-				$hdMaxSize = $hdTotal;
-			} else {
-				$hdMaxSize *= 1000 * 1000;
-			}
-			$hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed,$hdMaxSize);
-		}
+        $bargraph = $core->auth->user_prefs->dmhostingmonitor->show_gauges ? false : true;
+        $large    = $core->auth->user_prefs->dmhostingmonitor->large;
 
-		if ($core->auth->user_prefs->dmhostingmonitor->show_db_info)
-		{
-			$dbSize = dmHostingMonitorBehaviors::getDbSize($core);
-			$dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
-			$dbMaxSize *= 1000 * 1000;
-			$dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize,$dbMaxSize);
-		}
+        if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
+            $hdTotal   = dmHostingMonitorBehaviors::getTotalSpace($core);
+            $hdFree    = dmHostingMonitorBehaviors::getFreeSpace($core);
+            $hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree, $hdTotal);
 
-		$ret = '<div id="hosting-monitor" class="box '.($large ? 'medium' : 'small dm_hm_short_info').'">'.
-			'<h3>'.'<img src="'.urldecode(dcPage::getPF('dmHostingMonitor/icon.png')).'" alt="" />'.' '.__('Hosting Monitor').'</h3>';
-		$legend = array();
+            $hdUsed    = dmHostingMonitorBehaviors::getUsedSpace($core);
+            $hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
+            if ($hdMaxSize == 0) {
+                // Use total size of hard-disk
+                $hdMaxSize = $hdTotal;
+            } else {
+                $hdMaxSize *= 1000 * 1000;
+            }
+            $hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed, $hdMaxSize);
+        }
 
-		$bar = '';
-		$pie = '';
+        if ($core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+            $dbSize    = dmHostingMonitorBehaviors::getDbSize($core);
+            $dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
+            $dbMaxSize *= 1000 * 1000;
+            $dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize, $dbMaxSize);
+        }
 
-		if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
-			/* Hard-disk free vs total information */
-			if ($hdTotal > 0) {
-				$bar .= '<div class="graphe" title="'.__('Hard-disk free').'">'.
-					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent,$first_threshold,$second_threshold).
-					'" style="width: '.min($hdPercent,100).'%;">'.$hdPercent.'%</strong></div>';
-				if ($large) {
-					$bar .= '<p class="graphe text">'.__('Hard-disk free:').' '.dmHostingMonitorBehaviors::readableSize($hdFree);
-					if ($hdPercent > 0) {
-						$bar .= ' ('.$hdPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdTotal).')';
-					} else {
-						$bar .= ' - '.__('Hard-disk total:').' '.dmHostingMonitorBehaviors::readableSize($hdTotal);
-					}
-					$bar .= '</p>';
-				} else {
-					$legend[] = __('HD Free');
-				}
-				$pie .=
-				'<div id="hd-free" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
-				"<script type=\"text/javascript\">\n".
-				'var gauge_hd_free = new JustGage({id: "hd-free",value: '.(100 - $hdPercent).
-					',min: 0,max: 100,label: "%",title: "'.__('HD Free').' ('.dmHostingMonitorBehaviors::readableSize($hdFree).
-					')",showInnerShadow: false});'."\n".
-				"</script>\n";
-			}
-			/* Dotclear used vs allocated space information */
-			if ($hdUsed > 0) {
-				$bar .= '<div class="graphe" title="'.__('Hard-disk used').'">'.
-					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent,$first_threshold,$second_threshold).
-					'" style="width: '.min($hdMaxPercent,100).'%;">'.$hdMaxPercent.'%</strong></div>';
-				if ($large) {
-					$bar .= '<p class="graphe text">'.__('Hard-disk used:').' '.dmHostingMonitorBehaviors::readableSize($hdUsed);
-					if ($hdMaxSize > 0) {
-						if ($hdMaxPercent > 0) {
-							$bar .= ' ('.$hdMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize).')';
-						} else {
-							if ($hdMaxSize != $hdTotal) {
-								$bar .= ' - '.__('Hard-disk limit:').' '.dmHostingMonitorBehaviors::readableSize($hdMaxSize);
-							}
-						}
-					}
-					$bar .= '</p>';
-				} else {
-					$legend[] = __('HD Used');
-				}
-				$pie .=
-				'<div id="hd-used" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
-				"<script type=\"text/javascript\">\n".
-				'var gauge_hd_used = new JustGage({id: "hd-used",value: '.($hdMaxSize > 0 ? $hdMaxPercent : 0).
-					',min: 0,max: 100,label: "%",title: "'.__('HD Used').' ('.dmHostingMonitorBehaviors::readableSize($hdUsed).
-					')",showInnerShadow: false});'."\n".
-				"</script>\n";
-			}
-		}
+        $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
+        '<h3>' . '<img src="' . urldecode(dcPage::getPF('dmHostingMonitor/icon.png')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
+        $legend = array();
 
-		if ($core->auth->user_prefs->dmhostingmonitor->show_db_info)
-		{
-			/* Database information */
-			if ($dbSize > 0) {
-				$bar .= '<div class="graphe" title="'.__('Database size').'">'.
-					'<strong class="barre '.dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent,$first_threshold,$second_threshold).
-					'" style="width: '.min($dbMaxPercent,100).'%;">'.$dbMaxPercent.'%</strong></div>';
-				if ($large) {
-					$bar .= '<p class="graphe text">'.__('Database size:').' '.dmHostingMonitorBehaviors::readableSize($dbSize);
-					if ($dbMaxSize > 0) {
-						if ($dbMaxPercent > 0) {
-							$bar .= ' ('.$dbMaxPercent.'% '.__('of').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize).')';
-						} else {
-							$bar .= ' - '.__('Database limit:').' '.dmHostingMonitorBehaviors::readableSize($dbMaxSize);
-						}
-					}
-					$bar .= '</p>';
-				} else {
-					$legend[] = __('DB Size');
-				}
-				$pie .=
-				'<div id="db-used" class="'.($large ? 'pie-large' : 'pie-small').'"></div>'.
-				"<script type=\"text/javascript\">\n".
-				'var gauge_db_used = new JustGage({id: "db-used",value: '.($dbMaxSize > 0 ? $dbMaxPercent : 0).
-					',min: 0,max: 100,label: "%",title: "'.__('DB Size').' ('.dmHostingMonitorBehaviors::readableSize($dbSize).
-					')",showInnerShadow: false});'."\n".
-				"</script>\n";
-			}
-		}
+        $bar = '';
+        $pie = '';
 
-		if (count($legend)) {
-			$bar .= '<p class="graphe-legend">'.implode("; ", $legend).'</p>';
-		}
+        if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
+            /* Hard-disk free vs total information */
+            if ($hdTotal > 0) {
+                $bar .= '<div class="graphe" title="' . __('Hard-disk free') . '">' .
+                '<strong class="barre ' . dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent, $first_threshold, $second_threshold) .
+                '" style="width: ' . min($hdPercent, 100) . '%;">' . $hdPercent . '%</strong></div>';
+                if ($large) {
+                    $bar .= '<p class="graphe text">' . __('Hard-disk free:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdFree);
+                    if ($hdPercent > 0) {
+                        $bar .= ' (' . $hdPercent . '% ' . __('of') . ' ' . dmHostingMonitorBehaviors::readableSize($hdTotal) . ')';
+                    } else {
+                        $bar .= ' - ' . __('Hard-disk total:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdTotal);
+                    }
+                    $bar .= '</p>';
+                } else {
+                    $legend[] = __('HD Free');
+                }
+                $pie .=
+                '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                "<script type=\"text/javascript\">\n" .
+                'var gauge_hd_free = new JustGage({id: "hd-free",value: ' . (100 - $hdPercent) .
+                ',min: 0,max: 100,label: "%",title: "' . __('HD Free') . ' (' . dmHostingMonitorBehaviors::readableSize($hdFree) .
+                    ')",showInnerShadow: false});' . "\n" .
+                    "</script>\n";
+            }
+            /* Dotclear used vs allocated space information */
+            if ($hdUsed > 0) {
+                $bar .= '<div class="graphe" title="' . __('Hard-disk used') . '">' .
+                '<strong class="barre ' . dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent, $first_threshold, $second_threshold) .
+                '" style="width: ' . min($hdMaxPercent, 100) . '%;">' . $hdMaxPercent . '%</strong></div>';
+                if ($large) {
+                    $bar .= '<p class="graphe text">' . __('Hard-disk used:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdUsed);
+                    if ($hdMaxSize > 0) {
+                        if ($hdMaxPercent > 0) {
+                            $bar .= ' (' . $hdMaxPercent . '% ' . __('of') . ' ' . dmHostingMonitorBehaviors::readableSize($hdMaxSize) . ')';
+                        } else {
+                            if ($hdMaxSize != $hdTotal) {
+                                $bar .= ' - ' . __('Hard-disk limit:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+                            }
+                        }
+                    }
+                    $bar .= '</p>';
+                } else {
+                    $legend[] = __('HD Used');
+                }
+                $pie .=
+                '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                "<script type=\"text/javascript\">\n" .
+                'var gauge_hd_used = new JustGage({id: "hd-used",value: ' . ($hdMaxSize > 0 ? $hdMaxPercent : 0) .
+                ',min: 0,max: 100,label: "%",title: "' . __('HD Used') . ' (' . dmHostingMonitorBehaviors::readableSize($hdUsed) .
+                    ')",showInnerShadow: false});' . "\n" .
+                    "</script>\n";
+            }
+        }
 
-		$ret .= ($bargraph ? $bar : $pie);
-		$ret .= '</div>';
+        if ($core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+            /* Database information */
+            if ($dbSize > 0) {
+                $bar .= '<div class="graphe" title="' . __('Database size') . '">' .
+                '<strong class="barre ' . dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold) .
+                '" style="width: ' . min($dbMaxPercent, 100) . '%;">' . $dbMaxPercent . '%</strong></div>';
+                if ($large) {
+                    $bar .= '<p class="graphe text">' . __('Database size:') . ' ' . dmHostingMonitorBehaviors::readableSize($dbSize);
+                    if ($dbMaxSize > 0) {
+                        if ($dbMaxPercent > 0) {
+                            $bar .= ' (' . $dbMaxPercent . '% ' . __('of') . ' ' . dmHostingMonitorBehaviors::readableSize($dbMaxSize) . ')';
+                        } else {
+                            $bar .= ' - ' . __('Database limit:') . ' ' . dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+                        }
+                    }
+                    $bar .= '</p>';
+                } else {
+                    $legend[] = __('DB Size');
+                }
+                $pie .=
+                '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                "<script type=\"text/javascript\">\n" .
+                'var gauge_db_used = new JustGage({id: "db-used",value: ' . ($dbMaxSize > 0 ? $dbMaxPercent : 0) .
+                ',min: 0,max: 100,label: "%",title: "' . __('DB Size') . ' (' . dmHostingMonitorBehaviors::readableSize($dbSize) .
+                    ')",showInnerShadow: false});' . "\n" .
+                    "</script>\n";
+            }
+        }
 
-		return $ret;
-	}
+        if (count($legend)) {
+            $bar .= '<p class="graphe-legend">' . implode("; ", $legend) . '</p>';
+        }
 
-	public static function adminDashboardContents($core,$contents)
-	{
-		// Add module to the contents stack
-		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-		if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-			$contents[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
-		}
-	}
+        $ret .= ($bargraph ? $bar : $pie);
+        $ret .= '</div>';
 
-	public static function adminDashboardHeaders()
-	{
-		global $core;
+        return $ret;
+    }
 
-		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-		if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-			return
-				dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')),'screen',
-					$core->getVersion('dmHostingMonitor'))."\n".
-				dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
-					$core->getVersion('dmHostingMonitor'))."\n".
-				dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
-					$core->getVersion('dmHostingMonitor'))."\n";
-		}
-	}
+    public static function adminDashboardContents($core, $contents)
+    {
+        // Add module to the contents stack
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
+            $contents[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
+        }
+    }
 
-	public static function adminAfterDashboardOptionsUpdate($userID)
-	{
-		global $core;
+    public static function adminDashboardHeaders()
+    {
+        global $core;
 
-		// Get and store user's prefs for plugin options
-		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-		try {
-			// Hosting monitor options
-			$core->auth->user_prefs->dmhostingmonitor->put('activated',!empty($_POST['activated']),'boolean');
-			$core->auth->user_prefs->dmhostingmonitor->put('show_hd_info',!empty($_POST['show_hd_info']),'boolean');
-			$core->auth->user_prefs->dmhostingmonitor->put('max_hd_size',(integer)$_POST['max_hd_size'],'integer');
-			$core->auth->user_prefs->dmhostingmonitor->put('show_db_info',!empty($_POST['show_db_info']),'boolean');
-			$core->auth->user_prefs->dmhostingmonitor->put('max_db_size',(integer)$_POST['max_db_size'],'integer');
-			$core->auth->user_prefs->dmhostingmonitor->put('first_threshold',(integer)$_POST['first_threshold'],'integer');
-			$core->auth->user_prefs->dmhostingmonitor->put('second_threshold',(integer)$_POST['second_threshold'],'integer');
-			$core->auth->user_prefs->dmhostingmonitor->put('large',empty($_POST['small']),'boolean');
-			$core->auth->user_prefs->dmhostingmonitor->put('show_gauges',!empty($_POST['show_gauges']),'boolean');
-		}
-		catch (Exception $e)
-		{
-			$core->error->add($e->getMessage());
-		}
-	}
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
+            return
+            dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')), 'screen',
+                $core->getVersion('dmHostingMonitor')) . "\n" .
+            dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
+                $core->getVersion('dmHostingMonitor')) . "\n" .
+            dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
+                $core->getVersion('dmHostingMonitor')) . "\n";
+        }
+    }
 
-	public static function adminDashboardOptionsForm($core)
-	{
-		// Add fieldset for plugin options
-		$core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+    public static function adminAfterDashboardOptionsUpdate($userID)
+    {
+        global $core;
 
-		echo '<div class="fieldset"><h4>'.__('Hosting monitor on dashboard').'</h4>'.
+        // Get and store user's prefs for plugin options
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        try {
+            // Hosting monitor options
+            $core->auth->user_prefs->dmhostingmonitor->put('activated', !empty($_POST['activated']), 'boolean');
+            $core->auth->user_prefs->dmhostingmonitor->put('show_hd_info', !empty($_POST['show_hd_info']), 'boolean');
+            $core->auth->user_prefs->dmhostingmonitor->put('max_hd_size', (integer) $_POST['max_hd_size'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('show_db_info', !empty($_POST['show_db_info']), 'boolean');
+            $core->auth->user_prefs->dmhostingmonitor->put('max_db_size', (integer) $_POST['max_db_size'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('first_threshold', (integer) $_POST['first_threshold'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('second_threshold', (integer) $_POST['second_threshold'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('large', empty($_POST['small']), 'boolean');
+            $core->auth->user_prefs->dmhostingmonitor->put('show_gauges', !empty($_POST['show_gauges']), 'boolean');
+        } catch (Exception $e) {
+            $core->error->add($e->getMessage());
+        }
+    }
 
-		'<p>'.
-		form::checkbox('activated',1,$core->auth->user_prefs->dmhostingmonitor->activated).' '.
-		'<label for="activated" class="classic">'.__('Activate module').'</label></p>'.
+    public static function adminDashboardOptionsForm($core)
+    {
+        // Add fieldset for plugin options
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-		'<p>'.
-		form::checkbox('show_hd_info',1,$core->auth->user_prefs->dmhostingmonitor->show_hd_info).' '.
-		'<label for="show_hd_info" class="classic">'.__('Show hard-disk information').'</label></p>'.
+        echo '<div class="fieldset"><h4>' . __('Hosting monitor on dashboard') . '</h4>' .
 
-		'<p><label for="max_hd_size" class="classic">'.__('Allocated hard-disk size (in Mb, leave empty for unlimited):').'</label> '.
-		form::field('max_hd_size',7,10,(integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size).
-		'</p>'.
+        '<p>' .
+        form::checkbox('activated', 1, $core->auth->user_prefs->dmhostingmonitor->activated) . ' ' .
+        '<label for="activated" class="classic">' . __('Activate module') . '</label></p>' .
 
-		'<p>'.
-		form::checkbox('show_db_info',1,$core->auth->user_prefs->dmhostingmonitor->show_db_info).' '.
-		'<label for="show_db_info" class="classic">'.__('Show database information').'</label></p>'.
+        '<p>' .
+        form::checkbox('show_hd_info', 1, $core->auth->user_prefs->dmhostingmonitor->show_hd_info) . ' ' .
+        '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
 
-		'<p><label for="max_db_size" class="classic">'.__('Allocated database size (in Mb, leave empty for unlimited):').'</label> '.
-		form::field('max_db_size',7,10,(integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size).
-		'</p>'.
+        '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
+        form::field('max_hd_size', 7, 10, (integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
+        '</p>' .
 
-		'<p><label for="first_threshold" class="classic">'.__('1st threshold (in %, leave empty to ignore):').'</label> '.
-		form::field('first_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold).
-		'</p>'.
+        '<p>' .
+        form::checkbox('show_db_info', 1, $core->auth->user_prefs->dmhostingmonitor->show_db_info) . ' ' .
+        '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
 
-		'<p><label for="second_threshold" class="classic">'.__('2nd threshold (in %, leave empty to ignore):').'</label> '.
-		form::field('second_threshold',2,3,(integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold).
-		'</p>'.
+        '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
+        form::field('max_db_size', 7, 10, (integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
+        '</p>' .
 
-		'<p>'.
-		form::checkbox('small',1,!$core->auth->user_prefs->dmhostingmonitor->large).' '.
-		'<label for="small" class="classic">'.__('Small screen').'</label></p>'.
+        '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
+        form::field('first_threshold', 2, 3, (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
+        '</p>' .
 
-		'<p>'.
-		form::checkbox('show_gauges',1,$core->auth->user_prefs->dmhostingmonitor->show_gauges).' '.
-		'<label for="show_gauges" class="classic">'.__('Show gauges instead of bar graph').'</label></p>'.
+        '<p><label for="second_threshold" class="classic">' . __('2nd threshold (in %, leave empty to ignore):') . '</label> ' .
+        form::field('second_threshold', 2, 3, (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
+        '</p>' .
 
-		'</div>';
-	}
+        '<p>' .
+        form::checkbox('small', 1, !$core->auth->user_prefs->dmhostingmonitor->large) . ' ' .
+        '<label for="small" class="classic">' . __('Small screen') . '</label></p>' .
+
+        '<p>' .
+        form::checkbox('show_gauges', 1, $core->auth->user_prefs->dmhostingmonitor->show_gauges) . ' ' .
+        '<label for="show_gauges" class="classic">' . __('Show gauges instead of bar graph') . '</label></p>' .
+
+            '</div>';
+    }
 }
