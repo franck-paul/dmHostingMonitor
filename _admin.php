@@ -55,10 +55,10 @@ class dmHostingMonitorBehaviors
     {
         // Get current db size in bytes
         $dbSize = 0;
-        switch ($core->con->driver()) {
+        switch ($core->con->syntax()) {
             case 'sqlite':
                 break;
-            case 'pgsql':
+            case 'postgresql':
                 $sql = 'SELECT pg_database_size(\'' . $core->con->database() . '\') AS size';
                 $rs  = $core->con->select($sql);
                 while ($rs->fetch()) {
@@ -66,8 +66,6 @@ class dmHostingMonitorBehaviors
                 }
                 break;
             case 'mysql':
-            case 'mysqli':
-            case 'mysqlimb4':
                 $sql = 'SHOW TABLE STATUS';
                 $rs  = $core->con->select($sql);
                 while ($rs->fetch()) {

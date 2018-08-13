@@ -19,6 +19,7 @@ $this->registerModule(
     "Franck Paul",                             // Author
     '0.6.1',                                   // Version
     array(
+        'requires'    => array(array('core', '2.14')),
         'permissions' => 'admin',  // Permissions
         'type'        => 'plugin' // Type
     )
