@@ -17,11 +17,11 @@ if (!defined('DC_CONTEXT_ADMIN')) {return;}
 __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
 
 // Dashboard behaviours
-$core->addBehavior('adminDashboardHeaders', array('dmHostingMonitorBehaviors', 'adminDashboardHeaders'));
-$core->addBehavior('adminDashboardContents', array('dmHostingMonitorBehaviors', 'adminDashboardContents'));
+$core->addBehavior('adminDashboardHeaders', ['dmHostingMonitorBehaviors', 'adminDashboardHeaders']);
+$core->addBehavior('adminDashboardContents', ['dmHostingMonitorBehaviors', 'adminDashboardContents']);
 
-$core->addBehavior('adminAfterDashboardOptionsUpdate', array('dmHostingMonitorBehaviors', 'adminAfterDashboardOptionsUpdate'));
-$core->addBehavior('adminDashboardOptionsForm', array('dmHostingMonitorBehaviors', 'adminDashboardOptionsForm'));
+$core->addBehavior('adminAfterDashboardOptionsUpdate', ['dmHostingMonitorBehaviors', 'adminAfterDashboardOptionsUpdate']);
+$core->addBehavior('adminDashboardOptionsForm', ['dmHostingMonitorBehaviors', 'adminDashboardOptionsForm']);
 
 # BEHAVIORS
 class dmHostingMonitorBehaviors
@@ -92,7 +92,7 @@ class dmHostingMonitorBehaviors
         }
 
         // Stack of paths
-        $stack = array();
+        $stack = [];
 
         // Dotclear installation
         $stack[] = '..';
@@ -124,7 +124,7 @@ echo '<p>'.$folder.'</p>';
 //*/
 
         // Stack of real directories
-        $dir = array();
+        $dir = [];
         foreach ($stack as $path) {
             // Get real path
             $realPath = path::real($path);
@@ -269,7 +269,7 @@ echo '<p>'.$folder.'</p>';
 
         $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
         '<h3>' . '<img src="' . urldecode(dcPage::getPF('dmHostingMonitor/icon.png')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
-        $legend = array();
+        $legend = [];
 
         $bar = '';
         $pie = '';
@@ -373,7 +373,7 @@ echo '<p>'.$folder.'</p>';
         // Add module to the contents stack
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-            $contents[] = new ArrayObject(array(dmHostingMonitorBehaviors::getInfos($core)));
+            $contents[] = new ArrayObject([dmHostingMonitorBehaviors::getInfos($core)]);
         }
     }
 
