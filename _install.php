@@ -33,6 +33,7 @@ try
     $core->auth->user_prefs->dmhostingmonitor->put('first_threshold', 80, 'integer', '1st alert threshold (in %)', false, true);
     $core->auth->user_prefs->dmhostingmonitor->put('second_threshold', 90, 'integer', '2nd alert threshold (in %)', false, true);
     $core->auth->user_prefs->dmhostingmonitor->put('large', true, 'boolean', 'Large display', false, true);
+    $core->auth->user_prefs->dmhostingmonitor->put('ping', true, 'boolean', 'Check server status', false, true);
 
     $core->setVersion('dmHostingMonitor', $new_version);
 

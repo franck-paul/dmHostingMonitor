@@ -101,3 +101,12 @@ msgstr "Affichage abrégé"
 
 msgid "Show gauges instead of bar graph"
 msgstr "Afficher des jauges à la place des barres"
+
+msgid "Check server status"
+msgstr "Contrôler l'état du serveur"
+
+msgid "Server offline"
+msgstr "Serveur hors-ligne"
+
+msgid "Server online"
+msgstr "Serveur en ligne"

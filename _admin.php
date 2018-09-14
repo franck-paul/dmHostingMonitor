@@ -116,13 +116,6 @@ class dmHostingMonitorBehaviors
             $stack[]    = (substr($themesPath, 0, 1) == '/' ? $themesPath : '../' . $themesPath);
         }
 
-/* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
-echo '<h3>Paths</h3>';
-foreach ($stack as $folder) {
-echo '<p>'.$folder.'</p>';
-}
-//*/
-
         // Stack of real directories
         $dir = [];
         foreach ($stack as $path) {
@@ -151,13 +144,6 @@ echo '<p>'.$folder.'</p>';
                 sort($dir);
             }
         }
-
-/* Trace (add a / to the /* at the beginning of this line to uncomment the following code)
-echo '<h3>Folders</h3>';
-foreach ($dir as $folder) {
-echo '<p>'.$folder.'</p>';
-}
-//*/
 
         // Command : du -k -s <path>
         // Runs only on unix-like systems (Mac OS X, Unix, Linux)
@@ -373,7 +359,10 @@ echo '<p>'.$folder.'</p>';
         // Add module to the contents stack
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-            $contents[] = new ArrayObject([dmHostingMonitorBehaviors::getInfos($core)]);
+            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info ||
+                $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+                $contents[] = new ArrayObject([dmHostingMonitorBehaviors::getInfos($core)]);
+            }
         }
     }
 
@@ -383,13 +372,29 @@ echo '<p>'.$folder.'</p>';
 
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-            return
-            dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')), 'screen',
-                $core->getVersion('dmHostingMonitor')) . "\n" .
-            dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
-                $core->getVersion('dmHostingMonitor')) . "\n" .
-            dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
-                $core->getVersion('dmHostingMonitor')) . "\n";
+
+            $ret = '<script type="text/javascript">' . "\n" .
+            dcPage::jsVar('dotclear.dmHostingMonitor_Ping', $core->auth->user_prefs->dmhostingmonitor->ping) .
+            dcPage::jsVar('dotclear.dmHostingMonitor_Offline', __('Server offline')) .
+            dcPage::jsVar('dotclear.dmHostingMonitor_Online', __('Server online')) .
+            "</script>\n";
+
+            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info ||
+                $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+                $ret .=
+                dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')), 'screen',
+                    $core->getVersion('dmHostingMonitor')) . "\n" .
+                dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
+                    $core->getVersion('dmHostingMonitor')) . "\n" .
+                dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
+                    $core->getVersion('dmHostingMonitor')) . "\n";
+            }
+            if ($core->auth->user_prefs->dmhostingmonitor->ping) {
+                $ret .=
+                dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
+                    $core->getVersion('dmHostingMonitor')) . "\n";
+            }
+            return $ret;
         }
     }
 
@@ -410,6 +415,7 @@ echo '<p>'.$folder.'</p>';
             $core->auth->user_prefs->dmhostingmonitor->put('second_threshold', (integer) $_POST['second_threshold'], 'integer');
             $core->auth->user_prefs->dmhostingmonitor->put('large', empty($_POST['small']), 'boolean');
             $core->auth->user_prefs->dmhostingmonitor->put('show_gauges', !empty($_POST['show_gauges']), 'boolean');
+            $core->auth->user_prefs->dmhostingmonitor->put('ping', !empty($_POST['ping']), 'boolean');
         } catch (Exception $e) {
             $core->error->add($e->getMessage());
         }
@@ -457,6 +463,10 @@ echo '<p>'.$folder.'</p>';
         '<p>' .
         form::checkbox('show_gauges', 1, $core->auth->user_prefs->dmhostingmonitor->show_gauges) . ' ' .
         '<label for="show_gauges" class="classic">' . __('Show gauges instead of bar graph') . '</label></p>' .
+
+        '<p>' .
+        form::checkbox('ping', 1, $core->auth->user_prefs->dmhostingmonitor->ping) . ' ' .
+        '<label for="ping" class="classic">' . __('Check server status') . '</label></p>' .
 
             '</div>';
     }

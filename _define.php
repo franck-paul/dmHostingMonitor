@@ -19,7 +19,7 @@ $this->registerModule(
     "Franck Paul",                             // Author
     '0.8',                                     // Version
     [
-        'requires'    => [['core', '2.14']],
+        'requires'    => [['core', '2.15']],
         'permissions' => 'admin',  // Permissions
         'support'     => 'https://open-time.net/?q=dmHostingMonitor', // Support URL
         'type'        => 'plugin' // Type
