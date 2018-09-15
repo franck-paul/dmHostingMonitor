@@ -17,7 +17,7 @@ dotclear.dmHostingMonitorPing = function() {
       $home.prop('alt', dotclear.dmHostingMonitor_Offline);
     } else {
       // Server online
-      if (dotclear_darkMode) {
+      if (typeof dotclear_darkMode !== 'undefined' && dotclear_darkMode) {
         $home.css('filter', 'brightness(2)');
       } else {
         $home.css('filter', 'hue-rotate(225deg)');
