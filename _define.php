@@ -22,6 +22,7 @@ $this->registerModule(
         'requires'    => [['core', '2.15']],
         'permissions' => 'admin',  // Permissions
         'support'     => 'https://open-time.net/?q=dmHostingMonitor', // Support URL
-        'type'        => 'plugin' // Type
+        'type'        => 'plugin', // Type
+        'settings'    => ['pref' => '#user-favorites.dmhostingmonitor'] // Settings
     ]
 );
