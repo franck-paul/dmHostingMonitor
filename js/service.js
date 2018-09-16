@@ -7,22 +7,37 @@ dotclear.dmHostingMonitorPing = function() {
     xd_check: dotclear.nonce
   };
   $.get('services.php', params, function(data) {
-    const $home = $('#content h2 img');
+    const $page = $('#content h2 a img');
+    if ($page.length) {
+      // Use the alternate home icon (in color) rather than the regular one
+      var src = $page.prop('src');
+      if (src.endsWith('/style/dashboard.png')) {
+        // First pass, change icon and save it's alt label
+        $page.prop('src', 'style/dashboard-alt.png');
+        dotclear.dmHostingMonitor_Alt = $page.prop('alt') + ' : ';
+      }
+    } else {
+      dotclear.dmHostingMonitor_Alt = '';
+    }
+    const $img = $page.length ? $page : $('#content h2 img');
+    // Change image if necessary
     if ($('rsp[status=failed]', data).length > 0) {
       // For debugging purpose only:
       // console.log($('rsp',data).attr('message'));
       // window.console.log('Dotclear REST server error');
       // Server offline
-      $home.css('filter', 'grayscale(1)');
-      $home.prop('alt', dotclear.dmHostingMonitor_Offline);
+      $img.css('filter', 'grayscale(1)');
+      if (!$page.length) {
+        $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline);
+      }
     } else {
       // Server online
       if (typeof dotclear_darkMode !== 'undefined' && dotclear_darkMode) {
-        $home.css('filter', 'brightness(2)');
+        $img.css('filter', 'brightness(2)');
       } else {
-        $home.css('filter', 'hue-rotate(225deg)');
+        $img.css('filter', 'hue-rotate(225deg)');
       }
-      $home.prop('alt', dotclear.dmHostingMonitor_Online);
+      $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online);
     }
   });
 };

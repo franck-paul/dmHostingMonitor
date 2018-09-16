@@ -16,6 +16,9 @@ if (!defined('DC_CONTEXT_ADMIN')) {return;}
 // dead but useful code, in order to have translations
 __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
 
+// Admin page behaviours
+$core->addBehavior('adminPageHTMLHead', ['dmHostingMonitorBehaviors', 'adminPageHTMLHead']);
+
 // Dashboard behaviours
 $core->addBehavior('adminDashboardHeaders', ['dmHostingMonitorBehaviors', 'adminDashboardHeaders']);
 $core->addBehavior('adminDashboardContents', ['dmHostingMonitorBehaviors', 'adminDashboardContents']);
@@ -389,12 +392,26 @@ class dmHostingMonitorBehaviors
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n";
             }
+            return $ret;
+        }
+    }
+
+    public static function adminPageHTMLHead()
+    {
+        global $core;
+
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
             if ($core->auth->user_prefs->dmhostingmonitor->ping) {
-                $ret .=
+                echo
+                '<script type="text/javascript">' . "\n" .
+                dcPage::jsVar('dotclear.dmHostingMonitor_Ping', $core->auth->user_prefs->dmhostingmonitor->ping) .
+                dcPage::jsVar('dotclear.dmHostingMonitor_Offline', __('Server offline')) .
+                dcPage::jsVar('dotclear.dmHostingMonitor_Online', __('Server online')) .
+                "</script>\n" .
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n";
             }
-            return $ret;
         }
     }
 
