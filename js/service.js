@@ -2,11 +2,7 @@
 'use strict';
 
 dotclear.dmHostingMonitorPing = function() {
-  var params = {
-    f: 'dmHostingMonitorPing',
-    xd_check: dotclear.nonce
-  };
-  $.get('services.php', params, function(data) {
+  var showStatus = function(online = false) {
     const $page = $('#content h2 a img');
     if ($page.length) {
       // Use the alternate home icon (in color) rather than the regular one
@@ -21,7 +17,7 @@ dotclear.dmHostingMonitorPing = function() {
     }
     const $img = $page.length ? $page : $('#content h2 img');
     // Change image if necessary
-    if ($('rsp[status=failed]', data).length > 0) {
+    if (online !== true) {
       // For debugging purpose only:
       // console.log($('rsp',data).attr('message'));
       // window.console.log('Dotclear REST server error');
@@ -39,12 +35,28 @@ dotclear.dmHostingMonitorPing = function() {
       }
       $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online);
     }
-  });
+  };
+
+  $.get('services.php', {
+    f: 'dmHostingMonitorPing',
+    xd_check: dotclear.nonce
+  }, function(data) {
+      showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
+  })
+    .done(function() {
+      // Nothing here
+    })
+    .fail(function() {
+      showStatus(false);
+    })
+    .always(function() {
+      // Nothing here
+    });
 };
 
 $(function() {
   if (dotclear.dmHostingMonitor_Ping) {
     // Auto refresh requested : Set 5 minutes interval between two pings
-    dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 * 1000);
+    dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 / 10 * 1000);
   }
 });
