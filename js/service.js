@@ -38,13 +38,11 @@ dotclear.dmHostingMonitorPing = function() {
   };
 
   $.get('services.php', {
-    f: 'dmHostingMonitorPing',
-    xd_check: dotclear.nonce
-  }, function(data) {
+      f: 'dmHostingMonitorPing',
+      xd_check: dotclear.nonce
+    })
+    .done(function(data) {
       showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
-  })
-    .done(function() {
-      // Nothing here
     })
     .fail(function() {
       showStatus(false);
@@ -57,6 +55,6 @@ dotclear.dmHostingMonitorPing = function() {
 $(function() {
   if (dotclear.dmHostingMonitor_Ping) {
     // Auto refresh requested : Set 5 minutes interval between two pings
-    dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 / 10 * 1000);
+    dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 * 1000);
   }
 });
