@@ -44,7 +44,8 @@ dotclear.dmHostingMonitorPing = function() {
     .done(function(data) {
       showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
     })
-    .fail(function() {
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      window.console.log('AJAX ' + textStatus + ' (status: ' + jqXHR.status + ' ' + errorThrown + ')');
       showStatus(false);
     })
     .always(function() {
