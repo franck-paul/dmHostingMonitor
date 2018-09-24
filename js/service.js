@@ -2,11 +2,11 @@
 'use strict';
 
 dotclear.dmHostingMonitorPing = function() {
-  var showStatus = function(online = false) {
+  const showStatus = function(online = false) {
     const $page = $('#content h2 a img');
     if ($page.length) {
       // Use the alternate home icon (in color) rather than the regular one
-      var src = $page.prop('src');
+      const src = $page.prop('src');
       if (src.endsWith('/style/dashboard.png')) {
         // First pass, change icon and save it's alt label
         $page.prop('src', 'style/dashboard-alt.png');
@@ -45,7 +45,7 @@ dotclear.dmHostingMonitorPing = function() {
       showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
-      window.console.log('AJAX ' + textStatus + ' (status: ' + jqXHR.status + ' ' + errorThrown + ')');
+      window.console.log(`AJAX ${textStatus} (status: ${jqXHR.status} ${errorThrown})`);
       showStatus(false);
     })
     .always(function() {
