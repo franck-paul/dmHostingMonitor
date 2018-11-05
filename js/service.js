@@ -1,4 +1,4 @@
-/*global $, dotclear, dotclear_darkMode */
+/*global $, dotclear */
 'use strict';
 
 dotclear.dmHostingMonitorPing = function() {
@@ -28,7 +28,7 @@ dotclear.dmHostingMonitorPing = function() {
       }
     } else {
       // Server online
-      if (typeof dotclear_darkMode !== 'undefined' && dotclear_darkMode) {
+      if (dotclear && dotclear.data && dotclear.data.darkMode) {
         $img.css('filter', 'brightness(2)');
       } else {
         $img.css('filter', 'hue-rotate(225deg)');
