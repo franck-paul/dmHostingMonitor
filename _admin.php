@@ -456,7 +456,7 @@ class dmHostingMonitorBehaviors
         '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
 
         '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::field('max_hd_size', 7, 10, (integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
+        form::number('max_hd_size', 1, 9999999, (integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
         '</p>' .
 
         '<hr />' .
@@ -466,15 +466,15 @@ class dmHostingMonitorBehaviors
         '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
 
         '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::field('max_db_size', 7, 10, (integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
+        form::number('max_db_size', 1, 9999999, (integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
         '</p>' .
 
         '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::field('first_threshold', 2, 3, (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
+        form::number('first_threshold', 1, 100, (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
         '</p>' .
 
         '<p><label for="second_threshold" class="classic">' . __('2nd threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::field('second_threshold', 2, 3, (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
+        form::number('second_threshold', 1, 100, (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
         '</p>' .
 
         '<hr />' .

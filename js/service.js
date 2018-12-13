@@ -35,6 +35,7 @@ dotclear.dmHostingMonitorPing = function() {
       }
       $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online);
     }
+    $img.prop('title', $img.prop('alt'));
   };
 
   $.get('services.php', {
