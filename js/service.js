@@ -12,9 +12,8 @@ dotclear.dmHostingMonitorPing = function() {
         $page.prop('src', 'style/dashboard-alt.png');
         dotclear.dmHostingMonitor_Alt = $page.prop('alt') + ' : ';
       }
-    } else {
-      dotclear.dmHostingMonitor_Alt = '';
     }
+    dotclear.dmHostingMonitor_Alt = dotclear.dmHostingMonitor_Alt == undefined ? '' : dotclear.dmHostingMonitor_Alt;
     const $img = $page.length ? $page : $('#content h2 img');
     // Change image if necessary
     if (online !== true) {
@@ -56,6 +55,8 @@ dotclear.dmHostingMonitorPing = function() {
 
 $(function() {
   if (dotclear.dmHostingMonitor_Ping) {
+    // First pass
+    dotclear.dmHostingMonitorPing();
     // Auto refresh requested : Set 5 minutes interval between two pings
     dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 * 1000);
   }
