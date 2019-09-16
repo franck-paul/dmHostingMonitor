@@ -16,6 +16,9 @@ if (!defined('DC_CONTEXT_ADMIN')) {return;}
 // dead but useful code, in order to have translations
 __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
 
+// Admin page behaviours
+$core->addBehavior('adminPageHTMLHead', ['dmHostingMonitorBehaviors', 'adminPageHTMLHead']);
+
 // Dashboard behaviours
 $core->addBehavior('adminDashboardHeaders', ['dmHostingMonitorBehaviors', 'adminDashboardHeaders']);
 $core->addBehavior('adminDashboardContents', ['dmHostingMonitorBehaviors', 'adminDashboardContents']);
@@ -26,7 +29,7 @@ $core->addBehavior('adminDashboardOptionsForm', ['dmHostingMonitorBehaviors', 'a
 # BEHAVIORS
 class dmHostingMonitorBehaviors
 {
-    public static function readableSize($size)
+    private static function readableSize($size)
     {
         switch (true) {
             case ($size > 1000000000000):
@@ -51,7 +54,7 @@ class dmHostingMonitorBehaviors
         return round($size, 2) . ' ' . $suffix;
     }
 
-    public static function getDbSize($core)
+    private static function getDbSize($core)
     {
         // Get current db size in bytes
         $dbSize = 0;
@@ -76,7 +79,7 @@ class dmHostingMonitorBehaviors
         return $dbSize;
     }
 
-    public static function getUsedSpace($core)
+    private static function getUsedSpace($core)
     {
         // Get current space used by the installation in bytes
         // Take care about potential clean-install :
@@ -157,7 +160,7 @@ class dmHostingMonitorBehaviors
         return $hdUsed;
     }
 
-    public static function getFreeSpace($core)
+    private static function getFreeSpace($core)
     {
         // Get current free space on Hard Disk in bytes
 
@@ -170,7 +173,7 @@ class dmHostingMonitorBehaviors
         return $hdFree;
     }
 
-    public static function getTotalSpace($core)
+    private static function getTotalSpace($core)
     {
         // Get current total space on Hard Disk in bytes
 
@@ -183,7 +186,7 @@ class dmHostingMonitorBehaviors
         return $hdTotal;
     }
 
-    public static function getPercentageOf($part, $total)
+    private static function getPercentageOf($part, $total)
     {
         $percentage = 0;
         if (($part > 0) && ($total > 0)) {
@@ -192,7 +195,7 @@ class dmHostingMonitorBehaviors
         return $percentage;
     }
 
-    public static function getLevelClass($value, $firstLevel, $secondLevel)
+    private static function getLevelClass($value, $firstLevel, $secondLevel)
     {
         if ($firstLevel == 0 && $secondLevel == 0) {
             // No threshold -> always cool
@@ -220,7 +223,7 @@ class dmHostingMonitorBehaviors
         }
     }
 
-    public static function getInfos($core)
+    private static function getInfos($core)
     {
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
@@ -231,11 +234,11 @@ class dmHostingMonitorBehaviors
         $large    = $core->auth->user_prefs->dmhostingmonitor->large;
 
         if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
-            $hdTotal   = dmHostingMonitorBehaviors::getTotalSpace($core);
-            $hdFree    = dmHostingMonitorBehaviors::getFreeSpace($core);
-            $hdPercent = dmHostingMonitorBehaviors::getPercentageOf($hdFree, $hdTotal);
+            $hdTotal   = self::getTotalSpace($core);
+            $hdFree    = self::getFreeSpace($core);
+            $hdPercent = self::getPercentageOf($hdFree, $hdTotal);
 
-            $hdUsed    = dmHostingMonitorBehaviors::getUsedSpace($core);
+            $hdUsed    = self::getUsedSpace($core);
             $hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
             if ($hdMaxSize == 0) {
                 // Use total size of hard-disk
@@ -243,14 +246,14 @@ class dmHostingMonitorBehaviors
             } else {
                 $hdMaxSize *= 1000 * 1000;
             }
-            $hdMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($hdUsed, $hdMaxSize);
+            $hdMaxPercent = self::getPercentageOf($hdUsed, $hdMaxSize);
         }
 
         if ($core->auth->user_prefs->dmhostingmonitor->show_db_info) {
-            $dbSize    = dmHostingMonitorBehaviors::getDbSize($core);
+            $dbSize    = self::getDbSize($core);
             $dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
             $dbMaxSize *= 1000 * 1000;
-            $dbMaxPercent = dmHostingMonitorBehaviors::getPercentageOf($dbSize, $dbMaxSize);
+            $dbMaxPercent = self::getPercentageOf($dbSize, $dbMaxSize);
         }
 
         $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
@@ -264,14 +267,14 @@ class dmHostingMonitorBehaviors
             /* Hard-disk free vs total information */
             if ($hdTotal > 0) {
                 $bar .= '<div class="graphe" title="' . __('Hard-disk free') . '">' .
-                '<strong class="barre ' . dmHostingMonitorBehaviors::getLevelClass(100 - $hdPercent, $first_threshold, $second_threshold) .
+                '<strong class="barre ' . self::getLevelClass(100 - $hdPercent, $first_threshold, $second_threshold) .
                 '" style="width: ' . min($hdPercent, 100) . '%;">' . $hdPercent . '%</strong></div>';
                 if ($large) {
-                    $bar .= '<p class="graphe text">' . __('Hard-disk free:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdFree);
+                    $bar .= '<p class="graphe text">' . __('Hard-disk free:') . ' ' . self::readableSize($hdFree);
                     if ($hdPercent > 0) {
-                        $bar .= ' (' . $hdPercent . '% ' . __('of') . ' ' . dmHostingMonitorBehaviors::readableSize($hdTotal) . ')';
+                        $bar .= ' (' . $hdPercent . '% ' . __('of') . ' ' . self::readableSize($hdTotal) . ')';
                     } else {
-                        $bar .= ' - ' . __('Hard-disk total:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdTotal);
+                        $bar .= ' - ' . __('Hard-disk total:') . ' ' . self::readableSize($hdTotal);
                     }
                     $bar .= '</p>';
                 } else {
@@ -281,23 +284,23 @@ class dmHostingMonitorBehaviors
                 '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_hd_free = new JustGage({id: "hd-free",value: ' . (100 - $hdPercent) .
-                ',min: 0,max: 100,label: "%",title: "' . __('HD Free') . ' (' . dmHostingMonitorBehaviors::readableSize($hdFree) .
+                ',min: 0,max: 100,label: "%",title: "' . __('HD Free') . ' (' . self::readableSize($hdFree) .
                     ')",showInnerShadow: false});' . "\n" .
                     "</script>\n";
             }
             /* Dotclear used vs allocated space information */
             if ($hdUsed > 0) {
                 $bar .= '<div class="graphe" title="' . __('Hard-disk used') . '">' .
-                '<strong class="barre ' . dmHostingMonitorBehaviors::getLevelClass($hdMaxPercent, $first_threshold, $second_threshold) .
+                '<strong class="barre ' . self::getLevelClass($hdMaxPercent, $first_threshold, $second_threshold) .
                 '" style="width: ' . min($hdMaxPercent, 100) . '%;">' . $hdMaxPercent . '%</strong></div>';
                 if ($large) {
-                    $bar .= '<p class="graphe text">' . __('Hard-disk used:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdUsed);
+                    $bar .= '<p class="graphe text">' . __('Hard-disk used:') . ' ' . self::readableSize($hdUsed);
                     if ($hdMaxSize > 0) {
                         if ($hdMaxPercent > 0) {
-                            $bar .= ' (' . $hdMaxPercent . '% ' . __('of') . ' ' . dmHostingMonitorBehaviors::readableSize($hdMaxSize) . ')';
+                            $bar .= ' (' . $hdMaxPercent . '% ' . __('of') . ' ' . self::readableSize($hdMaxSize) . ')';
                         } else {
                             if ($hdMaxSize != $hdTotal) {
-                                $bar .= ' - ' . __('Hard-disk limit:') . ' ' . dmHostingMonitorBehaviors::readableSize($hdMaxSize);
+                                $bar .= ' - ' . __('Hard-disk limit:') . ' ' . self::readableSize($hdMaxSize);
                             }
                         }
                     }
@@ -309,7 +312,7 @@ class dmHostingMonitorBehaviors
                 '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_hd_used = new JustGage({id: "hd-used",value: ' . ($hdMaxSize > 0 ? $hdMaxPercent : 0) .
-                ',min: 0,max: 100,label: "%",title: "' . __('HD Used') . ' (' . dmHostingMonitorBehaviors::readableSize($hdUsed) .
+                ',min: 0,max: 100,label: "%",title: "' . __('HD Used') . ' (' . self::readableSize($hdUsed) .
                     ')",showInnerShadow: false});' . "\n" .
                     "</script>\n";
             }
@@ -319,15 +322,15 @@ class dmHostingMonitorBehaviors
             /* Database information */
             if ($dbSize > 0) {
                 $bar .= '<div class="graphe" title="' . __('Database size') . '">' .
-                '<strong class="barre ' . dmHostingMonitorBehaviors::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold) .
+                '<strong class="barre ' . self::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold) .
                 '" style="width: ' . min($dbMaxPercent, 100) . '%;">' . $dbMaxPercent . '%</strong></div>';
                 if ($large) {
-                    $bar .= '<p class="graphe text">' . __('Database size:') . ' ' . dmHostingMonitorBehaviors::readableSize($dbSize);
+                    $bar .= '<p class="graphe text">' . __('Database size:') . ' ' . self::readableSize($dbSize);
                     if ($dbMaxSize > 0) {
                         if ($dbMaxPercent > 0) {
-                            $bar .= ' (' . $dbMaxPercent . '% ' . __('of') . ' ' . dmHostingMonitorBehaviors::readableSize($dbMaxSize) . ')';
+                            $bar .= ' (' . $dbMaxPercent . '% ' . __('of') . ' ' . self::readableSize($dbMaxSize) . ')';
                         } else {
-                            $bar .= ' - ' . __('Database limit:') . ' ' . dmHostingMonitorBehaviors::readableSize($dbMaxSize);
+                            $bar .= ' - ' . __('Database limit:') . ' ' . self::readableSize($dbMaxSize);
                         }
                     }
                     $bar .= '</p>';
@@ -338,7 +341,7 @@ class dmHostingMonitorBehaviors
                 '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_db_used = new JustGage({id: "db-used",value: ' . ($dbMaxSize > 0 ? $dbMaxPercent : 0) .
-                ',min: 0,max: 100,label: "%",title: "' . __('DB Size') . ' (' . dmHostingMonitorBehaviors::readableSize($dbSize) .
+                ',min: 0,max: 100,label: "%",title: "' . __('DB Size') . ' (' . self::readableSize($dbSize) .
                     ')",showInnerShadow: false});' . "\n" .
                     "</script>\n";
             }
@@ -361,7 +364,7 @@ class dmHostingMonitorBehaviors
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
             if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info ||
                 $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
-                $contents[] = new ArrayObject([dmHostingMonitorBehaviors::getInfos($core)]);
+                $contents[] = new ArrayObject([self::getInfos($core)]);
             }
         }
     }
@@ -389,12 +392,26 @@ class dmHostingMonitorBehaviors
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n";
             }
+            return $ret;
+        }
+    }
+
+    public static function adminPageHTMLHead()
+    {
+        global $core;
+
+        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
             if ($core->auth->user_prefs->dmhostingmonitor->ping) {
-                $ret .=
+                echo
+                '<script type="text/javascript">' . "\n" .
+                dcPage::jsVar('dotclear.dmHostingMonitor_Ping', $core->auth->user_prefs->dmhostingmonitor->ping) .
+                dcPage::jsVar('dotclear.dmHostingMonitor_Offline', __('Server offline')) .
+                dcPage::jsVar('dotclear.dmHostingMonitor_Online', __('Server online')) .
+                "</script>\n" .
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n";
             }
-            return $ret;
         }
     }
 
@@ -426,35 +443,41 @@ class dmHostingMonitorBehaviors
         // Add fieldset for plugin options
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-        echo '<div class="fieldset"><h4>' . __('Hosting monitor on dashboard') . '</h4>' .
+        echo '<div class="fieldset" id="dmhostingmonitor"><h4>' . __('Hosting monitor on dashboard') . '</h4>' .
 
         '<p>' .
         form::checkbox('activated', 1, $core->auth->user_prefs->dmhostingmonitor->activated) . ' ' .
         '<label for="activated" class="classic">' . __('Activate module') . '</label></p>' .
+
+        '<hr />' .
 
         '<p>' .
         form::checkbox('show_hd_info', 1, $core->auth->user_prefs->dmhostingmonitor->show_hd_info) . ' ' .
         '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
 
         '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::field('max_hd_size', 7, 10, (integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
+        form::number('max_hd_size', 1, 9999999, (integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
         '</p>' .
+
+        '<hr />' .
 
         '<p>' .
         form::checkbox('show_db_info', 1, $core->auth->user_prefs->dmhostingmonitor->show_db_info) . ' ' .
         '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
 
         '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::field('max_db_size', 7, 10, (integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
+        form::number('max_db_size', 1, 9999999, (integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
         '</p>' .
 
         '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::field('first_threshold', 2, 3, (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
+        form::number('first_threshold', 1, 100, (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
         '</p>' .
 
         '<p><label for="second_threshold" class="classic">' . __('2nd threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::field('second_threshold', 2, 3, (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
+        form::number('second_threshold', 1, 100, (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
         '</p>' .
+
+        '<hr />' .
 
         '<p>' .
         form::checkbox('small', 1, !$core->auth->user_prefs->dmhostingmonitor->large) . ' ' .
@@ -463,6 +486,8 @@ class dmHostingMonitorBehaviors
         '<p>' .
         form::checkbox('show_gauges', 1, $core->auth->user_prefs->dmhostingmonitor->show_gauges) . ' ' .
         '<label for="show_gauges" class="classic">' . __('Show gauges instead of bar graph') . '</label></p>' .
+
+        '<hr />' .
 
         '<p>' .
         form::checkbox('ping', 1, $core->auth->user_prefs->dmhostingmonitor->ping) . ' ' .

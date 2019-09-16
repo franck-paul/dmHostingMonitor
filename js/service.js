@@ -1,34 +1,62 @@
-/*global $, dotclear, dotclear_darkMode */
+/*global $, dotclear */
 'use strict';
 
 dotclear.dmHostingMonitorPing = function() {
-  var params = {
-    f: 'dmHostingMonitorPing',
-    xd_check: dotclear.nonce
-  };
-  $.get('services.php', params, function(data) {
-    const $home = $('#content h2 img');
-    if ($('rsp[status=failed]', data).length > 0) {
+  const showStatus = function(online = false) {
+    const $page = $('#content h2 a img');
+    if ($page.length) {
+      // Use the alternate home icon (in color) rather than the regular one
+      const src = $page.prop('src');
+      if (src.endsWith('/style/dashboard.png')) {
+        // First pass, change icon and save it's alt label
+        $page.prop('src', 'style/dashboard-alt.png');
+        dotclear.dmHostingMonitor_Alt = $page.prop('alt') + ' : ';
+      }
+    }
+    dotclear.dmHostingMonitor_Alt = dotclear.dmHostingMonitor_Alt == undefined ? '' : dotclear.dmHostingMonitor_Alt;
+    const $img = $page.length ? $page : $('#content h2 img');
+    // Change image if necessary
+    if (online !== true) {
       // For debugging purpose only:
       // console.log($('rsp',data).attr('message'));
       // window.console.log('Dotclear REST server error');
       // Server offline
-      $home.css('filter', 'grayscale(1)');
-      $home.prop('alt', dotclear.dmHostingMonitor_Offline);
+      $img.css('filter', 'grayscale(1)');
+      if (!$page.length) {
+        $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline);
+      }
     } else {
       // Server online
-      if (typeof dotclear_darkMode !== 'undefined' && dotclear_darkMode) {
-        $home.css('filter', 'brightness(2)');
+      if (dotclear && dotclear.data && dotclear.data.darkMode) {
+        $img.css('filter', 'brightness(2)');
       } else {
-        $home.css('filter', 'hue-rotate(225deg)');
+        $img.css('filter', 'hue-rotate(225deg)');
       }
-      $home.prop('alt', dotclear.dmHostingMonitor_Online);
+      $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online);
     }
-  });
+    $img.prop('title', $img.prop('alt'));
+  };
+
+  $.get('services.php', {
+      f: 'dmHostingMonitorPing',
+      xd_check: dotclear.nonce
+    })
+    .done(function(data) {
+      showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      window.console.log(`AJAX ${textStatus} (status: ${jqXHR.status} ${errorThrown})`);
+      showStatus(false);
+    })
+    .always(function() {
+      // Nothing here
+    });
 };
 
 $(function() {
   if (dotclear.dmHostingMonitor_Ping) {
+    // First pass
+    dotclear.dmHostingMonitorPing();
     // Auto refresh requested : Set 5 minutes interval between two pings
     dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 * 1000);
   }
