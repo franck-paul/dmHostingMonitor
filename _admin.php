@@ -376,11 +376,7 @@ class dmHostingMonitorBehaviors
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
 
-            $ret = '<script type="text/javascript">' . "\n" .
-            dcPage::jsVar('dotclear.dmHostingMonitor_Ping', $core->auth->user_prefs->dmhostingmonitor->ping) .
-            dcPage::jsVar('dotclear.dmHostingMonitor_Offline', __('Server offline')) .
-            dcPage::jsVar('dotclear.dmHostingMonitor_Online', __('Server online')) .
-            "</script>\n";
+            $ret = '';
 
             if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info ||
                 $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
@@ -404,11 +400,11 @@ class dmHostingMonitorBehaviors
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
             if ($core->auth->user_prefs->dmhostingmonitor->ping) {
                 echo
-                '<script type="text/javascript">' . "\n" .
-                dcPage::jsVar('dotclear.dmHostingMonitor_Ping', $core->auth->user_prefs->dmhostingmonitor->ping) .
-                dcPage::jsVar('dotclear.dmHostingMonitor_Offline', __('Server offline')) .
-                dcPage::jsVar('dotclear.dmHostingMonitor_Online', __('Server online')) .
-                "</script>\n" .
+                dcPage::jsJson('dm_hostingmonitor', [
+                    'dmHostingMonitor_Ping'    => $core->auth->user_prefs->dmhostingmonitor->ping,
+                    'dmHostingMonitor_Offline' => __('Server offline'),
+                    'dmHostingMonitor_Online'  => __('Server online')
+                ]) .
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n";
             }

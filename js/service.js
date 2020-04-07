@@ -1,4 +1,4 @@
-/*global $, dotclear */
+/*global $, dotclear, getData */
 'use strict';
 
 dotclear.dmHostingMonitorPing = function() {
@@ -54,6 +54,7 @@ dotclear.dmHostingMonitorPing = function() {
 };
 
 $(function() {
+  Object.assign(dotclear, getData('dm_hostingmonitor'));
   if (dotclear.dmHostingMonitor_Ping) {
     // First pass
     dotclear.dmHostingMonitorPing();
