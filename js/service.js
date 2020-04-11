@@ -21,12 +21,13 @@ dotclear.dmHostingMonitorPing = function() {
       // console.log($('rsp',data).attr('message'));
       // window.console.log('Dotclear REST server error');
       // Server offline
-      $img.css('filter', 'grayscale(1)');
+      $('#content h2').css('filter', 'grayscale(1)');
       if (!$page.length) {
         $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline);
       }
     } else {
       // Server online
+      $('#content h2').css('filter', 'none');
       if (dotclear && dotclear.data && dotclear.data.darkMode) {
         $img.css('filter', 'brightness(2)');
       } else {
