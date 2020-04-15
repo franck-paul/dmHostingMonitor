@@ -23,7 +23,7 @@ dotclear.dmHostingMonitorPing = function() {
       // Server offline
       $('#content h2').css('filter', 'grayscale(1)');
       if (!$page.length) {
-        $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline);
+        $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline + ` (${new Date().toLocaleString()})`);
       }
     } else {
       // Server online
@@ -33,7 +33,7 @@ dotclear.dmHostingMonitorPing = function() {
       } else {
         $img.css('filter', 'hue-rotate(225deg)');
       }
-      $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online);
+      $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online + ` (${new Date().toLocaleString()})`);
     }
     $img.prop('title', $img.prop('alt'));
   };
