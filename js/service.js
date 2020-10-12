@@ -1,4 +1,4 @@
-/*global $, dotclear, getData */
+/*global $, dotclear, getData, notifyBrowser */
 'use strict';
 
 dotclear.dmHostingMonitorPing = function() {
@@ -22,9 +22,14 @@ dotclear.dmHostingMonitorPing = function() {
       // window.console.log('Dotclear REST server error');
       // Server offline
       $('body').css('filter', 'grayscale(1)');
+      const msg = dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline + ` (${new Date().toLocaleString()})`;
       if (!$page.length) {
-        $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Offline + ` (${new Date().toLocaleString()})`);
+        $img.prop('alt', msg);
       }
+      if (($('body').data('server') === 1) && (typeof notifyBrowser === "function")) {
+        notifyBrowser(msg);
+      }
+      $('body').data('server', 0);
     } else {
       // Server online
       $('body').css('filter', '');
@@ -33,7 +38,12 @@ dotclear.dmHostingMonitorPing = function() {
       } else {
         $img.css('filter', 'hue-rotate(225deg)');
       }
-      $img.prop('alt', dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online + ` (${new Date().toLocaleString()})`);
+      const msg = dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online + ` (${new Date().toLocaleString()})`;
+      $img.prop('alt', msg);
+      if (($('body').data('server') === 0) && (typeof notifyBrowser === "function")) {
+        notifyBrowser(msg);
+      }
+      $('body').data('server', 1);
     }
     $img.prop('title', $img.prop('alt'));
   };
@@ -57,6 +67,7 @@ dotclear.dmHostingMonitorPing = function() {
 $(function() {
   Object.assign(dotclear, getData('dm_hostingmonitor'));
   if (dotclear.dmHostingMonitor_Ping) {
+    $('body').data('server', -1);
     // First pass
     dotclear.dmHostingMonitorPing();
     // Auto refresh requested : Set 5 minutes interval between two pings
