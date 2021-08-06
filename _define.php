@@ -10,16 +10,17 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
-if (!defined('DC_RC_PATH')) {return;}
+if (!defined('DC_RC_PATH')) {
+    return;
+}
 
 $this->registerModule(
-    "Hosting Monitor Dashboard Module",        // Name
-    "Display server information on dashboard", // Description
-    "Franck Paul",                             // Author
-    '0.14',                                    // Version
+    'Hosting Monitor Dashboard Module',        // Name
+    'Display server information on dashboard', // Description
+    'Franck Paul',                             // Author
+    '0.15',                                    // Version
     [
-        'requires'    => [['core', '2.16']],
+        'requires'    => [['core', '2.19']],
         'permissions' => 'admin',                                           // Permissions
         'type'        => 'plugin',                                          // Type
         'details'     => 'https://open-time.net/?q=dmHostingMonitor',       // Support URL

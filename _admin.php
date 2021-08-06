@@ -10,8 +10,9 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
-if (!defined('DC_CONTEXT_ADMIN')) {return;}
+if (!defined('DC_CONTEXT_ADMIN')) {
+    return;
+}
 
 // dead but useful code, in order to have translations
 __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
@@ -35,22 +36,27 @@ class dmHostingMonitorBehaviors
             case ($size > 1000000000000):
                 $size /= 1000000000000;
                 $suffix = __('TB');
+
                 break;
             case ($size > 1000000000):
                 $size /= 1000000000;
                 $suffix = __('GB');
+
                 break;
             case ($size > 1000000):
                 $size /= 1000000;
                 $suffix = __('MB');
+
                 break;
             case ($size > 1000):
                 $size /= 1000;
                 $suffix = __('KB');
+
                 break;
             default:
                 $suffix = __('B');
         }
+
         return round($size, 2) . ' ' . $suffix;
     }
 
@@ -67,6 +73,7 @@ class dmHostingMonitorBehaviors
                 while ($rs->fetch()) {
                     $dbSize += $rs->size;
                 }
+
                 break;
             case 'mysql':
                 $sql = 'SHOW TABLE STATUS';
@@ -74,8 +81,10 @@ class dmHostingMonitorBehaviors
                 while ($rs->fetch()) {
                     $dbSize += $rs->Data_length + $rs->Index_length;
                 }
+
                 break;
         }
+
         return $dbSize;
     }
 
@@ -133,11 +142,13 @@ class dmHostingMonitorBehaviors
                 if (substr($realPath, 0, strlen($folder)) == $folder) {
                     // Parent folder found in stack : ignore it
                     $realPath = '';
+
                     break;
                 } elseif (substr($folder, 0, strlen($realPath)) == $realPath) {
                     // Child folder found in stack : replace it by parent
                     $dir[$index] = $realPath;
                     $realPath    = '';
+
                     break;
                 }
                 $index++;
@@ -169,7 +180,8 @@ class dmHostingMonitorBehaviors
             return $hdFree;
         }
 
-        $hdFree = (float) @disk_free_space(".");
+        $hdFree = (float) @disk_free_space('.');
+
         return $hdFree;
     }
 
@@ -182,7 +194,8 @@ class dmHostingMonitorBehaviors
             return $hdTotal;
         }
 
-        $hdTotal = (float) @disk_total_space(".");
+        $hdTotal = (float) @disk_total_space('.');
+
         return $hdTotal;
     }
 
@@ -192,6 +205,7 @@ class dmHostingMonitorBehaviors
         if (($part > 0) && ($total > 0)) {
             $percentage = round($part / $total, 2) * 100;
         }
+
         return $percentage;
     }
 
@@ -218,9 +232,9 @@ class dmHostingMonitorBehaviors
             return 'percent_warning';
         } elseif ($value <= 100) {
             return 'percent_alert';
-        } else {
-            return 'percent_explode';
         }
+
+        return 'percent_explode';
     }
 
     private static function getInfos($core)
@@ -280,8 +294,7 @@ class dmHostingMonitorBehaviors
                 } else {
                     $legend[] = __('HD Free');
                 }
-                $pie .=
-                '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                $pie .= '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_hd_free = new JustGage({id: "hd-free",value: ' . (100 - $hdPercent) .
                 ',min: 0,max: 100,label: "%",title: "' . __('HD Free') . ' (' . self::readableSize($hdFree) .
@@ -308,8 +321,7 @@ class dmHostingMonitorBehaviors
                 } else {
                     $legend[] = __('HD Used');
                 }
-                $pie .=
-                '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                $pie .= '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_hd_used = new JustGage({id: "hd-used",value: ' . ($hdMaxSize > 0 ? $hdMaxPercent : 0) .
                 ',min: 0,max: 100,label: "%",title: "' . __('HD Used') . ' (' . self::readableSize($hdUsed) .
@@ -337,8 +349,7 @@ class dmHostingMonitorBehaviors
                 } else {
                     $legend[] = __('DB Size');
                 }
-                $pie .=
-                '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_db_used = new JustGage({id: "db-used",value: ' . ($dbMaxSize > 0 ? $dbMaxPercent : 0) .
                 ',min: 0,max: 100,label: "%",title: "' . __('DB Size') . ' (' . self::readableSize($dbSize) .
@@ -348,7 +359,7 @@ class dmHostingMonitorBehaviors
         }
 
         if (count($legend)) {
-            $bar .= '<p class="graphe-legend">' . implode("; ", $legend) . '</p>';
+            $bar .= '<p class="graphe-legend">' . implode('; ', $legend) . '</p>';
         }
 
         $ret .= ($bargraph ? $bar : $pie);
@@ -362,8 +373,7 @@ class dmHostingMonitorBehaviors
         // Add module to the contents stack
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info ||
-                $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info || $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
                 $contents[] = new ArrayObject([self::getInfos($core)]);
             }
         }
@@ -375,19 +385,17 @@ class dmHostingMonitorBehaviors
 
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-
             $ret = '';
 
-            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info ||
-                $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
-                $ret .=
-                dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')), 'screen',
+            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info || $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+                $ret .= dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')), 'screen',
                     $core->getVersion('dmHostingMonitor')) . "\n" .
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n" .
                 dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
                     $core->getVersion('dmHostingMonitor')) . "\n";
             }
+
             return $ret;
         }
     }
@@ -417,6 +425,7 @@ class dmHostingMonitorBehaviors
 
         // Get and store user's prefs for plugin options
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+
         try {
             // Hosting monitor options
             $core->auth->user_prefs->dmhostingmonitor->put('activated', !empty($_POST['activated']), 'boolean');

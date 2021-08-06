@@ -10,8 +10,9 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
-if (!defined('DC_CONTEXT_ADMIN')) {return;}
+if (!defined('DC_CONTEXT_ADMIN')) {
+    return;
+}
 
 class dmHostingMonitorRest
 {

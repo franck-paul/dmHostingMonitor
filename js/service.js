@@ -1,8 +1,8 @@
-/*global $, dotclear, getData, notifyBrowser */
+/*global $, dotclear, notifyBrowser */
 'use strict';
 
-dotclear.dmHostingMonitorPing = function() {
-  const showStatus = function(online = false) {
+dotclear.dmHostingMonitorPing = function () {
+  const showStatus = function (online = false) {
     const $page = $('#content h2 a img');
     if ($page.length) {
       // Use the alternate home icon (in color) rather than the regular one
@@ -26,7 +26,7 @@ dotclear.dmHostingMonitorPing = function() {
       if (!$page.length) {
         $img.prop('alt', msg);
       }
-      if (($('body').data('server') === 1) && (typeof notifyBrowser === "function")) {
+      if ($('body').data('server') === 1 && typeof notifyBrowser === 'function') {
         notifyBrowser(msg);
       }
       $('body').data('server', 0);
@@ -40,7 +40,7 @@ dotclear.dmHostingMonitorPing = function() {
       }
       const msg = dotclear.dmHostingMonitor_Alt + dotclear.dmHostingMonitor_Online + ` (${new Date().toLocaleString()})`;
       $img.prop('alt', msg);
-      if (($('body').data('server') === 0) && (typeof notifyBrowser === "function")) {
+      if ($('body').data('server') === 0 && typeof notifyBrowser === 'function') {
         notifyBrowser(msg);
       }
       $('body').data('server', 1);
@@ -49,23 +49,23 @@ dotclear.dmHostingMonitorPing = function() {
   };
 
   $.get('services.php', {
-      f: 'dmHostingMonitorPing',
-      xd_check: dotclear.nonce
-    })
-    .done(function(data) {
+    f: 'dmHostingMonitorPing',
+    xd_check: dotclear.nonce,
+  })
+    .done(function (data) {
       showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
     })
-    .fail(function(jqXHR, textStatus, errorThrown) {
+    .fail(function (jqXHR, textStatus, errorThrown) {
       window.console.log(`AJAX ${textStatus} (status: ${jqXHR.status} ${errorThrown})`);
       showStatus(false);
     })
-    .always(function() {
+    .always(function () {
       // Nothing here
     });
 };
 
-$(function() {
-  Object.assign(dotclear, getData('dm_hostingmonitor'));
+$(function () {
+  Object.assign(dotclear, dotclear.getData('dm_hostingmonitor'));
   if (dotclear.dmHostingMonitor_Ping) {
     $('body').data('server', -1);
     // First pass
