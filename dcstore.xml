@@ -4,7 +4,7 @@
     <version>0.15</version>
     <author>Franck Paul</author>
     <desc>Display server information on dashboard</desc>
-    <file>https://github.com/franck-paul/dmHostingMonitor/releases/download/0.15/plugin-dmHostingMonitor.zip</file>
+    <file>https://github.com/franck-paul/dmHostingMonitor/releases/download/0.15/plugin-dmHostingMonitor-0.15.zip</file>
     <da:dcmin>2.19</da:dcmin>
     <da:details>https://open-time.net/?q=dmHostingMonitor</da:details>
     <da:support>https://github.com/franck-paul/dmHostingMonitor</da:support>
