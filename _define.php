@@ -23,10 +23,12 @@ $this->registerModule(
         'requires'    => [['core', '2.19']],
         'permissions' => 'admin',                                           // Permissions
         'type'        => 'plugin',                                          // Type
-        'details'     => 'https://open-time.net/?q=dmHostingMonitor',       // Support URL
-        'support'     => 'https://github.com/franck-paul/dmHostingMonitor', // Support URL
         'settings'    => [                                                  // Settings
             'pref' => '#user-favorites.dmhostingmonitor'
-        ]
+        ],
+
+        'details'    => 'https://open-time.net/?q=dmHostingMonitor',       // Details URL
+        'support'    => 'https://github.com/franck-paul/dmHostingMonitor', // Support URL
+        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/main/dcstore.xml'
     ]
 );
