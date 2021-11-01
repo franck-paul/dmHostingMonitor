@@ -29,6 +29,6 @@ $this->registerModule(
 
         'details'    => 'https://open-time.net/?q=dmHostingMonitor',       // Details URL
         'support'    => 'https://github.com/franck-paul/dmHostingMonitor', // Support URL
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/main/dcstore.xml'
+        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/master/dcstore.xml'
     ]
 );
