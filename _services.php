@@ -19,8 +19,10 @@ class dmHostingMonitorRest
     /**
      * Serve method to ping current server.
      *
-     * @param     core     <b>dcCore</b>     dcCore instance
-     * @param     get     <b>array</b>     cleaned $_GET
+     * @param      dcCore  $core   The core
+     * @param      array   $get    The get
+     *
+     * @return     xmlTag  The xml tag.
      */
     public static function ping($core, $get)
     {

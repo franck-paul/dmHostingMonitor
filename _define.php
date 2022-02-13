@@ -18,17 +18,17 @@ $this->registerModule(
     'Hosting Monitor Dashboard Module',        // Name
     'Display server information on dashboard', // Description
     'Franck Paul',                             // Author
-    '0.15',                                    // Version
+    '0.16',                                    // Version
     [
-        'requires'    => [['core', '2.19']],
+        'requires'    => [['core', '2.21']],
         'permissions' => 'admin',                                           // Permissions
         'type'        => 'plugin',                                          // Type
         'settings'    => [                                                  // Settings
-            'pref' => '#user-favorites.dmhostingmonitor'
+            'pref' => '#user-favorites.dmhostingmonitor',
         ],
 
         'details'    => 'https://open-time.net/?q=dmHostingMonitor',       // Details URL
         'support'    => 'https://github.com/franck-paul/dmHostingMonitor', // Support URL
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/master/dcstore.xml'
+        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/master/dcstore.xml',
     ]
 );

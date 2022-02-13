@@ -122,8 +122,8 @@ class dmHostingMonitorBehaviors
         while ($rs->fetch()) {
             $settings = new dcSettings($core, $rs->blog_id);
             $settings->addNamespace('system');
-            $publicPath = $settings->system->public_path;
-            $themesPath = $settings->system->themes_path;
+            $publicPath = $settings->system->public_path;   // @phpstan-ignore-line
+            $themesPath = $settings->system->themes_path;   // @phpstan-ignore-line
             $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
             $stack[]    = (substr($themesPath, 0, 1) == '/' ? $themesPath : '../' . $themesPath);
         }
@@ -239,10 +239,20 @@ class dmHostingMonitorBehaviors
 
     private static function getInfos($core)
     {
+        $dbSize       = 0;
+        $dbMaxSize    = 0;
+        $dbMaxPercent = 0;
+        $hdTotal      = 0;
+        $hdFree       = 0;
+        $hdPercent    = 0;
+        $hdUsed       = 0;
+        $hdMaxSize    = 0;
+        $hdMaxPercent = 0;
+
         $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-        $first_threshold  = (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold;
-        $second_threshold = (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold;
+        $first_threshold  = (int) $core->auth->user_prefs->dmhostingmonitor->first_threshold;
+        $second_threshold = (int) $core->auth->user_prefs->dmhostingmonitor->second_threshold;
 
         $bargraph = $core->auth->user_prefs->dmhostingmonitor->show_gauges ? false : true;
         $large    = $core->auth->user_prefs->dmhostingmonitor->large;
@@ -388,12 +398,19 @@ class dmHostingMonitorBehaviors
             $ret = '';
 
             if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info || $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
-                $ret .= dcPage::cssLoad(urldecode(dcPage::getPF('dmHostingMonitor/style.css')), 'screen',
-                    $core->getVersion('dmHostingMonitor')) . "\n" .
-                dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
-                    $core->getVersion('dmHostingMonitor')) . "\n" .
-                dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
-                    $core->getVersion('dmHostingMonitor')) . "\n";
+                $ret .= dcPage::cssLoad(
+                    urldecode(dcPage::getPF('dmHostingMonitor/style.css')),
+                    'screen',
+                    $core->getVersion('dmHostingMonitor')
+                ) . "\n" .
+                dcPage::jsLoad(
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
+                    $core->getVersion('dmHostingMonitor')
+                ) . "\n" .
+                dcPage::jsLoad(
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
+                    $core->getVersion('dmHostingMonitor')
+                ) . "\n";
             }
 
             return $ret;
@@ -411,10 +428,12 @@ class dmHostingMonitorBehaviors
                 dcPage::jsJson('dm_hostingmonitor', [
                     'dmHostingMonitor_Ping'    => $core->auth->user_prefs->dmhostingmonitor->ping,
                     'dmHostingMonitor_Offline' => __('Server offline'),
-                    'dmHostingMonitor_Online'  => __('Server online')
+                    'dmHostingMonitor_Online'  => __('Server online'),
                 ]) .
-                dcPage::jsLoad(urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
-                    $core->getVersion('dmHostingMonitor')) . "\n";
+                dcPage::jsLoad(
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
+                    $core->getVersion('dmHostingMonitor')
+                ) . "\n";
             }
         }
     }
@@ -430,11 +449,11 @@ class dmHostingMonitorBehaviors
             // Hosting monitor options
             $core->auth->user_prefs->dmhostingmonitor->put('activated', !empty($_POST['activated']), 'boolean');
             $core->auth->user_prefs->dmhostingmonitor->put('show_hd_info', !empty($_POST['show_hd_info']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('max_hd_size', (integer) $_POST['max_hd_size'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('max_hd_size', (int) $_POST['max_hd_size'], 'integer');
             $core->auth->user_prefs->dmhostingmonitor->put('show_db_info', !empty($_POST['show_db_info']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('max_db_size', (integer) $_POST['max_db_size'], 'integer');
-            $core->auth->user_prefs->dmhostingmonitor->put('first_threshold', (integer) $_POST['first_threshold'], 'integer');
-            $core->auth->user_prefs->dmhostingmonitor->put('second_threshold', (integer) $_POST['second_threshold'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('max_db_size', (int) $_POST['max_db_size'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('first_threshold', (int) $_POST['first_threshold'], 'integer');
+            $core->auth->user_prefs->dmhostingmonitor->put('second_threshold', (int) $_POST['second_threshold'], 'integer');
             $core->auth->user_prefs->dmhostingmonitor->put('large', empty($_POST['small']), 'boolean');
             $core->auth->user_prefs->dmhostingmonitor->put('show_gauges', !empty($_POST['show_gauges']), 'boolean');
             $core->auth->user_prefs->dmhostingmonitor->put('ping', !empty($_POST['ping']), 'boolean');
@@ -461,7 +480,7 @@ class dmHostingMonitorBehaviors
         '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
 
         '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_hd_size', 1, 9999999, (integer) $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
+        form::number('max_hd_size', 1, 9999999, $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
         '</p>' .
 
         '<hr />' .
@@ -471,15 +490,15 @@ class dmHostingMonitorBehaviors
         '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
 
         '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_db_size', 1, 9999999, (integer) $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
+        form::number('max_db_size', 1, 9999999, $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
         '</p>' .
 
         '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::number('first_threshold', 1, 100, (integer) $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
+        form::number('first_threshold', 1, 100, $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
         '</p>' .
 
         '<p><label for="second_threshold" class="classic">' . __('2nd threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::number('second_threshold', 1, 100, (integer) $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
+        form::number('second_threshold', 1, 100, $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
         '</p>' .
 
         '<hr />' .

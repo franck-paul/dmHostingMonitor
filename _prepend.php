@@ -22,7 +22,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 
 // Admin mode
 
-$__autoload['dmHostingMonitorRest'] = dirname(__FILE__) . '/_services.php';
+$__autoload['dmHostingMonitorRest'] = __DIR__ . '/_services.php';
 
 // Register REST methods
 $core->rest->addFunction('dmHostingMonitorPing', ['dmHostingMonitorRest', 'ping']);
