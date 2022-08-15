@@ -25,4 +25,4 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 $__autoload['dmHostingMonitorRest'] = __DIR__ . '/_services.php';
 
 // Register REST methods
-$core->rest->addFunction('dmHostingMonitorPing', ['dmHostingMonitorRest', 'ping']);
+dcCore::app()->rest->addFunction('dmHostingMonitorPing', ['dmHostingMonitorRest', 'ping']);

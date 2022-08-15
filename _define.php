@@ -18,9 +18,9 @@ $this->registerModule(
     'Hosting Monitor Dashboard Module',        // Name
     'Display server information on dashboard', // Description
     'Franck Paul',                             // Author
-    '0.16',                                    // Version
+    '0.17',
     [
-        'requires'    => [['core', '2.21']],
+        'requires'    => [['core', '2.23']],
         'permissions' => 'admin',                                           // Permissions
         'type'        => 'plugin',                                          // Type
         'settings'    => [                                                  // Settings

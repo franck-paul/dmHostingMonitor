@@ -19,16 +19,14 @@ class dmHostingMonitorRest
     /**
      * Serve method to ping current server.
      *
-     * @param      dcCore  $core   The core
      * @param      array   $get    The get
      *
      * @return     xmlTag  The xml tag.
      */
-    public static function ping($core, $get)
+    public static function ping($get)
     {
-        $rsp      = new xmlTag('check');
-        $rsp->ret = true;
-
-        return $rsp;
+        return [
+            'ret' => true,
+        ];
     }
 }

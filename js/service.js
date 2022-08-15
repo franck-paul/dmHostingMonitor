@@ -16,31 +16,41 @@ dotclear.dmHostingMonitorPing = () => {
     if ($img.length) {
       $img.prop('alt', msg);
     }
-    if (typeof notifyBrowser === 'function') {
-      // Notify user if server status has changed
-      if ((online && $('body').data('server') === 0) || (!online && $('body').data('server') === 1)) {
-        notifyBrowser(msg);
-      }
+    if (
+      typeof notifyBrowser === 'function' &&
+      ((online && $('body').data('server') === 0) || (!online && $('body').data('server') === 1))
+    ) {
+      notifyBrowser(msg);
     }
     // Store new server status
     $('body').data('server', online ? 1 : 0);
     $img.prop('title', $img.prop('alt'));
   };
 
-  $.get('services.php', {
-    f: 'dmHostingMonitorPing',
-    xd_check: dotclear.nonce,
-  })
-    .done((data) => {
-      showStatus($('rsp[status=failed]', data).length > 0 ? false : true);
-    })
-    .fail((jqXHR, textStatus, errorThrown) => {
-      window.console.log(`AJAX ${textStatus} (status: ${jqXHR.status} ${errorThrown})`);
+  dotclear.services(
+    'dmHostingMonitorPing',
+    (data) => {
+      try {
+        const response = JSON.parse(data);
+        if (response?.success) {
+          if (response?.payload.ret) {
+            showStatus(true);
+          }
+        } else {
+          console.log(dotclear.debug && response?.message ? response.message : 'Dotclear REST server error');
+          return;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    (error) => {
+      console.log(error);
       showStatus(false);
-    })
-    .always(() => {
-      // Nothing here
-    });
+    },
+    true, // Use GET method
+    { json: 1 },
+  );
 };
 
 $(() => {

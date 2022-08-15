@@ -18,14 +18,14 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
 
 // Admin page behaviours
-$core->addBehavior('adminPageHTMLHead', ['dmHostingMonitorBehaviors', 'adminPageHTMLHead']);
+dcCore::app()->addBehavior('adminPageHTMLHead', ['dmHostingMonitorBehaviors', 'adminPageHTMLHead']);
 
 // Dashboard behaviours
-$core->addBehavior('adminDashboardHeaders', ['dmHostingMonitorBehaviors', 'adminDashboardHeaders']);
-$core->addBehavior('adminDashboardContents', ['dmHostingMonitorBehaviors', 'adminDashboardContents']);
+dcCore::app()->addBehavior('adminDashboardHeaders', ['dmHostingMonitorBehaviors', 'adminDashboardHeaders']);
+dcCore::app()->addBehavior('adminDashboardContents', ['dmHostingMonitorBehaviors', 'adminDashboardContents']);
 
-$core->addBehavior('adminAfterDashboardOptionsUpdate', ['dmHostingMonitorBehaviors', 'adminAfterDashboardOptionsUpdate']);
-$core->addBehavior('adminDashboardOptionsForm', ['dmHostingMonitorBehaviors', 'adminDashboardOptionsForm']);
+dcCore::app()->addBehavior('adminAfterDashboardOptionsUpdate', ['dmHostingMonitorBehaviors', 'adminAfterDashboardOptionsUpdate']);
+dcCore::app()->addBehavior('adminDashboardOptionsForm', ['dmHostingMonitorBehaviors', 'adminDashboardOptionsForm']);
 
 # BEHAVIORS
 class dmHostingMonitorBehaviors
@@ -60,16 +60,16 @@ class dmHostingMonitorBehaviors
         return round($size, 2) . ' ' . $suffix;
     }
 
-    private static function getDbSize($core)
+    private static function getDbSize()
     {
         // Get current db size in bytes
         $dbSize = 0;
-        switch ($core->con->syntax()) {
+        switch (dcCore::app()->con->syntax()) {
             case 'sqlite':
                 break;
             case 'postgresql':
-                $sql = 'SELECT pg_database_size(\'' . $core->con->database() . '\') AS size';
-                $rs  = $core->con->select($sql);
+                $sql = 'SELECT pg_database_size(\'' . dcCore::app()->con->database() . '\') AS size';
+                $rs  = dcCore::app()->con->select($sql);
                 while ($rs->fetch()) {
                     $dbSize += $rs->size;
                 }
@@ -77,7 +77,7 @@ class dmHostingMonitorBehaviors
                 break;
             case 'mysql':
                 $sql = 'SHOW TABLE STATUS';
-                $rs  = $core->con->select($sql);
+                $rs  = dcCore::app()->con->select($sql);
                 while ($rs->fetch()) {
                     $dbSize += $rs->Data_length + $rs->Index_length;
                 }
@@ -88,7 +88,7 @@ class dmHostingMonitorBehaviors
         return $dbSize;
     }
 
-    private static function getUsedSpace($core)
+    private static function getUsedSpace()
     {
         // Get current space used by the installation in bytes
         // Take care about potential clean-install :
@@ -118,9 +118,9 @@ class dmHostingMonitorBehaviors
 
         // For each blog : public and theme folder
         // If not absolute (1st char <> /) then prefix with ../
-        $rs = $core->getBlogs();
+        $rs = dcCore::app()->getBlogs();
         while ($rs->fetch()) {
-            $settings = new dcSettings($core, $rs->blog_id);
+            $settings = new dcSettings(dcCore::app(), $rs->blog_id);
             $settings->addNamespace('system');
             $publicPath = $settings->system->public_path;   // @phpstan-ignore-line
             $themesPath = $settings->system->themes_path;   // @phpstan-ignore-line
@@ -162,16 +162,14 @@ class dmHostingMonitorBehaviors
         // Command : du -k -s <path>
         // Runs only on unix-like systems (Mac OS X, Unix, Linux)
         foreach ($dir as $folder) {
-            if ($folder != '') {
-                $hdUsed += (int) shell_exec('du -k -s -L ' . $folder);
-            }
+            $hdUsed += (int) shell_exec('du -k -s -L ' . $folder);
         }
         $hdUsed *= 1024;
 
         return $hdUsed;
     }
 
-    private static function getFreeSpace($core)
+    private static function getFreeSpace()
     {
         // Get current free space on Hard Disk in bytes
 
@@ -185,7 +183,7 @@ class dmHostingMonitorBehaviors
         return $hdFree;
     }
 
-    private static function getTotalSpace($core)
+    private static function getTotalSpace()
     {
         // Get current total space on Hard Disk in bytes
 
@@ -237,7 +235,7 @@ class dmHostingMonitorBehaviors
         return 'percent_explode';
     }
 
-    private static function getInfos($core)
+    private static function getInfos()
     {
         $dbSize       = 0;
         $dbMaxSize    = 0;
@@ -249,21 +247,21 @@ class dmHostingMonitorBehaviors
         $hdMaxSize    = 0;
         $hdMaxPercent = 0;
 
-        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
-        $first_threshold  = (int) $core->auth->user_prefs->dmhostingmonitor->first_threshold;
-        $second_threshold = (int) $core->auth->user_prefs->dmhostingmonitor->second_threshold;
+        $first_threshold  = (int) dcCore::app()->auth->user_prefs->dmhostingmonitor->first_threshold;
+        $second_threshold = (int) dcCore::app()->auth->user_prefs->dmhostingmonitor->second_threshold;
 
-        $bargraph = $core->auth->user_prefs->dmhostingmonitor->show_gauges ? false : true;
-        $large    = $core->auth->user_prefs->dmhostingmonitor->large;
+        $bargraph = dcCore::app()->auth->user_prefs->dmhostingmonitor->show_gauges ? false : true;
+        $large    = dcCore::app()->auth->user_prefs->dmhostingmonitor->large;
 
-        if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
-            $hdTotal   = self::getTotalSpace($core);
-            $hdFree    = self::getFreeSpace($core);
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info) {
+            $hdTotal   = self::getTotalSpace();
+            $hdFree    = self::getFreeSpace();
             $hdPercent = self::getPercentageOf($hdFree, $hdTotal);
 
-            $hdUsed    = self::getUsedSpace($core);
-            $hdMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_hd_size;
+            $hdUsed    = self::getUsedSpace();
+            $hdMaxSize = dcCore::app()->auth->user_prefs->dmhostingmonitor->max_hd_size;
             if ($hdMaxSize == 0) {
                 // Use total size of hard-disk
                 $hdMaxSize = $hdTotal;
@@ -273,9 +271,9 @@ class dmHostingMonitorBehaviors
             $hdMaxPercent = self::getPercentageOf($hdUsed, $hdMaxSize);
         }
 
-        if ($core->auth->user_prefs->dmhostingmonitor->show_db_info) {
-            $dbSize    = self::getDbSize($core);
-            $dbMaxSize = $core->auth->user_prefs->dmhostingmonitor->max_db_size;
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
+            $dbSize    = self::getDbSize();
+            $dbMaxSize = dcCore::app()->auth->user_prefs->dmhostingmonitor->max_db_size;
             $dbMaxSize *= 1000 * 1000;
             $dbMaxPercent = self::getPercentageOf($dbSize, $dbMaxSize);
         }
@@ -287,7 +285,7 @@ class dmHostingMonitorBehaviors
         $bar = '';
         $pie = '';
 
-        if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info) {
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info) {
             /* Hard-disk free vs total information */
             if ($hdTotal > 0) {
                 $bar .= '<div class="graphe" title="' . __('Hard-disk free') . '">' .
@@ -340,7 +338,7 @@ class dmHostingMonitorBehaviors
             }
         }
 
-        if ($core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
             /* Database information */
             if ($dbSize > 0) {
                 $bar .= '<div class="graphe" title="' . __('Database size') . '">' .
@@ -381,35 +379,33 @@ class dmHostingMonitorBehaviors
     public static function adminDashboardContents($core, $contents)
     {
         // Add module to the contents stack
-        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info || $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
-                $contents[] = new ArrayObject([self::getInfos($core)]);
+        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) {
+            if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info || dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
+                $contents[] = new ArrayObject([self::getInfos()]);
             }
         }
     }
 
     public static function adminDashboardHeaders()
     {
-        global $core;
-
-        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
+        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) {
             $ret = '';
 
-            if ($core->auth->user_prefs->dmhostingmonitor->show_hd_info || $core->auth->user_prefs->dmhostingmonitor->show_db_info) {
+            if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info || dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
                 $ret .= dcPage::cssLoad(
                     urldecode(dcPage::getPF('dmHostingMonitor/style.css')),
                     'screen',
-                    $core->getVersion('dmHostingMonitor')
+                    dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n" .
                 dcPage::jsLoad(
                     urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
-                    $core->getVersion('dmHostingMonitor')
+                    dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n" .
                 dcPage::jsLoad(
                     urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
-                    $core->getVersion('dmHostingMonitor')
+                    dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
             }
 
@@ -419,20 +415,18 @@ class dmHostingMonitorBehaviors
 
     public static function adminPageHTMLHead()
     {
-        global $core;
-
-        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
-        if ($core->auth->user_prefs->dmhostingmonitor->activated) {
-            if ($core->auth->user_prefs->dmhostingmonitor->ping) {
+        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) {
+            if (dcCore::app()->auth->user_prefs->dmhostingmonitor->ping) {
                 echo
                 dcPage::jsJson('dm_hostingmonitor', [
-                    'dmHostingMonitor_Ping'    => $core->auth->user_prefs->dmhostingmonitor->ping,
+                    'dmHostingMonitor_Ping'    => dcCore::app()->auth->user_prefs->dmhostingmonitor->ping,
                     'dmHostingMonitor_Offline' => __('Server offline'),
                     'dmHostingMonitor_Online'  => __('Server online'),
                 ]) .
                 dcPage::jsLoad(
                     urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
-                    $core->getVersion('dmHostingMonitor')
+                    dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
             }
         }
@@ -440,81 +434,79 @@ class dmHostingMonitorBehaviors
 
     public static function adminAfterDashboardOptionsUpdate($userID)
     {
-        global $core;
-
         // Get and store user's prefs for plugin options
-        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
         try {
             // Hosting monitor options
-            $core->auth->user_prefs->dmhostingmonitor->put('activated', !empty($_POST['activated']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('show_hd_info', !empty($_POST['show_hd_info']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('max_hd_size', (int) $_POST['max_hd_size'], 'integer');
-            $core->auth->user_prefs->dmhostingmonitor->put('show_db_info', !empty($_POST['show_db_info']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('max_db_size', (int) $_POST['max_db_size'], 'integer');
-            $core->auth->user_prefs->dmhostingmonitor->put('first_threshold', (int) $_POST['first_threshold'], 'integer');
-            $core->auth->user_prefs->dmhostingmonitor->put('second_threshold', (int) $_POST['second_threshold'], 'integer');
-            $core->auth->user_prefs->dmhostingmonitor->put('large', empty($_POST['small']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('show_gauges', !empty($_POST['show_gauges']), 'boolean');
-            $core->auth->user_prefs->dmhostingmonitor->put('ping', !empty($_POST['ping']), 'boolean');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('activated', !empty($_POST['activated']), 'boolean');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('show_hd_info', !empty($_POST['show_hd_info']), 'boolean');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('max_hd_size', (int) $_POST['max_hd_size'], 'integer');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('show_db_info', !empty($_POST['show_db_info']), 'boolean');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('max_db_size', (int) $_POST['max_db_size'], 'integer');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('first_threshold', (int) $_POST['first_threshold'], 'integer');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('second_threshold', (int) $_POST['second_threshold'], 'integer');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('large', empty($_POST['small']), 'boolean');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('show_gauges', !empty($_POST['show_gauges']), 'boolean');
+            dcCore::app()->auth->user_prefs->dmhostingmonitor->put('ping', !empty($_POST['ping']), 'boolean');
         } catch (Exception $e) {
-            $core->error->add($e->getMessage());
+            dcCore::app()->error->add($e->getMessage());
         }
     }
 
     public static function adminDashboardOptionsForm($core)
     {
         // Add fieldset for plugin options
-        $core->auth->user_prefs->addWorkspace('dmhostingmonitor');
+        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
         echo '<div class="fieldset" id="dmhostingmonitor"><h4>' . __('Hosting monitor on dashboard') . '</h4>' .
 
         '<p>' .
-        form::checkbox('activated', 1, $core->auth->user_prefs->dmhostingmonitor->activated) . ' ' .
+        form::checkbox('activated', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) . ' ' .
         '<label for="activated" class="classic">' . __('Activate module') . '</label></p>' .
 
         '<hr />' .
 
         '<p>' .
-        form::checkbox('show_hd_info', 1, $core->auth->user_prefs->dmhostingmonitor->show_hd_info) . ' ' .
+        form::checkbox('show_hd_info', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info) . ' ' .
         '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
 
         '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_hd_size', 1, 9999999, $core->auth->user_prefs->dmhostingmonitor->max_hd_size) .
+        form::number('max_hd_size', 1, 9999999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_hd_size) .
         '</p>' .
 
         '<hr />' .
 
         '<p>' .
-        form::checkbox('show_db_info', 1, $core->auth->user_prefs->dmhostingmonitor->show_db_info) . ' ' .
+        form::checkbox('show_db_info', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) . ' ' .
         '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
 
         '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_db_size', 1, 9999999, $core->auth->user_prefs->dmhostingmonitor->max_db_size) .
+        form::number('max_db_size', 1, 9999999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_db_size) .
         '</p>' .
 
         '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::number('first_threshold', 1, 100, $core->auth->user_prefs->dmhostingmonitor->first_threshold) .
+        form::number('first_threshold', 1, 100, dcCore::app()->auth->user_prefs->dmhostingmonitor->first_threshold) .
         '</p>' .
 
         '<p><label for="second_threshold" class="classic">' . __('2nd threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::number('second_threshold', 1, 100, $core->auth->user_prefs->dmhostingmonitor->second_threshold) .
+        form::number('second_threshold', 1, 100, dcCore::app()->auth->user_prefs->dmhostingmonitor->second_threshold) .
         '</p>' .
 
         '<hr />' .
 
         '<p>' .
-        form::checkbox('small', 1, !$core->auth->user_prefs->dmhostingmonitor->large) . ' ' .
+        form::checkbox('small', 1, !dcCore::app()->auth->user_prefs->dmhostingmonitor->large) . ' ' .
         '<label for="small" class="classic">' . __('Small screen') . '</label></p>' .
 
         '<p>' .
-        form::checkbox('show_gauges', 1, $core->auth->user_prefs->dmhostingmonitor->show_gauges) . ' ' .
+        form::checkbox('show_gauges', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->show_gauges) . ' ' .
         '<label for="show_gauges" class="classic">' . __('Show gauges instead of bar graph') . '</label></p>' .
 
         '<hr />' .
 
         '<p>' .
-        form::checkbox('ping', 1, $core->auth->user_prefs->dmhostingmonitor->ping) . ' ' .
+        form::checkbox('ping', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->ping) . ' ' .
         '<label for="ping" class="classic">' . __('Check server status') . '</label></p>' .
 
             '</div>';
