@@ -120,7 +120,7 @@ class dmHostingMonitorBehaviors
         // If not absolute (1st char <> /) then prefix with ../
         $rs = dcCore::app()->getBlogs();
         while ($rs->fetch()) {
-            $settings = new dcSettings(dcCore::app(), $rs->blog_id);
+            $settings = new dcSettings($rs->blog_id);
             $settings->addNamespace('system');
             $publicPath = $settings->system->public_path;   // @phpstan-ignore-line
             $themesPath = $settings->system->themes_path;   // @phpstan-ignore-line
@@ -178,9 +178,7 @@ class dmHostingMonitorBehaviors
             return $hdFree;
         }
 
-        $hdFree = (float) @disk_free_space('.');
-
-        return $hdFree;
+        return (float) @disk_free_space('.');
     }
 
     private static function getTotalSpace()
@@ -192,9 +190,7 @@ class dmHostingMonitorBehaviors
             return $hdTotal;
         }
 
-        $hdTotal = (float) @disk_total_space('.');
-
-        return $hdTotal;
+        return (float) @disk_total_space('.');
     }
 
     private static function getPercentageOf($part, $total)
@@ -220,9 +216,7 @@ class dmHostingMonitorBehaviors
             $firstLevel = $secondLevel;
         }
         if ($secondLevel < $firstLevel) {
-            $temp        = $firstLevel;
-            $firstLevel  = $secondLevel;
-            $secondLevel = $firstLevel;
+            [$firstLevel, $secondLevel] = [$secondLevel, $firstLevel];
         }
         if ($value < $firstLevel) {
             return 'percent_cool';
@@ -416,9 +410,8 @@ class dmHostingMonitorBehaviors
     public static function adminPageHTMLHead()
     {
         dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
-        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) {
-            if (dcCore::app()->auth->user_prefs->dmhostingmonitor->ping) {
-                echo
+        if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated && dcCore::app()->auth->user_prefs->dmhostingmonitor->ping) {
+            echo
                 dcPage::jsJson('dm_hostingmonitor', [
                     'dmHostingMonitor_Ping'    => dcCore::app()->auth->user_prefs->dmhostingmonitor->ping,
                     'dmHostingMonitor_Offline' => __('Server offline'),
@@ -428,11 +421,10 @@ class dmHostingMonitorBehaviors
                     urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
-            }
         }
     }
 
-    public static function adminAfterDashboardOptionsUpdate($userID)
+    public static function adminAfterDashboardOptionsUpdate()
     {
         // Get and store user's prefs for plugin options
         dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
@@ -454,7 +446,7 @@ class dmHostingMonitorBehaviors
         }
     }
 
-    public static function adminDashboardOptionsForm($core)
+    public static function adminDashboardOptionsForm()
     {
         // Add fieldset for plugin options
         dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');

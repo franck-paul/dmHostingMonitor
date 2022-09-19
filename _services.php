@@ -19,11 +19,9 @@ class dmHostingMonitorRest
     /**
      * Serve method to ping current server.
      *
-     * @param      array   $get    The get
-     *
-     * @return     xmlTag  The xml tag.
+     * @return     array   The payload.
      */
-    public static function ping($get)
+    public static function ping(): array
     {
         return [
             'ret' => true,
