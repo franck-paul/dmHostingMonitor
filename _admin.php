@@ -266,8 +266,9 @@ class dmHostingMonitorBehaviors
         '<h3>' . '<img src="' . urldecode(dcPage::getPF('dmHostingMonitor/icon.png')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
         $legend = [];
 
-        $bar = '';
-        $pie = '';
+        $bar  = '';
+        $pie  = '';
+        $json = [];
 
         if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info) {
             /* Hard-disk free vs total information */
@@ -288,11 +289,8 @@ class dmHostingMonitorBehaviors
                 }
                 $pie .= '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
                 '<p>' . __('HD Free') . ($large ? ' (' . self::readableSize($hdFree) . ')' : '') . '</p>' .
-                '</div>' .
-                "<script type=\"text/javascript\">\n" .
-                'var gauge_hd_free = new JustGage({id: "hd-free",value: ' . (100 - $hdPercent) .
-                ',min: 0,max: 100,label: "%",showInnerShadow: false});' . "\n" .
-                "</script>\n";
+                '</div>';
+                $json['hd_free'] = 100 - $hdPercent;
             }
             /* Dotclear used vs allocated space information */
             if ($hdUsed > 0) {
@@ -316,11 +314,8 @@ class dmHostingMonitorBehaviors
                 }
                 $pie .= '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
                 '<p>' . __('HD Used') . ($large ? ' (' . self::readableSize($hdUsed) . ')' : '') . '</p>' .
-                '</div>' .
-                "<script type=\"text/javascript\">\n" .
-                'var gauge_hd_used = new JustGage({id: "hd-used",value: ' . ($hdMaxSize > 0 ? $hdMaxPercent : 0) .
-                ',min: 0,max: 100,label: "%",showInnerShadow: false});' . "\n" .
-                "</script>\n";
+                '</div>';
+                $json['hd_used'] = $hdMaxSize > 0 ? $hdMaxPercent : 0;
             }
         }
 
@@ -345,11 +340,8 @@ class dmHostingMonitorBehaviors
                 }
                 $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
                 '<p>' . __('DB Size') . ($large ? ' (' . self::readableSize($dbSize) . ')' : '') . '</p>' .
-                '</div>' .
-                "<script type=\"text/javascript\">\n" .
-                'var gauge_db_used = new JustGage({id: "db-used",value: ' . ($dbMaxSize > 0 ? $dbMaxPercent : 0) .
-                ',min: 0,max: 100,label: "%",showInnerShadow: false});' . "\n" .
-                "</script>\n";
+                '</div>';
+                $json['db_used'] = $dbMaxSize > 0 ? $dbMaxPercent : 0;
             }
         }
 
@@ -359,6 +351,14 @@ class dmHostingMonitorBehaviors
 
         $ret .= ($bargraph ? $bar : $pie);
         $ret .= '</div>';
+
+        if ($pie !== '') {
+            $ret .= dcPage::jsJson('dm_hostingmonitor_values', $json) .
+                    dcPage::jsLoad(
+                        urldecode(dcPage::getPF('dmHostingMonitor/js/admin.js')),
+                        dcCore::app()->getVersion('dmHostingMonitor')
+                    );
+        }
 
         return $ret;
     }
