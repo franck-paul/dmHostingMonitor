@@ -17,16 +17,6 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 // dead but useful code, in order to have translations
 __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
 
-// Admin page behaviours
-dcCore::app()->addBehavior('adminPageHTMLHead', ['dmHostingMonitorBehaviors', 'adminPageHTMLHead']);
-
-// Dashboard behaviours
-dcCore::app()->addBehavior('adminDashboardHeaders', ['dmHostingMonitorBehaviors', 'adminDashboardHeaders']);
-dcCore::app()->addBehavior('adminDashboardContents', ['dmHostingMonitorBehaviors', 'adminDashboardContents']);
-
-dcCore::app()->addBehavior('adminAfterDashboardOptionsUpdate', ['dmHostingMonitorBehaviors', 'adminAfterDashboardOptionsUpdate']);
-dcCore::app()->addBehavior('adminDashboardOptionsForm', ['dmHostingMonitorBehaviors', 'adminDashboardOptionsForm']);
-
 # BEHAVIORS
 class dmHostingMonitorBehaviors
 {
@@ -69,7 +59,7 @@ class dmHostingMonitorBehaviors
                 break;
             case 'postgresql':
                 $sql = 'SELECT pg_database_size(\'' . dcCore::app()->con->database() . '\') AS size';
-                $rs  = dcCore::app()->con->select($sql);
+                $rs  = new dcRecord(dcCore::app()->con->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->size;
                 }
@@ -77,7 +67,7 @@ class dmHostingMonitorBehaviors
                 break;
             case 'mysql':
                 $sql = 'SHOW TABLE STATUS';
-                $rs  = dcCore::app()->con->select($sql);
+                $rs  = new dcRecord(dcCore::app()->con->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->Data_length + $rs->Index_length;
                 }
@@ -296,12 +286,13 @@ class dmHostingMonitorBehaviors
                 } else {
                     $legend[] = __('HD Free');
                 }
-                $pie .= '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                $pie .= '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
+                '<p>' . __('HD Free') . ($large ? ' (' . self::readableSize($hdFree) . ')' : '') . '</p>' .
+                '</div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_hd_free = new JustGage({id: "hd-free",value: ' . (100 - $hdPercent) .
-                ',min: 0,max: 100,label: "%",title: "' . __('HD Free') . ' (' . self::readableSize($hdFree) .
-                    ')",showInnerShadow: false});' . "\n" .
-                    "</script>\n";
+                ',min: 0,max: 100,label: "%",showInnerShadow: false});' . "\n" .
+                "</script>\n";
             }
             /* Dotclear used vs allocated space information */
             if ($hdUsed > 0) {
@@ -323,12 +314,13 @@ class dmHostingMonitorBehaviors
                 } else {
                     $legend[] = __('HD Used');
                 }
-                $pie .= '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                $pie .= '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
+                '<p>' . __('HD Used') . ($large ? ' (' . self::readableSize($hdUsed) . ')' : '') . '</p>' .
+                '</div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_hd_used = new JustGage({id: "hd-used",value: ' . ($hdMaxSize > 0 ? $hdMaxPercent : 0) .
-                ',min: 0,max: 100,label: "%",title: "' . __('HD Used') . ' (' . self::readableSize($hdUsed) .
-                    ')",showInnerShadow: false});' . "\n" .
-                    "</script>\n";
+                ',min: 0,max: 100,label: "%",showInnerShadow: false});' . "\n" .
+                "</script>\n";
             }
         }
 
@@ -351,12 +343,13 @@ class dmHostingMonitorBehaviors
                 } else {
                     $legend[] = __('DB Size');
                 }
-                $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '"></div>' .
+                $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
+                '<p>' . __('DB Size') . ($large ? ' (' . self::readableSize($dbSize) . ')' : '') . '</p>' .
+                '</div>' .
                 "<script type=\"text/javascript\">\n" .
                 'var gauge_db_used = new JustGage({id: "db-used",value: ' . ($dbMaxSize > 0 ? $dbMaxPercent : 0) .
-                ',min: 0,max: 100,label: "%",title: "' . __('DB Size') . ' (' . self::readableSize($dbSize) .
-                    ')",showInnerShadow: false});' . "\n" .
-                    "</script>\n";
+                ',min: 0,max: 100,label: "%",showInnerShadow: false});' . "\n" .
+                "</script>\n";
             }
         }
 
@@ -389,16 +382,16 @@ class dmHostingMonitorBehaviors
 
             if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info || dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
                 $ret .= dcPage::cssLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/style.css')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/css/style.min.css')),
                     'screen',
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n" .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.2.1.0.min.js')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.min.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n" .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.1.0.1.min.js')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.min.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
             }
@@ -504,3 +497,13 @@ class dmHostingMonitorBehaviors
             '</div>';
     }
 }
+
+// Admin page behaviours
+dcCore::app()->addBehavior('adminPageHTMLHead', [dmHostingMonitorBehaviors::class, 'adminPageHTMLHead']);
+
+// Dashboard behaviours
+dcCore::app()->addBehavior('adminDashboardHeaders', [dmHostingMonitorBehaviors::class, 'adminDashboardHeaders']);
+dcCore::app()->addBehavior('adminDashboardContents', [dmHostingMonitorBehaviors::class, 'adminDashboardContents']);
+
+dcCore::app()->addBehavior('adminAfterDashboardOptionsUpdate', [dmHostingMonitorBehaviors::class, 'adminAfterDashboardOptionsUpdate']);
+dcCore::app()->addBehavior('adminDashboardOptionsForm', [dmHostingMonitorBehaviors::class, 'adminDashboardOptionsForm']);

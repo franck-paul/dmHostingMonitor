@@ -15,20 +15,26 @@ if (!defined('DC_RC_PATH')) {
 }
 
 $this->registerModule(
-    'Hosting Monitor Dashboard Module',        // Name
-    'Display server information on dashboard', // Description
-    'Franck Paul',                             // Author
+    'Hosting Monitor Dashboard Module',
+    'Display server information on dashboard',
+    'Franck Paul',
     '0.17',
     [
-        'requires'    => [['core', '2.24']],
-        'permissions' => 'admin',                                           // Permissions
-        'type'        => 'plugin',                                          // Type
-        'settings'    => [                                                  // Settings
+        'requires' => [
+            ['core', '2.24'],
+            ['dmHelper', '1.0'],
+        ],
+        'permissions' => dcCore::app()->auth->makePermissions([
+            dcAuth::PERMISSION_ADMIN,
+        ]),
+        'type'     => 'plugin',
+        'priority' => 1001,     // Must be higher than dmHelper priority which should be 1000 (default)
+        'settings' => [
             'pref' => '#user-favorites.dmhostingmonitor',
         ],
 
-        'details'    => 'https://open-time.net/?q=dmHostingMonitor',       // Details URL
-        'support'    => 'https://github.com/franck-paul/dmHostingMonitor', // Support URL
+        'details'    => 'https://open-time.net/?q=dmHostingMonitor',
+        'support'    => 'https://github.com/franck-paul/dmHostingMonitor',
         'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/master/dcstore.xml',
     ]
 );

@@ -27,29 +27,15 @@ dotclear.dmHostingMonitorPing = () => {
     $img.prop('title', $img.prop('alt'));
   };
 
-  dotclear.services(
-    'dmHostingMonitorPing',
-    (data) => {
-      try {
-        const response = JSON.parse(data);
-        if (response?.success) {
-          if (response?.payload.ret) {
-            showStatus(true);
-          }
-        } else {
-          console.log(dotclear.debug && response?.message ? response.message : 'Dotclear REST server error');
-          return;
-        }
-      } catch (e) {
-        console.log(e);
-      }
+  dotclear.jsonServices(
+    'dmHelperPing', // Provided by dmHelper plugin
+    (payload) => {
+      showStatus(payload.ret);
     },
     (error) => {
       console.log(error);
       showStatus(false);
     },
-    true, // Use GET method
-    { json: 1 },
   );
 };
 

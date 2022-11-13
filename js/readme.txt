@@ -13,3 +13,9 @@ And it can even be made working on older Androids but hey - you don't really exp
 So, if you feel like justGage has been useful to you, or you’d like to see more features, buy me a coffee so I can stay awake and do more cool stuff.
 
 Throw comments, questions, eggs and tomatoes @Toorshia.
+
+----
+
+justgage : 1.5.1 (https://github.com/toorshia/justgage)
+raphael : 2.3.0 (https://github.com/DmitryBaranovskiy/raphael)
+

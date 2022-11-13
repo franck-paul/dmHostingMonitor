@@ -9,13 +9,21 @@
 .pie-small {
   width: 140px;
   height: 90px;
-  display: inline-block;
 }
 
 .pie-large {
   width: 200px;
   height: 160px;
+}
+
+.pie-large,
+.pie-small {
   display: inline-block;
+}
+
+.pie-large p,
+.pie-small p {
+  text-align: center;
 }
 
 .graphe {
@@ -36,7 +44,7 @@
 .graphe .barre {
   display: block;
   position: relative;
-  background: #B1D632;
+  background: #b1d632;
   text-align: center;
   color: #333;
   height: 2em;
@@ -44,7 +52,7 @@
 }
 
 .graphe .barre.percent_cool {
-  background: #B1D632;
+  background: #b1d632;
 }
 
 .graphe .barre.percent_warning {

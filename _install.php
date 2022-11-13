@@ -35,6 +35,19 @@ try {
     dcCore::app()->auth->user_prefs->dmhostingmonitor->put('large', true, 'boolean', 'Large display', false, true);
     dcCore::app()->auth->user_prefs->dmhostingmonitor->put('ping', true, 'boolean', 'Check server status', false, true);
 
+    if (version_compare($old_version, '0.17', '<')) {
+        try {
+            // Some cleanup is needed as 0.17+ use dmHelper services
+            @unlink(__DIR__ . DIRECTORY_SEPARATOR . '_prepend.php');
+            @unlink(__DIR__ . DIRECTORY_SEPARATOR . '_services.php');
+            @unlink(__DIR__ . DIRECTORY_SEPARATOR . 'style.css');
+            @unlink(__DIR__ . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'justgage.1.0.1.min.js');
+            @unlink(__DIR__ . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'raphael.2.1.0.min.js');
+        } catch (Exception $e) {
+            dcCore::app()->error->add($e->getMessage());
+        }
+    }
+
     dcCore::app()->setVersion('dmHostingMonitor', $new_version);
 
     return true;
