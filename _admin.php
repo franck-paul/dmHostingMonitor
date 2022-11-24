@@ -355,7 +355,7 @@ class dmHostingMonitorBehaviors
         if ($pie !== '') {
             $ret .= dcPage::jsJson('dm_hostingmonitor_values', $json) .
                     dcPage::jsLoad(
-                        urldecode(dcPage::getPF('dmHostingMonitor/js/admin.js')),
+                        urldecode(dcPage::getPF('dmHostingMonitor/js/admin.min.js')),
                         dcCore::app()->getVersion('dmHostingMonitor')
                     );
         }
@@ -363,7 +363,7 @@ class dmHostingMonitorBehaviors
         return $ret;
     }
 
-    public static function adminDashboardContents($core, $contents)
+    public static function adminDashboardContents($contents)
     {
         // Add module to the contents stack
         dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
@@ -411,7 +411,7 @@ class dmHostingMonitorBehaviors
                     'dmHostingMonitor_Online'  => __('Server online'),
                 ]) .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/service.min.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
         }
@@ -503,7 +503,7 @@ dcCore::app()->addBehavior('adminPageHTMLHead', [dmHostingMonitorBehaviors::clas
 
 // Dashboard behaviours
 dcCore::app()->addBehavior('adminDashboardHeaders', [dmHostingMonitorBehaviors::class, 'adminDashboardHeaders']);
-dcCore::app()->addBehavior('adminDashboardContents', [dmHostingMonitorBehaviors::class, 'adminDashboardContents']);
+dcCore::app()->addBehavior('adminDashboardContentsV2', [dmHostingMonitorBehaviors::class, 'adminDashboardContents']);
 
 dcCore::app()->addBehavior('adminAfterDashboardOptionsUpdate', [dmHostingMonitorBehaviors::class, 'adminAfterDashboardOptionsUpdate']);
-dcCore::app()->addBehavior('adminDashboardOptionsForm', [dmHostingMonitorBehaviors::class, 'adminDashboardOptionsForm']);
+dcCore::app()->addBehavior('adminDashboardOptionsFormV2', [dmHostingMonitorBehaviors::class, 'adminDashboardOptionsForm']);

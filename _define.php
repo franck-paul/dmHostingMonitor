@@ -18,7 +18,7 @@ $this->registerModule(
     'Hosting Monitor Dashboard Module',
     'Display server information on dashboard',
     'Franck Paul',
-    '0.17',
+    '0.18',
     [
         'requires' => [
             ['core', '2.24'],
