@@ -17,7 +17,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 $new_version = dcCore::app()->plugins->moduleInfo('dmHostingMonitor', 'version');
 $old_version = dcCore::app()->getVersion('dmHostingMonitor');
 
-if (version_compare($old_version, $new_version, '>=')) {
+if (version_compare((string) $old_version, $new_version, '>=')) {
     return;
 }
 
@@ -35,7 +35,7 @@ try {
     dcCore::app()->auth->user_prefs->dmhostingmonitor->put('large', true, 'boolean', 'Large display', false, true);
     dcCore::app()->auth->user_prefs->dmhostingmonitor->put('ping', true, 'boolean', 'Check server status', false, true);
 
-    if (version_compare($old_version, '0.17', '<')) {
+    if (version_compare((string) $old_version, '0.17', '<')) {
         try {
             // Some cleanup is needed as 0.17+ use dmHelper services
             @unlink(__DIR__ . DIRECTORY_SEPARATOR . '_prepend.php');
