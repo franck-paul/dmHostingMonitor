@@ -23,18 +23,18 @@ class dmHostingMonitorBehaviors
     private static function readableSize($size)
     {
         switch (true) {
-            case ($size > 1000000000000):
-                $size /= 1000000000000;
+            case ($size > 1_000_000_000_000):
+                $size /= 1_000_000_000_000;
                 $suffix = __('TB');
 
                 break;
-            case ($size > 1000000000):
-                $size /= 1000000000;
+            case ($size > 1_000_000_000):
+                $size /= 1_000_000_000;
                 $suffix = __('GB');
 
                 break;
-            case ($size > 1000000):
-                $size /= 1000000;
+            case ($size > 1_000_000):
+                $size /= 1_000_000;
                 $suffix = __('MB');
 
                 break;
@@ -101,7 +101,7 @@ class dmHostingMonitorBehaviors
 
         // Plugins
         $plugins = explode(PATH_SEPARATOR, DC_PLUGINS_ROOT);
-        $stack   = array_merge($stack, $plugins);
+        $stack   = [...$stack, ...$plugins];
 
         // Cache
         $stack[] = DC_TPL_CACHE;
@@ -110,8 +110,7 @@ class dmHostingMonitorBehaviors
         // If not absolute (1st char <> /) then prefix with ../
         $rs = dcCore::app()->getBlogs();
         while ($rs->fetch()) {
-            $settings = new dcSettings($rs->blog_id);
-            $settings->addNamespace('system');
+            $settings   = new dcSettings($rs->blog_id);
             $publicPath = $settings->system->public_path;   // @phpstan-ignore-line
             $themesPath = $settings->system->themes_path;   // @phpstan-ignore-line
             $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
@@ -230,8 +229,6 @@ class dmHostingMonitorBehaviors
         $hdUsed       = 0;
         $hdMaxSize    = 0;
         $hdMaxPercent = 0;
-
-        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
         $first_threshold  = (int) dcCore::app()->auth->user_prefs->dmhostingmonitor->first_threshold;
         $second_threshold = (int) dcCore::app()->auth->user_prefs->dmhostingmonitor->second_threshold;
@@ -355,7 +352,7 @@ class dmHostingMonitorBehaviors
         if ($pie !== '') {
             $ret .= dcPage::jsJson('dm_hostingmonitor_values', $json) .
                     dcPage::jsLoad(
-                        urldecode(dcPage::getPF('dmHostingMonitor/js/admin.min.js')),
+                        urldecode(dcPage::getPF('dmHostingMonitor/js/admin.js')),
                         dcCore::app()->getVersion('dmHostingMonitor')
                     );
         }
@@ -366,7 +363,6 @@ class dmHostingMonitorBehaviors
     public static function adminDashboardContents($contents)
     {
         // Add module to the contents stack
-        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) {
             if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info || dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
                 $contents[] = new ArrayObject([self::getInfos()]);
@@ -376,22 +372,21 @@ class dmHostingMonitorBehaviors
 
     public static function adminDashboardHeaders()
     {
-        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) {
             $ret = '';
 
             if (dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info || dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) {
                 $ret .= dcPage::cssLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/css/style.min.css')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/css/style.css')),
                     'screen',
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n" .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.min.js')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n" .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.min.js')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
             }
@@ -402,7 +397,6 @@ class dmHostingMonitorBehaviors
 
     public static function adminPageHTMLHead()
     {
-        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
         if (dcCore::app()->auth->user_prefs->dmhostingmonitor->activated && dcCore::app()->auth->user_prefs->dmhostingmonitor->ping) {
             echo
                 dcPage::jsJson('dm_hostingmonitor', [
@@ -411,7 +405,7 @@ class dmHostingMonitorBehaviors
                     'dmHostingMonitor_Online'  => __('Server online'),
                 ]) .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/service.min.js')),
+                    urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
                     dcCore::app()->getVersion('dmHostingMonitor')
                 ) . "\n";
         }
@@ -420,8 +414,6 @@ class dmHostingMonitorBehaviors
     public static function adminAfterDashboardOptionsUpdate()
     {
         // Get and store user's prefs for plugin options
-        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
-
         try {
             // Hosting monitor options
             dcCore::app()->auth->user_prefs->dmhostingmonitor->put('activated', !empty($_POST['activated']), 'boolean');
@@ -442,7 +434,6 @@ class dmHostingMonitorBehaviors
     public static function adminDashboardOptionsForm()
     {
         // Add fieldset for plugin options
-        dcCore::app()->auth->user_prefs->addWorkspace('dmhostingmonitor');
 
         echo '<div class="fieldset" id="dmhostingmonitor"><h4>' . __('Hosting monitor on dashboard') . '</h4>' .
 
@@ -457,7 +448,7 @@ class dmHostingMonitorBehaviors
         '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
 
         '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_hd_size', 1, 9999999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_hd_size) .
+        form::number('max_hd_size', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_hd_size) .
         '</p>' .
 
         '<hr />' .
@@ -467,7 +458,7 @@ class dmHostingMonitorBehaviors
         '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
 
         '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_db_size', 1, 9999999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_db_size) .
+        form::number('max_db_size', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_db_size) .
         '</p>' .
 
         '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
@@ -498,12 +489,14 @@ class dmHostingMonitorBehaviors
     }
 }
 
-// Admin page behaviours
-dcCore::app()->addBehavior('adminPageHTMLHead', [dmHostingMonitorBehaviors::class, 'adminPageHTMLHead']);
+dcCore::app()->addBehaviors([
+    // Admin page behaviours
+    'adminPageHTMLHead'                => [dmHostingMonitorBehaviors::class, 'adminPageHTMLHead'],
 
-// Dashboard behaviours
-dcCore::app()->addBehavior('adminDashboardHeaders', [dmHostingMonitorBehaviors::class, 'adminDashboardHeaders']);
-dcCore::app()->addBehavior('adminDashboardContentsV2', [dmHostingMonitorBehaviors::class, 'adminDashboardContents']);
+    // Dashboard behaviours
+    'adminDashboardHeaders'            => [dmHostingMonitorBehaviors::class, 'adminDashboardHeaders'],
+    'adminDashboardContentsV2'         => [dmHostingMonitorBehaviors::class, 'adminDashboardContents'],
 
-dcCore::app()->addBehavior('adminAfterDashboardOptionsUpdate', [dmHostingMonitorBehaviors::class, 'adminAfterDashboardOptionsUpdate']);
-dcCore::app()->addBehavior('adminDashboardOptionsFormV2', [dmHostingMonitorBehaviors::class, 'adminDashboardOptionsForm']);
+    'adminAfterDashboardOptionsUpdate' => [dmHostingMonitorBehaviors::class, 'adminAfterDashboardOptionsUpdate'],
+    'adminDashboardOptionsFormV2'      => [dmHostingMonitorBehaviors::class, 'adminDashboardOptionsForm'],
+]);

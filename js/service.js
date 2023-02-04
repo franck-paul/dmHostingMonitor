@@ -33,7 +33,7 @@ dotclear.dmHostingMonitorPing = () => {
       showStatus(payload.ret);
     },
     (error) => {
-      console.log(error);
+      if (dotclear?.debug) console.log(error);
       showStatus(false);
     },
   );
