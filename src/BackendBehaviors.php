@@ -10,15 +10,26 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return;
-}
+declare(strict_types=1);
 
-// dead but useful code, in order to have translations
-__('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');
+namespace Dotclear\Plugin\dmHostingMonitor;
 
-# BEHAVIORS
-class dmHostingMonitorBehaviors
+use ArrayObject;
+use dcCore;
+use dcPage;
+use dcSettings;
+use Dotclear\Database\MetaRecord;
+use Dotclear\Helper\File\Path;
+use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\Fieldset;
+use Dotclear\Helper\Html\Form\Label;
+use Dotclear\Helper\Html\Form\Legend;
+use Dotclear\Helper\Html\Form\Number;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Text;
+use Exception;
+
+class BackendBehaviors
 {
     private static function readableSize($size)
     {
@@ -59,7 +70,7 @@ class dmHostingMonitorBehaviors
                 break;
             case 'postgresql':
                 $sql = 'SELECT pg_database_size(\'' . dcCore::app()->con->database() . '\') AS size';
-                $rs  = new dcRecord(dcCore::app()->con->select($sql));
+                $rs  = new MetaRecord(dcCore::app()->con->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->size;
                 }
@@ -67,7 +78,7 @@ class dmHostingMonitorBehaviors
                 break;
             case 'mysql':
                 $sql = 'SHOW TABLE STATUS';
-                $rs  = new dcRecord(dcCore::app()->con->select($sql));
+                $rs  = new MetaRecord(dcCore::app()->con->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->Data_length + $rs->Index_length;
                 }
@@ -121,7 +132,7 @@ class dmHostingMonitorBehaviors
         $dir = [];
         foreach ($stack as $path) {
             // Get real path
-            $realPath = path::real($path);
+            $realPath = Path::real($path);
             if (!$realPath) {
                 continue;
             }
@@ -435,68 +446,61 @@ class dmHostingMonitorBehaviors
     {
         // Add fieldset for plugin options
 
-        echo '<div class="fieldset" id="dmhostingmonitor"><h4>' . __('Hosting monitor on dashboard') . '</h4>' .
-
-        '<p>' .
-        form::checkbox('activated', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->activated) . ' ' .
-        '<label for="activated" class="classic">' . __('Activate module') . '</label></p>' .
-
-        '<hr />' .
-
-        '<p>' .
-        form::checkbox('show_hd_info', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info) . ' ' .
-        '<label for="show_hd_info" class="classic">' . __('Show hard-disk information') . '</label></p>' .
-
-        '<p><label for="max_hd_size" class="classic">' . __('Allocated hard-disk size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_hd_size', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_hd_size) .
-        '</p>' .
-
-        '<hr />' .
-
-        '<p>' .
-        form::checkbox('show_db_info', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info) . ' ' .
-        '<label for="show_db_info" class="classic">' . __('Show database information') . '</label></p>' .
-
-        '<p><label for="max_db_size" class="classic">' . __('Allocated database size (in Mb, leave empty for unlimited):') . '</label> ' .
-        form::number('max_db_size', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_db_size) .
-        '</p>' .
-
-        '<p><label for="first_threshold" class="classic">' . __('1st threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::number('first_threshold', 1, 100, dcCore::app()->auth->user_prefs->dmhostingmonitor->first_threshold) .
-        '</p>' .
-
-        '<p><label for="second_threshold" class="classic">' . __('2nd threshold (in %, leave empty to ignore):') . '</label> ' .
-        form::number('second_threshold', 1, 100, dcCore::app()->auth->user_prefs->dmhostingmonitor->second_threshold) .
-        '</p>' .
-
-        '<hr />' .
-
-        '<p>' .
-        form::checkbox('small', 1, !dcCore::app()->auth->user_prefs->dmhostingmonitor->large) . ' ' .
-        '<label for="small" class="classic">' . __('Small screen') . '</label></p>' .
-
-        '<p>' .
-        form::checkbox('show_gauges', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->show_gauges) . ' ' .
-        '<label for="show_gauges" class="classic">' . __('Show gauges instead of bar graph') . '</label></p>' .
-
-        '<hr />' .
-
-        '<p>' .
-        form::checkbox('ping', 1, dcCore::app()->auth->user_prefs->dmhostingmonitor->ping) . ' ' .
-        '<label for="ping" class="classic">' . __('Check server status') . '</label></p>' .
-
-            '</div>';
+        echo
+        (new Fieldset('dmhostingmonitor'))
+        ->legend((new Legend(__('Hosting monitor on dashboard'))))
+        ->fields([
+            (new Para())->items([
+                (new Checkbox('activated', dcCore::app()->auth->user_prefs->dmhostingmonitor->activated))
+                    ->value(1)
+                    ->label((new Label(__('Activate module'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+            (new Text(null, '<hr />')),
+            (new Para())->items([
+                (new Checkbox('show_hd_info', dcCore::app()->auth->user_prefs->dmhostingmonitor->show_hd_info))
+                    ->value(1)
+                    ->label((new Label(__('Show hard-disk information'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+            (new Para())->items([
+                (new Number('max_hd_size', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_hd_size))
+                    ->label((new Label(__('Allocated hard-disk size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
+            ]),
+            (new Text(null, '<hr />')),
+            (new Para())->items([
+                (new Checkbox('show_db_info', dcCore::app()->auth->user_prefs->dmhostingmonitor->show_db_info))
+                    ->value(1)
+                    ->label((new Label(__('Show database information'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+            (new Para())->items([
+                (new Number('max_db_size', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->max_db_size))
+                    ->label((new Label(__('Allocated database size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
+            ]),
+            (new Para())->items([
+                (new Number('first_threshold', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->first_threshold))
+                    ->label((new Label(__('1st threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
+            ]),
+            (new Para())->items([
+                (new Number('second_threshold', 1, 9_999_999, dcCore::app()->auth->user_prefs->dmhostingmonitor->second_threshold))
+                    ->label((new Label(__('2nd threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
+            ]),
+            (new Text(null, '<hr />')),
+            (new Para())->items([
+                (new Checkbox('small', dcCore::app()->auth->user_prefs->dmhostingmonitor->large))
+                    ->value(1)
+                    ->label((new Label(__('Small screen'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+            (new Para())->items([
+                (new Checkbox('show_gauges', dcCore::app()->auth->user_prefs->dmhostingmonitor->show_gauges))
+                    ->value(1)
+                    ->label((new Label(__('Show gauges instead of bar graph'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+            (new Text(null, '<hr />')),
+            (new Para())->items([
+                (new Checkbox('ping', dcCore::app()->auth->user_prefs->dmhostingmonitor->ping))
+                    ->value(1)
+                    ->label((new Label(__('Check server status'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+        ])
+        ->render();
     }
 }
-
-dcCore::app()->addBehaviors([
-    // Admin page behaviours
-    'adminPageHTMLHead'                => [dmHostingMonitorBehaviors::class, 'adminPageHTMLHead'],
-
-    // Dashboard behaviours
-    'adminDashboardHeaders'            => [dmHostingMonitorBehaviors::class, 'adminDashboardHeaders'],
-    'adminDashboardContentsV2'         => [dmHostingMonitorBehaviors::class, 'adminDashboardContents'],
-
-    'adminAfterDashboardOptionsUpdate' => [dmHostingMonitorBehaviors::class, 'adminAfterDashboardOptionsUpdate'],
-    'adminDashboardOptionsFormV2'      => [dmHostingMonitorBehaviors::class, 'adminDashboardOptionsForm'],
-]);

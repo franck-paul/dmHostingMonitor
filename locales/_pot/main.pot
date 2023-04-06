@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 dmHostingMonitor module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-01 16:53+0200\n"
+"POT-Creation-Date: 2023-05-02 18:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,125 +16,137 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:16
+#: ../git-plugins/dmHostingMonitor/_admin.php:22
 msgid "Display server information on dashboard"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:16
+#: ../git-plugins/dmHostingMonitor/_admin.php:22
 msgid "Hosting Monitor Dashboard Module"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:34
+#: ../git-plugins/dmHostingMonitor/_admin.php:32
 msgid "TB"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:38
+#: ../git-plugins/dmHostingMonitor/_admin.php:37
 msgid "GB"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:42
+#: ../git-plugins/dmHostingMonitor/_admin.php:42
 msgid "MB"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:46
+#: ../git-plugins/dmHostingMonitor/_admin.php:47
 msgid "KB"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:49
+#: ../git-plugins/dmHostingMonitor/_admin.php:51
 msgid "B"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:268
+#: ../git-plugins/dmHostingMonitor/_admin.php:267
 msgid "Hosting Monitor"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:277
+#: ../git-plugins/dmHostingMonitor/_admin.php:277
 msgid "Hard-disk free"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:281
+#: ../git-plugins/dmHostingMonitor/_admin.php:281
 msgid "Hard-disk free:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:285
+#: ../git-plugins/dmHostingMonitor/_admin.php:285
 msgid "Hard-disk total:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:289
-#: ../hg-plugins/dmHostingMonitor/_admin.php:296
+#: ../git-plugins/dmHostingMonitor/_admin.php:289
+#: ../git-plugins/dmHostingMonitor/_admin.php:292
 msgid "HD Free"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:303
+#: ../git-plugins/dmHostingMonitor/_admin.php:298
 msgid "Hard-disk used"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:307
+#: ../git-plugins/dmHostingMonitor/_admin.php:302
 msgid "Hard-disk used:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:313
+#: ../git-plugins/dmHostingMonitor/_admin.php:308
 msgid "Hard-disk limit:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:319
-#: ../hg-plugins/dmHostingMonitor/_admin.php:326
+#: ../git-plugins/dmHostingMonitor/_admin.php:314
+#: ../git-plugins/dmHostingMonitor/_admin.php:317
 msgid "HD Used"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:337
+#: ../git-plugins/dmHostingMonitor/_admin.php:326
 msgid "Database size"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:341
+#: ../git-plugins/dmHostingMonitor/_admin.php:330
 msgid "Database size:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:346
+#: ../git-plugins/dmHostingMonitor/_admin.php:335
 msgid "Database limit:"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:351
-#: ../hg-plugins/dmHostingMonitor/_admin.php:358
+#: ../git-plugins/dmHostingMonitor/_admin.php:340
+#: ../git-plugins/dmHostingMonitor/_admin.php:343
 msgid "DB Size"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:421
+#: ../git-plugins/dmHostingMonitor/_admin.php:408
+msgid "Server offline"
+msgstr ""
+
+#: ../git-plugins/dmHostingMonitor/_admin.php:409
+msgid "Server online"
+msgstr ""
+
+#: ../git-plugins/dmHostingMonitor/_admin.php:442
 msgid "Hosting monitor on dashboard"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:425
+#: ../git-plugins/dmHostingMonitor/_admin.php:446
 msgid "Activate module"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:429
+#: ../git-plugins/dmHostingMonitor/_admin.php:452
 msgid "Show hard-disk information"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:431
+#: ../git-plugins/dmHostingMonitor/_admin.php:454
 msgid "Allocated hard-disk size (in Mb, leave empty for unlimited):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:437
+#: ../git-plugins/dmHostingMonitor/_admin.php:462
 msgid "Show database information"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:439
+#: ../git-plugins/dmHostingMonitor/_admin.php:464
 msgid "Allocated database size (in Mb, leave empty for unlimited):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:443
+#: ../git-plugins/dmHostingMonitor/_admin.php:468
 msgid "1st threshold (in %, leave empty to ignore):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:447
+#: ../git-plugins/dmHostingMonitor/_admin.php:472
 msgid "2nd threshold (in %, leave empty to ignore):"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:453
+#: ../git-plugins/dmHostingMonitor/_admin.php:480
 msgid "Small screen"
 msgstr ""
 
-#: ../hg-plugins/dmHostingMonitor/_admin.php:457
+#: ../git-plugins/dmHostingMonitor/_admin.php:484
 msgid "Show gauges instead of bar graph"
+msgstr ""
+
+#: ../git-plugins/dmHostingMonitor/_admin.php:490
+msgid "Check server status"
 msgstr ""

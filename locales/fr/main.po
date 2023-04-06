@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 dmHostingMonitor module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-01 16:53+0200\n"
+"POT-Creation-Date: 2023-05-02 18:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Franck Paul <carnet.franck.paul@gmail.com>\n"
 "Language-Team: \n"
@@ -72,6 +72,12 @@ msgstr "Place allouée pour la base de données :"
 msgid "DB Size"
 msgstr "BD utilisée"
 
+msgid "Server offline"
+msgstr "Serveur hors-ligne"
+
+msgid "Server online"
+msgstr "Serveur en ligne"
+
 msgid "Hosting monitor on dashboard"
 msgstr "Capacités serveur sur le tableau de bord"
 
@@ -104,9 +110,3 @@ msgstr "Afficher des jauges à la place des barres"
 
 msgid "Check server status"
 msgstr "Contrôler l'état du serveur"
-
-msgid "Server offline"
-msgstr "Serveur hors-ligne"
-
-msgid "Server online"
-msgstr "Serveur en ligne"
