@@ -36,7 +36,7 @@ class Install extends dcNsProcess
         }
 
         try {
-            // Default prefs for last comments
+            // Default prefs for hosting monitor
             $settings = dcCore::app()->auth->user_prefs->dmhostingmonitor;
 
             $settings->put('activated', false, 'boolean', 'Activate Hosting Monitor', false, true);
