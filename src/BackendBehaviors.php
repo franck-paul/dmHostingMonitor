@@ -365,8 +365,8 @@ class BackendBehaviors
         if ($pie !== '') {
             $ret .= dcPage::jsJson('dm_hostingmonitor_values', $json) .
                     dcPage::jsLoad(
-                        urldecode(dcPage::getPF('dmHostingMonitor/js/admin.js')),
-                        dcCore::app()->getVersion('dmHostingMonitor')
+                        urldecode(dcPage::getPF(My::id() . '/js/admin.js')),
+                        dcCore::app()->getVersion(My::id())
                     );
         }
 
@@ -394,17 +394,17 @@ class BackendBehaviors
 
             if ($settings->show_hd_info || $settings->show_db_info) {
                 $ret .= dcPage::cssLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/css/style.css')),
+                    urldecode(dcPage::getPF(My::id() . '/css/style.css')),
                     'screen',
-                    dcCore::app()->getVersion('dmHostingMonitor')
+                    dcCore::app()->getVersion(My::id())
                 ) . "\n" .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/raphael.js')),
-                    dcCore::app()->getVersion('dmHostingMonitor')
+                    urldecode(dcPage::getPF(My::id() . '/js/raphael.js')),
+                    dcCore::app()->getVersion(My::id())
                 ) . "\n" .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/justgage.js')),
-                    dcCore::app()->getVersion('dmHostingMonitor')
+                    urldecode(dcPage::getPF(My::id() . '/js/justgage.js')),
+                    dcCore::app()->getVersion(My::id())
                 ) . "\n";
             }
 
@@ -424,8 +424,8 @@ class BackendBehaviors
                     'dmHostingMonitor_Online'  => __('Server online'),
                 ]) .
                 dcPage::jsLoad(
-                    urldecode(dcPage::getPF('dmHostingMonitor/js/service.js')),
-                    dcCore::app()->getVersion('dmHostingMonitor')
+                    urldecode(dcPage::getPF(My::id() . '/js/service.js')),
+                    dcCore::app()->getVersion(My::id())
                 ) . "\n";
         }
     }
