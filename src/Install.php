@@ -55,6 +55,7 @@ class Install extends dcNsProcess
             $settings->put('second_threshold', 90, 'integer', '2nd alert threshold (in %)', false, true);
             $settings->put('large', true, 'boolean', 'Large display', false, true);
             $settings->put('ping', true, 'boolean', 'Check server status', false, true);
+            $settings->put('show_gauges', false, 'boolean', 'Show gauges instead of bar graph', false, true);
 
             return true;
         } catch (Exception $e) {
