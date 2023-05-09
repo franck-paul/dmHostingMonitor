@@ -21,7 +21,7 @@ class Backend extends dcNsProcess
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN');
+        static::$init = My::checkContext(My::BACKEND);
 
         // dead but useful code, in order to have translations
         __('Hosting Monitor Dashboard Module') . __('Display server information on dashboard');

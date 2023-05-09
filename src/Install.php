@@ -22,9 +22,7 @@ class Install extends dcNsProcess
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN')
-            && My::phpCompliant()
-            && dcCore::app()->newVersion(My::id(), dcCore::app()->plugins->moduleInfo(My::id(), 'version'));
+        static::$init = My::checkContext(My::INSTALL);
 
         return static::$init;
     }
@@ -36,8 +34,17 @@ class Install extends dcNsProcess
         }
 
         try {
+            $old_version = dcCore::app()->getVersion(My::id());
+            if (version_compare((string) $old_version, '2.1', '<')) {
+                // Rename settings namespace
+                if (dcCore::app()->blog->settings->exists('dmhostingmonitor')) {
+                    dcCore::app()->blog->settings->delNamespace(My::id());
+                    dcCore::app()->blog->settings->renNamespace('dmhostingmonitor', My::id());
+                }
+            }
+
             // Default prefs for hosting monitor
-            $settings = dcCore::app()->auth->user_prefs->dmhostingmonitor;
+            $settings = dcCore::app()->auth->user_prefs->get(My::id());
 
             $settings->put('activated', false, 'boolean', 'Activate Hosting Monitor', false, true);
             $settings->put('show_hd_info', true, 'boolean', 'Show hard-disk information', false, true);
