@@ -473,7 +473,7 @@ class BackendBehaviors
                     ->label((new Label(__('Show hard-disk information'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('max_hd_size', 1, 9_999_999, $settings->max_hd_size))
+                (new Number('max_hd_size', 0, 9_999_999, $settings->max_hd_size))
                     ->label((new Label(__('Allocated hard-disk size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Text(null, '<hr />')),
@@ -483,15 +483,15 @@ class BackendBehaviors
                     ->label((new Label(__('Show database information'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('max_db_size', 1, 9_999_999, $settings->max_db_size))
+                (new Number('max_db_size', 0, 9_999_999, $settings->max_db_size))
                     ->label((new Label(__('Allocated database size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Para())->items([
-                (new Number('first_threshold', 1, 9_999_999, $settings->first_threshold))
+                (new Number('first_threshold', 0, 9_999_999, $settings->first_threshold))
                     ->label((new Label(__('1st threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Para())->items([
-                (new Number('second_threshold', 1, 9_999_999, $settings->second_threshold))
+                (new Number('second_threshold', 0, 9_999_999, $settings->second_threshold))
                     ->label((new Label(__('2nd threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Text(null, '<hr />')),

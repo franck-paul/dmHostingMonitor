@@ -37,9 +37,9 @@ class Install extends dcNsProcess
             $old_version = dcCore::app()->getVersion(My::id());
             if (version_compare((string) $old_version, '2.1', '<')) {
                 // Rename settings namespace
-                if (dcCore::app()->blog->settings->exists('dmhostingmonitor')) {
-                    dcCore::app()->blog->settings->delNamespace(My::id());
-                    dcCore::app()->blog->settings->renNamespace('dmhostingmonitor', My::id());
+                if (dcCore::app()->auth->user_prefs->exists('dmhostingmonitor')) {
+                    dcCore::app()->auth->user_prefs->delWorkspace(My::id());
+                    dcCore::app()->auth->user_prefs->renWorkspace('dmhostingmonitor', My::id());
                 }
             }
 
