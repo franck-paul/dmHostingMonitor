@@ -36,7 +36,7 @@ class Install extends dcNsProcess
         try {
             $old_version = dcCore::app()->getVersion(My::id());
             if (version_compare((string) $old_version, '2.1', '<')) {
-                // Rename settings namespace
+                // Rename preferences workspace
                 if (dcCore::app()->auth->user_prefs->exists('dmhostingmonitor')) {
                     dcCore::app()->auth->user_prefs->delWorkspace(My::id());
                     dcCore::app()->auth->user_prefs->renWorkspace('dmhostingmonitor', My::id());
@@ -44,20 +44,18 @@ class Install extends dcNsProcess
             }
 
             // Default prefs for hosting monitor
-            $settings = dcCore::app()->auth->user_prefs->get(My::id());
+            $preferences = dcCore::app()->auth->user_prefs->get(My::id());
 
-            $settings->put('activated', false, 'boolean', 'Activate Hosting Monitor', false, true);
-            $settings->put('show_hd_info', true, 'boolean', 'Show hard-disk information', false, true);
-            $settings->put('max_hd_size', 0, 'integer', 'Size of allocated hard-disk (in Mb)', false, true);
-            $settings->put('show_db_info', true, 'boolean', 'Show database information', false, true);
-            $settings->put('max_db_size', 0, 'integer', 'Size of allocated database file (in Mb)', false, true);
-            $settings->put('first_threshold', 80, 'integer', '1st alert threshold (in %)', false, true);
-            $settings->put('second_threshold', 90, 'integer', '2nd alert threshold (in %)', false, true);
-            $settings->put('large', true, 'boolean', 'Large display', false, true);
-            $settings->put('ping', true, 'boolean', 'Check server status', false, true);
-            $settings->put('show_gauges', false, 'boolean', 'Show gauges instead of bar graph', false, true);
-
-            return true;
+            $preferences->put('activated', false, 'boolean', 'Activate Hosting Monitor', false, true);
+            $preferences->put('show_hd_info', true, 'boolean', 'Show hard-disk information', false, true);
+            $preferences->put('max_hd_size', 0, 'integer', 'Size of allocated hard-disk (in Mb)', false, true);
+            $preferences->put('show_db_info', true, 'boolean', 'Show database information', false, true);
+            $preferences->put('max_db_size', 0, 'integer', 'Size of allocated database file (in Mb)', false, true);
+            $preferences->put('first_threshold', 80, 'integer', '1st alert threshold (in %)', false, true);
+            $preferences->put('second_threshold', 90, 'integer', '2nd alert threshold (in %)', false, true);
+            $preferences->put('large', true, 'boolean', 'Large display', false, true);
+            $preferences->put('ping', true, 'boolean', 'Check server status', false, true);
+            $preferences->put('show_gauges', false, 'boolean', 'Show gauges instead of bar graph', false, true);
         } catch (Exception $e) {
             dcCore::app()->error->add($e->getMessage());
         }
