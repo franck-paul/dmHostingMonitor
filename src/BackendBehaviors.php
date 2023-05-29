@@ -497,7 +497,7 @@ class BackendBehaviors
             ]),
             (new Text(null, '<hr />')),
             (new Para())->items([
-                (new Checkbox('small', $preferences->large))
+                (new Checkbox('small', !$preferences->large))
                     ->value(1)
                     ->label((new Label(__('Small screen'), Label::INSIDE_TEXT_AFTER))),
             ]),
