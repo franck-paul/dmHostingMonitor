@@ -16,6 +16,7 @@ namespace Dotclear\Plugin\dmHostingMonitor;
 
 use dcCore;
 use dcNsProcess;
+use dcWorkspace;
 use Exception;
 
 class Install extends dcNsProcess
@@ -47,17 +48,17 @@ class Install extends dcNsProcess
             // Default prefs for hosting monitor
             $preferences = dcCore::app()->auth->user_prefs->get(My::id());
 
-            $preferences->put('activated', false, 'boolean', 'Activate Hosting Monitor', false, true);
-            $preferences->put('show_hd_info', true, 'boolean', 'Show hard-disk information', false, true);
-            $preferences->put('max_hd_size', 0, 'integer', 'Size of allocated hard-disk (in Mb)', false, true);
-            $preferences->put('show_db_info', true, 'boolean', 'Show database information', false, true);
-            $preferences->put('max_db_size', 0, 'integer', 'Size of allocated database file (in Mb)', false, true);
-            $preferences->put('first_threshold', 80, 'integer', '1st alert threshold (in %)', false, true);
-            $preferences->put('second_threshold', 90, 'integer', '2nd alert threshold (in %)', false, true);
-            $preferences->put('large', true, 'boolean', 'Large display', false, true);
-            $preferences->put('ping', true, 'boolean', 'Check server status', false, true);
-            $preferences->put('interval', 300, 'integer', 'Interval between two refresh', false, true);
-            $preferences->put('show_gauges', false, 'boolean', 'Show gauges instead of bar graph', false, true);
+            $preferences->put('activated', false, dcWorkspace::WS_BOOL, 'Activate Hosting Monitor', false, true);
+            $preferences->put('show_hd_info', true, dcWorkspace::WS_BOOL, 'Show hard-disk information', false, true);
+            $preferences->put('max_hd_size', 0, dcWorkspace::WS_INT, 'Size of allocated hard-disk (in Mb)', false, true);
+            $preferences->put('show_db_info', true, dcWorkspace::WS_BOOL, 'Show database information', false, true);
+            $preferences->put('max_db_size', 0, dcWorkspace::WS_INT, 'Size of allocated database file (in Mb)', false, true);
+            $preferences->put('first_threshold', 80, dcWorkspace::WS_INT, '1st alert threshold (in %)', false, true);
+            $preferences->put('second_threshold', 90, dcWorkspace::WS_INT, '2nd alert threshold (in %)', false, true);
+            $preferences->put('large', true, dcWorkspace::WS_BOOL, 'Large display', false, true);
+            $preferences->put('ping', true, dcWorkspace::WS_BOOL, 'Check server status', false, true);
+            $preferences->put('interval', 300, dcWorkspace::WS_INT, 'Interval between two refresh', false, true);
+            $preferences->put('show_gauges', false, dcWorkspace::WS_BOOL, 'Show gauges instead of bar graph', false, true);
         } catch (Exception $e) {
             dcCore::app()->error->add($e->getMessage());
         }

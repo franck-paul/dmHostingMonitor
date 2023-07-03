@@ -41,14 +41,15 @@ dotclear.dmHostingMonitorPing = () => {
 
 $(() => {
   Object.assign(dotclear, dotclear.getData('dm_hostingmonitor'));
-  if (dotclear.dmHostingMonitor_Ping) {
-    $('body').data('server', -1);
-    // First pass
-    dotclear.dmHostingMonitorPing();
-    // Auto refresh requested (5 minutes interval by default between two pings)
-    dotclear.dmHostingMonitor_Timer = setInterval(
-      dotclear.dmHostingMonitorPing,
-      (dotclear.dmHostingMonitor_Interval || 300) * 1000,
-    );
+  if (!dotclear.dmHostingMonitor_Ping) {
+    return;
   }
+  $('body').data('server', -1);
+  // First pass
+  dotclear.dmHostingMonitorPing();
+  // Auto refresh requested (5 minutes interval by default between two pings)
+  dotclear.dmHostingMonitor_Timer = setInterval(
+    dotclear.dmHostingMonitorPing,
+    (dotclear.dmHostingMonitor_Interval || 300) * 1000,
+  );
 });
