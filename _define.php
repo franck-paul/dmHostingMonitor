@@ -14,10 +14,10 @@ $this->registerModule(
     'Hosting Monitor Dashboard Module',
     'Display server information on dashboard',
     'Franck Paul',
-    '2.2',
+    '2.2.1',
     [
         'requires' => [
-            ['core', '2.26'],
+            ['core', '2.2.16'],
             ['dmHelper', '2.0'],
         ],
         'permissions' => dcCore::app()->auth->makePermissions([
