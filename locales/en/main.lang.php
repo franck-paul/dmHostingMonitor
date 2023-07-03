@@ -44,3 +44,4 @@ L10n::$locales['2nd threshold (in %, leave empty to ignore):'] = '';
 L10n::$locales['Small screen'] = '';
 L10n::$locales['Show gauges instead of bar graph'] = '';
 L10n::$locales['Check server status'] = '';
+L10n::$locales['Interval in seconds between two pings:'] = '';
