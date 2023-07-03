@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 dmHostingMonitor module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-13 15:33+0200\n"
+"POT-Creation-Date: 2023-07-03 12:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../git-plugins/dmHostingMonitor/src/Backend.php:27
+#: ../git-plugins/dmHostingMonitor/src/Backend.php:28
 msgid "Display server information on dashboard"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/Backend.php:27
+#: ../git-plugins/dmHostingMonitor/src/Backend.php:28
 msgid "Hosting Monitor Dashboard Module"
 msgstr ""
 
@@ -107,46 +107,50 @@ msgstr ""
 msgid "Server online"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:463
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:465
 msgid "Hosting monitor on dashboard"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:468
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:470
 msgid "Activate module"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:474
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:476
 msgid "Show hard-disk information"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:478
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:480
 msgid "Allocated hard-disk size (in Mb, leave empty for unlimited):"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:484
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:486
 msgid "Show database information"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:488
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:490
 msgid "Allocated database size (in Mb, leave empty for unlimited):"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:492
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:494
 msgid "1st threshold (in %, leave empty to ignore):"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:496
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:498
 msgid "2nd threshold (in %, leave empty to ignore):"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:502
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:504
 msgid "Small screen"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:507
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:509
 msgid "Show gauges instead of bar graph"
 msgstr ""
 
-#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:513
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:515
 msgid "Check server status"
+msgstr ""
+
+#: ../git-plugins/dmHostingMonitor/src/BackendBehaviors.php:519
+msgid "Interval in seconds between two pings:"
 msgstr ""
