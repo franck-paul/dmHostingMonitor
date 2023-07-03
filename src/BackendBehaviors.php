@@ -420,9 +420,10 @@ class BackendBehaviors
         if ($preferences->activated && $preferences->ping) {
             echo
                 dcPage::jsJson('dm_hostingmonitor', [
-                    'dmHostingMonitor_Ping'    => $preferences->ping,
-                    'dmHostingMonitor_Offline' => __('Server offline'),
-                    'dmHostingMonitor_Online'  => __('Server online'),
+                    'dmHostingMonitor_Ping'     => $preferences->ping,
+                    'dmHostingMonitor_Offline'  => __('Server offline'),
+                    'dmHostingMonitor_Online'   => __('Server online'),
+                    'dmHostingMonitor_Interval' => ($preferences->interval ?? 300),
                 ]) .
                 dcPage::jsLoad(
                     urldecode(dcPage::getPF(My::id() . '/js/service.js')),
@@ -448,6 +449,7 @@ class BackendBehaviors
             $preferences->put('large', empty($_POST['small']), dcWorkspace::WS_BOOL);
             $preferences->put('show_gauges', !empty($_POST['show_gauges']), dcWorkspace::WS_BOOL);
             $preferences->put('ping', !empty($_POST['ping']), dcWorkspace::WS_BOOL);
+            $preferences->put('interval', (int) $_POST['interval'], dcWorkspace::WS_INT);
         } catch (Exception $e) {
             dcCore::app()->error->add($e->getMessage());
         }
@@ -511,6 +513,10 @@ class BackendBehaviors
                 (new Checkbox('ping', $preferences->ping))
                     ->value(1)
                     ->label((new Label(__('Check server status'), Label::INSIDE_TEXT_AFTER))),
+            ]),
+            (new Para())->items([
+                (new Number('interval', 0, 9_999_999, $preferences->interval))
+                    ->label((new Label(__('Interval in seconds between two pings:'), Label::INSIDE_TEXT_BEFORE))),
             ]),
         ])
         ->render();

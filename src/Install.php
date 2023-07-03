@@ -56,6 +56,7 @@ class Install extends dcNsProcess
             $preferences->put('second_threshold', 90, 'integer', '2nd alert threshold (in %)', false, true);
             $preferences->put('large', true, 'boolean', 'Large display', false, true);
             $preferences->put('ping', true, 'boolean', 'Check server status', false, true);
+            $preferences->put('interval', 300, 'integer', 'Interval between two refresh', false, true);
             $preferences->put('show_gauges', false, 'boolean', 'Show gauges instead of bar graph', false, true);
         } catch (Exception $e) {
             dcCore::app()->error->add($e->getMessage());

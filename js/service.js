@@ -45,7 +45,10 @@ $(() => {
     $('body').data('server', -1);
     // First pass
     dotclear.dmHostingMonitorPing();
-    // Auto refresh requested : Set 5 minutes interval between two pings
-    dotclear.dmHostingMonitor_Timer = setInterval(dotclear.dmHostingMonitorPing, 60 * 5 * 1000);
+    // Auto refresh requested (5 minutes interval by default between two pings)
+    dotclear.dmHostingMonitor_Timer = setInterval(
+      dotclear.dmHostingMonitorPing,
+      (dotclear.dmHostingMonitor_Interval || 300) * 1000,
+    );
   }
 });
