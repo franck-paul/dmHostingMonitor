@@ -274,7 +274,7 @@ class BackendBehaviors
         }
 
         $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
-        '<h3>' . '<img src="' . urldecode(dcPage::getPF('dmHostingMonitor/icon.png')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
+        '<h3>' . '<img src="' . urldecode(dcPage::getPF('dmHostingMonitor/icon.svg')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
         $legend = [];
 
         $bar  = '';
