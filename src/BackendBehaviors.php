@@ -16,9 +16,9 @@ namespace Dotclear\Plugin\dmHostingMonitor;
 
 use ArrayObject;
 use dcCore;
-use dcPage;
 use dcSettings;
 use dcWorkspace;
+use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\Html\Form\Checkbox;
@@ -274,7 +274,7 @@ class BackendBehaviors
         }
 
         $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
-        '<h3>' . '<img src="' . urldecode(dcPage::getPF('dmHostingMonitor/icon.svg')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
+        '<h3>' . '<img src="' . urldecode(Page::getPF('dmHostingMonitor/icon.svg')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
         $legend = [];
 
         $bar  = '';
@@ -364,9 +364,9 @@ class BackendBehaviors
         $ret .= '</div>';
 
         if ($pie !== '') {
-            $ret .= dcPage::jsJson('dm_hostingmonitor_values', $json) .
-                    dcPage::jsLoad(
-                        urldecode(dcPage::getPF(My::id() . '/js/admin.js')),
+            $ret .= Page::jsJson('dm_hostingmonitor_values', $json) .
+                    Page::jsLoad(
+                        urldecode(Page::getPF(My::id() . '/js/admin.js')),
                         dcCore::app()->getVersion(My::id())
                     );
         }
@@ -394,17 +394,17 @@ class BackendBehaviors
             $ret = '';
 
             if ($preferences->show_hd_info || $preferences->show_db_info) {
-                $ret .= dcPage::cssLoad(
-                    urldecode(dcPage::getPF(My::id() . '/css/style.css')),
+                $ret .= Page::cssLoad(
+                    urldecode(Page::getPF(My::id() . '/css/style.css')),
                     'screen',
                     dcCore::app()->getVersion(My::id())
                 ) . "\n" .
-                dcPage::jsLoad(
-                    urldecode(dcPage::getPF(My::id() . '/js/raphael.js')),
+                Page::jsLoad(
+                    urldecode(Page::getPF(My::id() . '/js/raphael.js')),
                     dcCore::app()->getVersion(My::id())
                 ) . "\n" .
-                dcPage::jsLoad(
-                    urldecode(dcPage::getPF(My::id() . '/js/justgage.js')),
+                Page::jsLoad(
+                    urldecode(Page::getPF(My::id() . '/js/justgage.js')),
                     dcCore::app()->getVersion(My::id())
                 ) . "\n";
             }
@@ -419,14 +419,14 @@ class BackendBehaviors
 
         if ($preferences->activated && $preferences->ping) {
             echo
-                dcPage::jsJson('dm_hostingmonitor', [
+                Page::jsJson('dm_hostingmonitor', [
                     'dmHostingMonitor_Ping'     => $preferences->ping,
                     'dmHostingMonitor_Offline'  => __('Server offline'),
                     'dmHostingMonitor_Online'   => __('Server online'),
                     'dmHostingMonitor_Interval' => ($preferences->interval ?? 300),
                 ]) .
-                dcPage::jsLoad(
-                    urldecode(dcPage::getPF(My::id() . '/js/service.js')),
+                Page::jsLoad(
+                    urldecode(Page::getPF(My::id() . '/js/service.js')),
                     dcCore::app()->getVersion(My::id())
                 ) . "\n";
         }
