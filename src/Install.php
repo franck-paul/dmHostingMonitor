@@ -43,7 +43,7 @@ class Install extends Process
             }
 
             // Default prefs for hosting monitor
-            $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+            $preferences = My::prefs();
 
             $preferences->put('activated', false, dcWorkspace::WS_BOOL, 'Activate Hosting Monitor', false, true);
             $preferences->put('show_hd_info', true, dcWorkspace::WS_BOOL, 'Show hard-disk information', false, true);

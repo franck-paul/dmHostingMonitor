@@ -232,7 +232,7 @@ class BackendBehaviors
 
     private static function getInfos()
     {
-        $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+        $preferences = My::prefs();
 
         $dbSize       = 0;
         $dbMaxSize    = 0;
@@ -376,7 +376,7 @@ class BackendBehaviors
 
     public static function adminDashboardContents($contents)
     {
-        $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+        $preferences = My::prefs();
 
         // Add module to the contents stack
         if ($preferences->activated) {
@@ -388,7 +388,7 @@ class BackendBehaviors
 
     public static function adminDashboardHeaders()
     {
-        $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+        $preferences = My::prefs();
 
         if ($preferences->activated) {
             $ret = '';
@@ -415,7 +415,7 @@ class BackendBehaviors
 
     public static function adminPageHTMLHead()
     {
-        $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+        $preferences = My::prefs();
 
         if ($preferences->activated && $preferences->ping) {
             echo
@@ -434,7 +434,7 @@ class BackendBehaviors
 
     public static function adminAfterDashboardOptionsUpdate()
     {
-        $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+        $preferences = My::prefs();
 
         // Get and store user's prefs for plugin options
         try {
@@ -457,7 +457,7 @@ class BackendBehaviors
 
     public static function adminDashboardOptionsForm()
     {
-        $preferences = dcCore::app()->auth->user_prefs->get(My::id());
+        $preferences = My::prefs();
 
         // Add fieldset for plugin options
         echo
