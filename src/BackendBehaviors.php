@@ -122,7 +122,7 @@ class BackendBehaviors
         // If not absolute (1st char <> /) then prefix with ../
         $rs = dcCore::app()->getBlogs();
         while ($rs->fetch()) {
-            $settings   = new dcSettings($rs->blog_id);
+            $settings   = new dcSettings($rs->blog_id);     // @phpstan-ignore-line
             $publicPath = $settings->system->public_path;   // @phpstan-ignore-line
             $themesPath = $settings->system->themes_path;   // @phpstan-ignore-line
             $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
