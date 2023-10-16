@@ -32,25 +32,25 @@ use Exception;
 
 class BackendBehaviors
 {
-    private static function readableSize($size)
+    private static function readableSize(int|float $size): string
     {
         switch (true) {
-            case ($size > 1_000_000_000_000):
+            case $size > 1_000_000_000_000:
                 $size /= 1_000_000_000_000;
                 $suffix = __('TB');
 
                 break;
-            case ($size > 1_000_000_000):
+            case $size > 1_000_000_000:
                 $size /= 1_000_000_000;
                 $suffix = __('GB');
 
                 break;
-            case ($size > 1_000_000):
+            case $size > 1_000_000:
                 $size /= 1_000_000;
                 $suffix = __('MB');
 
                 break;
-            case ($size > 1000):
+            case $size > 1000:
                 $size /= 1000;
                 $suffix = __('KB');
 
@@ -62,7 +62,7 @@ class BackendBehaviors
         return round($size, 2) . ' ' . $suffix;
     }
 
-    private static function getDbSize()
+    private static function getDbSize(): float
     {
         // Get current db size in bytes
         $dbSize = 0;
@@ -90,7 +90,7 @@ class BackendBehaviors
         return $dbSize;
     }
 
-    private static function getUsedSpace()
+    private static function getUsedSpace(): float
     {
         // Get current space used by the installation in bytes
         // Take care about potential clean-install :
@@ -170,7 +170,7 @@ class BackendBehaviors
         return $hdUsed;
     }
 
-    private static function getFreeSpace()
+    private static function getFreeSpace(): float
     {
         // Get current free space on Hard Disk in bytes
 
@@ -182,7 +182,7 @@ class BackendBehaviors
         return (float) @disk_free_space('.');
     }
 
-    private static function getTotalSpace()
+    private static function getTotalSpace(): float
     {
         // Get current total space on Hard Disk in bytes
 
@@ -194,7 +194,7 @@ class BackendBehaviors
         return (float) @disk_total_space('.');
     }
 
-    private static function getPercentageOf($part, $total)
+    private static function getPercentageOf(float $part, float $total): float
     {
         $percentage = 0;
         if (($part > 0) && ($total > 0)) {
@@ -204,7 +204,7 @@ class BackendBehaviors
         return $percentage;
     }
 
-    private static function getLevelClass($value, $firstLevel, $secondLevel)
+    private static function getLevelClass(float $value, float $firstLevel, float $secondLevel): string
     {
         if ($firstLevel == 0 && $secondLevel == 0) {
             // No threshold -> always cool
@@ -230,7 +230,7 @@ class BackendBehaviors
         return 'percent_explode';
     }
 
-    private static function getInfos()
+    private static function getInfos(): string
     {
         $preferences = My::prefs();
 
@@ -374,7 +374,12 @@ class BackendBehaviors
         return $ret;
     }
 
-    public static function adminDashboardContents($contents)
+    /**
+     * @param      ArrayObject<int, ArrayObject<int, string>>  $contents  The contents
+     *
+     * @return     string
+     */
+    public static function adminDashboardContents(ArrayObject $contents): string
     {
         $preferences = My::prefs();
 
@@ -384,9 +389,11 @@ class BackendBehaviors
                 $contents[] = new ArrayObject([self::getInfos()]);
             }
         }
+
+        return '';
     }
 
-    public static function adminDashboardHeaders()
+    public static function adminDashboardHeaders(): string
     {
         $preferences = My::prefs();
 
@@ -411,9 +418,11 @@ class BackendBehaviors
 
             return $ret;
         }
+
+        return '';
     }
 
-    public static function adminPageHTMLHead()
+    public static function adminPageHTMLHead(): string
     {
         $preferences = My::prefs();
 
@@ -430,9 +439,11 @@ class BackendBehaviors
                     dcCore::app()->getVersion(My::id())
                 ) . "\n";
         }
+
+        return '';
     }
 
-    public static function adminAfterDashboardOptionsUpdate()
+    public static function adminAfterDashboardOptionsUpdate(): string
     {
         $preferences = My::prefs();
 
@@ -453,9 +464,11 @@ class BackendBehaviors
         } catch (Exception $e) {
             dcCore::app()->error->add($e->getMessage());
         }
+
+        return '';
     }
 
-    public static function adminDashboardOptionsForm()
+    public static function adminDashboardOptionsForm(): string
     {
         $preferences = My::prefs();
 
@@ -520,5 +533,7 @@ class BackendBehaviors
             ]),
         ])
         ->render();
+
+        return '';
     }
 }
