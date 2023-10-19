@@ -233,6 +233,9 @@ class BackendBehaviors
     private static function getInfos(): string
     {
         $preferences = My::prefs();
+        if (!$preferences) {
+            return '';
+        }
 
         $dbSize       = 0;
         $dbMaxSize    = 0;
@@ -384,7 +387,7 @@ class BackendBehaviors
         $preferences = My::prefs();
 
         // Add module to the contents stack
-        if ($preferences->activated) {
+        if ($preferences?->activated) {
             if ($preferences->show_hd_info || $preferences->show_db_info) {
                 $contents[] = new ArrayObject([self::getInfos()]);
             }
@@ -397,7 +400,7 @@ class BackendBehaviors
     {
         $preferences = My::prefs();
 
-        if ($preferences->activated) {
+        if ($preferences?->activated) {
             $ret = '';
 
             if ($preferences->show_hd_info || $preferences->show_db_info) {
@@ -426,7 +429,7 @@ class BackendBehaviors
     {
         $preferences = My::prefs();
 
-        if ($preferences->activated && $preferences->ping) {
+        if ($preferences?->activated && $preferences->ping) {
             echo
                 Page::jsJson('dm_hostingmonitor', [
                     'dmHostingMonitor_Ping'     => $preferences->ping,
@@ -448,21 +451,23 @@ class BackendBehaviors
         $preferences = My::prefs();
 
         // Get and store user's prefs for plugin options
-        try {
-            // Hosting monitor options
-            $preferences->put('activated', !empty($_POST['dmhostingmonitor_activated']), dcWorkspace::WS_BOOL);
-            $preferences->put('show_hd_info', !empty($_POST['dmhostingmonitor_show_hd_info']), dcWorkspace::WS_BOOL);
-            $preferences->put('max_hd_size', (int) $_POST['dmhostingmonitor_max_hd_size'], dcWorkspace::WS_INT);
-            $preferences->put('show_db_info', !empty($_POST['dmhostingmonitor_show_db_info']), dcWorkspace::WS_BOOL);
-            $preferences->put('max_db_size', (int) $_POST['dmhostingmonitor_max_db_size'], dcWorkspace::WS_INT);
-            $preferences->put('first_threshold', (int) $_POST['dmhostingmonitor_first_threshold'], dcWorkspace::WS_INT);
-            $preferences->put('second_threshold', (int) $_POST['dmhostingmonitor_second_threshold'], dcWorkspace::WS_INT);
-            $preferences->put('large', empty($_POST['dmhostingmonitor_small']), dcWorkspace::WS_BOOL);
-            $preferences->put('show_gauges', !empty($_POST['dmhostingmonitor_show_gauges']), dcWorkspace::WS_BOOL);
-            $preferences->put('ping', !empty($_POST['dmhostingmonitor_ping']), dcWorkspace::WS_BOOL);
-            $preferences->put('interval', (int) $_POST['dmhostingmonitor_interval'], dcWorkspace::WS_INT);
-        } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+        if ($preferences) {
+            try {
+                // Hosting monitor options
+                $preferences->put('activated', !empty($_POST['dmhostingmonitor_activated']), dcWorkspace::WS_BOOL);
+                $preferences->put('show_hd_info', !empty($_POST['dmhostingmonitor_show_hd_info']), dcWorkspace::WS_BOOL);
+                $preferences->put('max_hd_size', (int) $_POST['dmhostingmonitor_max_hd_size'], dcWorkspace::WS_INT);
+                $preferences->put('show_db_info', !empty($_POST['dmhostingmonitor_show_db_info']), dcWorkspace::WS_BOOL);
+                $preferences->put('max_db_size', (int) $_POST['dmhostingmonitor_max_db_size'], dcWorkspace::WS_INT);
+                $preferences->put('first_threshold', (int) $_POST['dmhostingmonitor_first_threshold'], dcWorkspace::WS_INT);
+                $preferences->put('second_threshold', (int) $_POST['dmhostingmonitor_second_threshold'], dcWorkspace::WS_INT);
+                $preferences->put('large', empty($_POST['dmhostingmonitor_small']), dcWorkspace::WS_BOOL);
+                $preferences->put('show_gauges', !empty($_POST['dmhostingmonitor_show_gauges']), dcWorkspace::WS_BOOL);
+                $preferences->put('ping', !empty($_POST['dmhostingmonitor_ping']), dcWorkspace::WS_BOOL);
+                $preferences->put('interval', (int) $_POST['dmhostingmonitor_interval'], dcWorkspace::WS_INT);
+            } catch (Exception $e) {
+                dcCore::app()->error->add($e->getMessage());
+            }
         }
 
         return '';
@@ -478,57 +483,57 @@ class BackendBehaviors
         ->legend((new Legend(__('Hosting monitor on dashboard'))))
         ->fields([
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_activated', $preferences->activated))
+                (new Checkbox('dmhostingmonitor_activated', $preferences?->activated))
                     ->value(1)
                     ->label((new Label(__('Activate module'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Text(null, '<hr />')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_show_hd_info', $preferences->show_hd_info))
+                (new Checkbox('dmhostingmonitor_show_hd_info', $preferences?->show_hd_info))
                     ->value(1)
                     ->label((new Label(__('Show hard-disk information'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_max_hd_size', 0, 9_999_999, $preferences->max_hd_size))
+                (new Number('dmhostingmonitor_max_hd_size', 0, 9_999_999, $preferences?->max_hd_size))
                     ->label((new Label(__('Allocated hard-disk size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Text(null, '<hr />')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_show_db_info', $preferences->show_db_info))
+                (new Checkbox('dmhostingmonitor_show_db_info', $preferences?->show_db_info))
                     ->value(1)
                     ->label((new Label(__('Show database information'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_max_db_size', 0, 9_999_999, $preferences->max_db_size))
+                (new Number('dmhostingmonitor_max_db_size', 0, 9_999_999, $preferences?->max_db_size))
                     ->label((new Label(__('Allocated database size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_first_threshold', 0, 9_999_999, $preferences->first_threshold))
+                (new Number('dmhostingmonitor_first_threshold', 0, 9_999_999, $preferences?->first_threshold))
                     ->label((new Label(__('1st threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_second_threshold', 0, 9_999_999, $preferences->second_threshold))
+                (new Number('dmhostingmonitor_second_threshold', 0, 9_999_999, $preferences?->second_threshold))
                     ->label((new Label(__('2nd threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Text(null, '<hr />')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_small', !$preferences->large))
+                (new Checkbox('dmhostingmonitor_small', !$preferences?->large))
                     ->value(1)
                     ->label((new Label(__('Small screen'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_show_gauges', $preferences->show_gauges))
+                (new Checkbox('dmhostingmonitor_show_gauges', $preferences?->show_gauges))
                     ->value(1)
                     ->label((new Label(__('Show gauges instead of bar graph'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Text(null, '<hr />')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_ping', $preferences->ping))
+                (new Checkbox('dmhostingmonitor_ping', $preferences?->ping))
                     ->value(1)
                     ->label((new Label(__('Check server status'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_interval', 0, 9_999_999, $preferences->interval))
+                (new Number('dmhostingmonitor_interval', 0, 9_999_999, $preferences?->interval))
                     ->label((new Label(__('Interval in seconds between two pings:'), Label::INSIDE_TEXT_BEFORE))),
             ]),
         ])

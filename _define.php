@@ -17,7 +17,7 @@ $this->registerModule(
     '3.0',
     [
         'requires' => [
-            ['core', '2.2.16'],
+            ['core', '2.28'],
             ['dmHelper', '2.0'],
         ],
         'permissions' => dcCore::app()->auth->makePermissions([
