@@ -110,11 +110,11 @@ class BackendBehaviors
         $stack[] = '..';
 
         // Plugins
-        $plugins = explode(PATH_SEPARATOR, DC_PLUGINS_ROOT);
+        $plugins = explode(PATH_SEPARATOR, App::config()->pluginsRoot());
         $stack   = [...$stack, ...$plugins];
 
         // Cache
-        $stack[] = DC_TPL_CACHE;
+        $stack[] = App::config()->cacheRoot();
 
         // Get current blog
         $current_blog_id = App::blog()->id();
