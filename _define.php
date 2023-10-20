@@ -20,12 +20,10 @@ $this->registerModule(
             ['core', '2.28'],
             ['dmHelper', '2.0'],
         ],
-        'permissions' => dcCore::app()->auth->makePermissions([
-            dcAuth::PERMISSION_ADMIN,
-        ]),
-        'type'     => 'plugin',
-        'priority' => 1001,     // Must be higher than dmHelper priority which should be 1000 (default)
-        'settings' => [
+        'permissions' => 'My',
+        'type'        => 'plugin',
+        'priority'    => 1001,     // Must be higher than dmHelper priority which should be 1000 (default)
+        'settings'    => [
             'pref' => '#user-favorites.dmhostingmonitor',
         ],
 

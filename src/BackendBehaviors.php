@@ -15,9 +15,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\dmHostingMonitor;
 
 use ArrayObject;
-use dcCore;
-use dcSettings;
-use dcWorkspace;
+use Dotclear\App;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\File\Path;
@@ -66,12 +64,12 @@ class BackendBehaviors
     {
         // Get current db size in bytes
         $dbSize = 0;
-        switch (dcCore::app()->con->syntax()) {
+        switch (App::con()->syntax()) {
             case 'sqlite':
                 break;
             case 'postgresql':
-                $sql = 'SELECT pg_database_size(\'' . dcCore::app()->con->database() . '\') AS size';
-                $rs  = new MetaRecord(dcCore::app()->con->select($sql));
+                $sql = 'SELECT pg_database_size(\'' . App::con()->database() . '\') AS size';
+                $rs  = new MetaRecord(App::con()->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->size;
                 }
@@ -79,7 +77,7 @@ class BackendBehaviors
                 break;
             case 'mysql':
                 $sql = 'SHOW TABLE STATUS';
-                $rs  = new MetaRecord(dcCore::app()->con->select($sql));
+                $rs  = new MetaRecord(App::con()->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->Data_length + $rs->Index_length;
                 }
@@ -118,16 +116,22 @@ class BackendBehaviors
         // Cache
         $stack[] = DC_TPL_CACHE;
 
+        // Get current blog
+        $current_blog_id = App::blog()->id();
+
         // For each blog : public and theme folder
         // If not absolute (1st char <> /) then prefix with ../
-        $rs = dcCore::app()->getBlogs();
+        $rs = App::blogs()->getBlogs();
         while ($rs->fetch()) {
-            $settings   = new dcSettings($rs->blog_id);     // @phpstan-ignore-line
-            $publicPath = $settings->system->public_path;   // @phpstan-ignore-line
-            $themesPath = $settings->system->themes_path;   // @phpstan-ignore-line
+            App::blog()->loadFromBlog($rs->blog_id);
+            $publicPath = App::blog()->settings()->system->public_path;   // @phpstan-ignore-line
+            $themesPath = App::blog()->settings()->system->themes_path;   // @phpstan-ignore-line
             $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
             $stack[]    = (substr($themesPath, 0, 1) == '/' ? $themesPath : '../' . $themesPath);
         }
+
+        // Back to current blog
+        App::blog()->loadFromBlog($current_blog_id);
 
         // Stack of real directories
         $dir = [];
@@ -370,7 +374,7 @@ class BackendBehaviors
             $ret .= Page::jsJson('dm_hostingmonitor_values', $json) .
                     Page::jsLoad(
                         urldecode(Page::getPF(My::id() . '/js/admin.js')),
-                        dcCore::app()->getVersion(My::id())
+                        App::version()->getVersion(My::id())
                     );
         }
 
@@ -407,15 +411,15 @@ class BackendBehaviors
                 $ret .= Page::cssLoad(
                     urldecode(Page::getPF(My::id() . '/css/style.css')),
                     'screen',
-                    dcCore::app()->getVersion(My::id())
+                    App::version()->getVersion(My::id())
                 ) . "\n" .
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/raphael.js')),
-                    dcCore::app()->getVersion(My::id())
+                    App::version()->getVersion(My::id())
                 ) . "\n" .
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/justgage.js')),
-                    dcCore::app()->getVersion(My::id())
+                    App::version()->getVersion(My::id())
                 ) . "\n";
             }
 
@@ -439,7 +443,7 @@ class BackendBehaviors
                 ]) .
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/service.js')),
-                    dcCore::app()->getVersion(My::id())
+                    App::version()->getVersion(My::id())
                 ) . "\n";
         }
 
@@ -454,19 +458,19 @@ class BackendBehaviors
         if ($preferences) {
             try {
                 // Hosting monitor options
-                $preferences->put('activated', !empty($_POST['dmhostingmonitor_activated']), dcWorkspace::WS_BOOL);
-                $preferences->put('show_hd_info', !empty($_POST['dmhostingmonitor_show_hd_info']), dcWorkspace::WS_BOOL);
-                $preferences->put('max_hd_size', (int) $_POST['dmhostingmonitor_max_hd_size'], dcWorkspace::WS_INT);
-                $preferences->put('show_db_info', !empty($_POST['dmhostingmonitor_show_db_info']), dcWorkspace::WS_BOOL);
-                $preferences->put('max_db_size', (int) $_POST['dmhostingmonitor_max_db_size'], dcWorkspace::WS_INT);
-                $preferences->put('first_threshold', (int) $_POST['dmhostingmonitor_first_threshold'], dcWorkspace::WS_INT);
-                $preferences->put('second_threshold', (int) $_POST['dmhostingmonitor_second_threshold'], dcWorkspace::WS_INT);
-                $preferences->put('large', empty($_POST['dmhostingmonitor_small']), dcWorkspace::WS_BOOL);
-                $preferences->put('show_gauges', !empty($_POST['dmhostingmonitor_show_gauges']), dcWorkspace::WS_BOOL);
-                $preferences->put('ping', !empty($_POST['dmhostingmonitor_ping']), dcWorkspace::WS_BOOL);
-                $preferences->put('interval', (int) $_POST['dmhostingmonitor_interval'], dcWorkspace::WS_INT);
+                $preferences->put('activated', !empty($_POST['dmhostingmonitor_activated']), App::userWorkspace()::WS_BOOL);
+                $preferences->put('show_hd_info', !empty($_POST['dmhostingmonitor_show_hd_info']), App::userWorkspace()::WS_BOOL);
+                $preferences->put('max_hd_size', (int) $_POST['dmhostingmonitor_max_hd_size'], App::userWorkspace()::WS_INT);
+                $preferences->put('show_db_info', !empty($_POST['dmhostingmonitor_show_db_info']), App::userWorkspace()::WS_BOOL);
+                $preferences->put('max_db_size', (int) $_POST['dmhostingmonitor_max_db_size'], App::userWorkspace()::WS_INT);
+                $preferences->put('first_threshold', (int) $_POST['dmhostingmonitor_first_threshold'], App::userWorkspace()::WS_INT);
+                $preferences->put('second_threshold', (int) $_POST['dmhostingmonitor_second_threshold'], App::userWorkspace()::WS_INT);
+                $preferences->put('large', empty($_POST['dmhostingmonitor_small']), App::userWorkspace()::WS_BOOL);
+                $preferences->put('show_gauges', !empty($_POST['dmhostingmonitor_show_gauges']), App::userWorkspace()::WS_BOOL);
+                $preferences->put('ping', !empty($_POST['dmhostingmonitor_ping']), App::userWorkspace()::WS_BOOL);
+                $preferences->put('interval', (int) $_POST['dmhostingmonitor_interval'], App::userWorkspace()::WS_INT);
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
