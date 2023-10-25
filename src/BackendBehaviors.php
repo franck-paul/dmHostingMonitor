@@ -124,8 +124,8 @@ class BackendBehaviors
         $rs = App::blogs()->getBlogs();
         while ($rs->fetch()) {
             App::blog()->loadFromBlog($rs->blog_id);
-            $publicPath = App::blog()->settings()->system->public_path;   // @phpstan-ignore-line
-            $themesPath = App::blog()->settings()->system->themes_path;   // @phpstan-ignore-line
+            $publicPath = App::blog()->settings()->system->public_path;
+            $themesPath = App::blog()->settings()->system->themes_path;
             $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
             $stack[]    = (substr($themesPath, 0, 1) == '/' ? $themesPath : '../' . $themesPath);
         }
