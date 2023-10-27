@@ -126,8 +126,8 @@ class BackendBehaviors
             App::blog()->loadFromBlog($rs->blog_id);
             $publicPath = App::blog()->settings()->system->public_path;
             $themesPath = App::blog()->settings()->system->themes_path;
-            $stack[]    = (substr($publicPath, 0, 1) == '/' ? $publicPath : '../' . $publicPath);
-            $stack[]    = (substr($themesPath, 0, 1) == '/' ? $themesPath : '../' . $themesPath);
+            $stack[]    = (str_starts_with($publicPath, '/') ? $publicPath : '../' . $publicPath);
+            $stack[]    = (str_starts_with($themesPath, '/') ? $themesPath : '../' . $themesPath);
         }
 
         // Back to current blog
@@ -141,23 +141,26 @@ class BackendBehaviors
             if (!$realPath) {
                 continue;
             }
+
             // Check if not already counted
             $index = 0;
             foreach ($dir as $folder) {
-                if (substr($realPath, 0, strlen($folder)) == $folder) {
+                if (str_starts_with($realPath, $folder)) {
                     // Parent folder found in stack : ignore it
                     $realPath = '';
 
                     break;
-                } elseif (substr($folder, 0, strlen($realPath)) == $realPath) {
+                } elseif (str_starts_with($folder, $realPath)) {
                     // Child folder found in stack : replace it by parent
                     $dir[$index] = $realPath;
                     $realPath    = '';
 
                     break;
                 }
-                $index++;
+
+                ++$index;
             }
+
             if ($realPath != '') {
                 $dir[] = $realPath;
                 sort($dir);
@@ -169,9 +172,8 @@ class BackendBehaviors
         foreach ($dir as $folder) {
             $hdUsed += (int) shell_exec('du -k -s -L ' . $folder);
         }
-        $hdUsed *= 1024;
 
-        return $hdUsed;
+        return $hdUsed * 1024;
     }
 
     private static function getFreeSpace(): float
@@ -214,15 +216,19 @@ class BackendBehaviors
             // No threshold -> always cool
             return 'percent_cool';
         }
+
         if ($secondLevel == 0) {
             $secondLevel = $firstLevel;
         }
+
         if ($firstLevel == 0) {
             $firstLevel = $secondLevel;
         }
+
         if ($secondLevel < $firstLevel) {
             [$firstLevel, $secondLevel] = [$secondLevel, $firstLevel];
         }
+
         if ($value < $firstLevel) {
             return 'percent_cool';
         } elseif ($value < $secondLevel) {
@@ -254,7 +260,7 @@ class BackendBehaviors
         $first_threshold  = (int) $preferences->first_threshold;
         $second_threshold = (int) $preferences->second_threshold;
 
-        $bargraph = $preferences->show_gauges ? false : true;
+        $bargraph = !(bool) $preferences->show_gauges;
         $large    = $preferences->large;
 
         if ($preferences->show_hd_info) {
@@ -270,6 +276,7 @@ class BackendBehaviors
             } else {
                 $hdMaxSize *= 1000 * 1000;
             }
+
             $hdMaxPercent = self::getPercentageOf($hdUsed, $hdMaxSize);
         }
 
@@ -301,15 +308,18 @@ class BackendBehaviors
                     } else {
                         $bar .= ' - ' . __('Hard-disk total:') . ' ' . self::readableSize($hdTotal);
                     }
+
                     $bar .= '</p>';
                 } else {
                     $legend[] = __('HD Free');
                 }
+
                 $pie .= '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
                 '<p>' . __('HD Free') . ($large ? ' (' . self::readableSize($hdFree) . ')' : '') . '</p>' .
                 '</div>';
                 $json['hd_free'] = 100 - $hdPercent;
             }
+
             /* Dotclear used vs allocated space information */
             if ($hdUsed > 0) {
                 $bar .= '<div class="graphe" title="' . __('Hard-disk used') . '">' .
@@ -320,16 +330,16 @@ class BackendBehaviors
                     if ($hdMaxSize > 0) {
                         if ($hdMaxPercent > 0) {
                             $bar .= ' (' . $hdMaxPercent . '% ' . __('of') . ' ' . self::readableSize($hdMaxSize) . ')';
-                        } else {
-                            if ($hdMaxSize != $hdTotal) {
-                                $bar .= ' - ' . __('Hard-disk limit:') . ' ' . self::readableSize($hdMaxSize);
-                            }
+                        } elseif ($hdMaxSize != $hdTotal) {
+                            $bar .= ' - ' . __('Hard-disk limit:') . ' ' . self::readableSize($hdMaxSize);
                         }
                     }
+
                     $bar .= '</p>';
                 } else {
                     $legend[] = __('HD Used');
                 }
+
                 $pie .= '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
                 '<p>' . __('HD Used') . ($large ? ' (' . self::readableSize($hdUsed) . ')' : '') . '</p>' .
                 '</div>';
@@ -337,33 +347,33 @@ class BackendBehaviors
             }
         }
 
-        if ($preferences->show_db_info) {
-            /* Database information */
-            if ($dbSize > 0) {
-                $bar .= '<div class="graphe" title="' . __('Database size') . '">' .
-                '<strong class="barre ' . self::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold) .
-                '" style="width: ' . min($dbMaxPercent, 100) . '%;">' . $dbMaxPercent . '%</strong></div>';
-                if ($large) {
-                    $bar .= '<p class="graphe text">' . __('Database size:') . ' ' . self::readableSize($dbSize);
-                    if ($dbMaxSize > 0) {
-                        if ($dbMaxPercent > 0) {
-                            $bar .= ' (' . $dbMaxPercent . '% ' . __('of') . ' ' . self::readableSize($dbMaxSize) . ')';
-                        } else {
-                            $bar .= ' - ' . __('Database limit:') . ' ' . self::readableSize($dbMaxSize);
-                        }
+        /* Database information */
+        if ($preferences->show_db_info && $dbSize > 0) {
+            $bar .= '<div class="graphe" title="' . __('Database size') . '">' .
+            '<strong class="barre ' . self::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold) .
+            '" style="width: ' . min($dbMaxPercent, 100) . '%;">' . $dbMaxPercent . '%</strong></div>';
+            if ($large) {
+                $bar .= '<p class="graphe text">' . __('Database size:') . ' ' . self::readableSize($dbSize);
+                if ($dbMaxSize > 0) {
+                    if ($dbMaxPercent > 0) {
+                        $bar .= ' (' . $dbMaxPercent . '% ' . __('of') . ' ' . self::readableSize($dbMaxSize) . ')';
+                    } else {
+                        $bar .= ' - ' . __('Database limit:') . ' ' . self::readableSize($dbMaxSize);
                     }
-                    $bar .= '</p>';
-                } else {
-                    $legend[] = __('DB Size');
                 }
-                $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
-                '<p>' . __('DB Size') . ($large ? ' (' . self::readableSize($dbSize) . ')' : '') . '</p>' .
-                '</div>';
-                $json['db_used'] = $dbMaxSize > 0 ? $dbMaxPercent : 0;
+
+                $bar .= '</p>';
+            } else {
+                $legend[] = __('DB Size');
             }
+
+            $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
+            '<p>' . __('DB Size') . ($large ? ' (' . self::readableSize($dbSize) . ')' : '') . '</p>' .
+            '</div>';
+            $json['db_used'] = $dbMaxSize > 0 ? $dbMaxPercent : 0;
         }
 
-        if (count($legend)) {
+        if ($legend !== []) {
             $bar .= '<p class="graphe-legend">' . implode('; ', $legend) . '</p>';
         }
 
@@ -391,10 +401,8 @@ class BackendBehaviors
         $preferences = My::prefs();
 
         // Add module to the contents stack
-        if ($preferences?->activated) {
-            if ($preferences->show_hd_info || $preferences->show_db_info) {
-                $contents[] = new ArrayObject([self::getInfos()]);
-            }
+        if ($preferences?->activated && ($preferences->show_hd_info || $preferences->show_db_info)) {
+            $contents[] = new ArrayObject([self::getInfos()]);
         }
 
         return '';

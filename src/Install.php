@@ -33,12 +33,10 @@ class Install extends Process
 
         try {
             $old_version = App::version()->getVersion(My::id());
-            if (version_compare((string) $old_version, '2.1', '<')) {
-                // Rename preferences workspace
-                if (App::auth()->prefs()->exists('dmhostingmonitor')) {
-                    App::auth()->prefs()->delWorkspace(My::id());
-                    App::auth()->prefs()->renWorkspace('dmhostingmonitor', My::id());
-                }
+            // Rename preferences workspace
+            if (version_compare((string) $old_version, '2.1', '<') && App::auth()->prefs()->exists('dmhostingmonitor')) {
+                App::auth()->prefs()->delWorkspace(My::id());
+                App::auth()->prefs()->renWorkspace('dmhostingmonitor', My::id());
             }
 
             // Default prefs for hosting monitor
@@ -56,8 +54,8 @@ class Install extends Process
                 $preferences->put('interval', 300, App::userWorkspace()::WS_INT, 'Interval between two refresh', false, true);
                 $preferences->put('show_gauges', false, App::userWorkspace()::WS_BOOL, 'Show gauges instead of bar graph', false, true);
             }
-        } catch (Exception $e) {
-            App::error()->add($e->getMessage());
+        } catch (Exception $exception) {
+            App::error()->add($exception->getMessage());
         }
 
         return true;
