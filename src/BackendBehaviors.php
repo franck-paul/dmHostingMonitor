@@ -288,7 +288,7 @@ class BackendBehaviors
         }
 
         $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
-        '<h3>' . '<img src="' . urldecode(Page::getPF('dmHostingMonitor/icon.svg')) . '" alt="" />' . ' ' . __('Hosting Monitor') . '</h3>';
+        '<h3>' . '<img src="' . urldecode(Page::getPF('dmHostingMonitor/icon.svg')) . '" alt="">' . ' ' . __('Hosting Monitor') . '</h3>';
         $legend = [];
 
         $bar  = '';
@@ -402,7 +402,7 @@ class BackendBehaviors
 
         // Add module to the contents stack
         if ($preferences?->activated && ($preferences->show_hd_info || $preferences->show_db_info)) {
-            $contents[] = new ArrayObject([self::getInfos()]);
+            $contents->append(new ArrayObject([self::getInfos()]));
         }
 
         return '';
@@ -499,7 +499,7 @@ class BackendBehaviors
                     ->value(1)
                     ->label((new Label(__('Activate module'), Label::INSIDE_TEXT_AFTER))),
             ]),
-            (new Text(null, '<hr />')),
+            (new Text(null, '<hr>')),
             (new Para())->items([
                 (new Checkbox('dmhostingmonitor_show_hd_info', $preferences?->show_hd_info))
                     ->value(1)
@@ -509,7 +509,7 @@ class BackendBehaviors
                 (new Number('dmhostingmonitor_max_hd_size', 0, 9_999_999, $preferences?->max_hd_size))
                     ->label((new Label(__('Allocated hard-disk size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
-            (new Text(null, '<hr />')),
+            (new Text(null, '<hr>')),
             (new Para())->items([
                 (new Checkbox('dmhostingmonitor_show_db_info', $preferences?->show_db_info))
                     ->value(1)
@@ -527,7 +527,7 @@ class BackendBehaviors
                 (new Number('dmhostingmonitor_second_threshold', 0, 9_999_999, $preferences?->second_threshold))
                     ->label((new Label(__('2nd threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
-            (new Text(null, '<hr />')),
+            (new Text(null, '<hr>')),
             (new Para())->items([
                 (new Checkbox('dmhostingmonitor_small', !$preferences?->large))
                     ->value(1)
@@ -538,7 +538,7 @@ class BackendBehaviors
                     ->value(1)
                     ->label((new Label(__('Show gauges instead of bar graph'), Label::INSIDE_TEXT_AFTER))),
             ]),
-            (new Text(null, '<hr />')),
+            (new Text(null, '<hr>')),
             (new Para())->items([
                 (new Checkbox('dmhostingmonitor_ping', $preferences?->ping))
                     ->value(1)
