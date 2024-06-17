@@ -18,7 +18,7 @@ $this->registerModule(
     [
         'requires' => [
             ['core', '2.28'],
-            ['dmHelper', '2.0'],
+            ['dmHelper', '4.2'],
         ],
         'permissions' => 'My',
         'type'        => 'plugin',

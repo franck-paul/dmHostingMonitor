@@ -27,6 +27,11 @@ dotclear.dmHostingMonitorPing = () => {
     $img.prop('title', $img.prop('alt'));
   };
 
+  if (dotclear.dmOnline() === false) {
+    // No connection, no need to ping anything
+    showStatus(false);
+    return;
+  }
   dotclear.jsonServices(
     'dmHelperPing', // Provided by dmHelper plugin
     (payload) => {
