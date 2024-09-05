@@ -18,7 +18,7 @@ $this->registerModule(
     [
         'requires' => [
             ['core', '2.28'],
-            ['dmHelper', '4.2'],
+            ['dmHelper'],
         ],
         'permissions' => 'My',
         'type'        => 'plugin',
@@ -29,6 +29,6 @@ $this->registerModule(
 
         'details'    => 'https://open-time.net/?q=dmHostingMonitor',
         'support'    => 'https://github.com/franck-paul/dmHostingMonitor',
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/master/dcstore.xml',
+        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/main/dcstore.xml',
     ]
 );

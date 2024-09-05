@@ -79,7 +79,7 @@ class BackendBehaviors
                 $sql = 'SHOW TABLE STATUS';
                 $rs  = new MetaRecord(App::con()->select($sql));
                 while ($rs->fetch()) {
-                    $dbSize += $rs->Data_length + $rs->Index_length;
+                    $dbSize += (float) $rs->Data_length + (float) $rs->Index_length;
                 }
 
                 break;
