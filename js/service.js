@@ -1,30 +1,45 @@
-/*global $, dotclear, notifyBrowser */
+/*global dotclear, notifyBrowser */
 'use strict';
 
 dotclear.dmHostingMonitorPing = () => {
   const showStatus = (online = false) => {
-    const $img = $('#content h2 a img').length ? $('#content h2 a img') : $('#content h2 img');
-    if ($('body').data('server') === -1 && $img.length && $img.prop('alt').length) {
+    const body = document.querySelector('body');
+    if (!body) return;
+
+    const icons =
+      document.querySelectorAll('#content h2 a img').length > 0
+        ? document.querySelectorAll('#content h2 a img')
+        : document.querySelectorAll('#content h2 img');
+
+    if (body.dataset.server === '' && icons.length && icons[0].alt.length) {
       // Server status has never been tested yet
-      dotclear.dmHostingMonitor_Alt = `${$img.prop('alt')} : `;
+      dotclear.dmHostingMonitor_Alt = `${icons[0].alt} : `;
     }
     dotclear.dmHostingMonitor_Alt = dotclear.dmHostingMonitor_Alt ?? '';
-    $('body').css('filter', online ? '' : 'grayscale(1)');
+
+    body.style.filter = online ? '' : 'grayscale(1)';
+
     const msg = `${
       dotclear.dmHostingMonitor_Alt + (online ? dotclear.dmHostingMonitor_Online : dotclear.dmHostingMonitor_Offline)
     } (${new Date().toLocaleString()})`;
-    if ($img.length) {
-      $img.prop('alt', msg);
+
+    if (icons.length) {
+      // Set icon(s) alt text
+      for (const icon of icons) icon.alt = msg;
     }
+
     if (
       typeof notifyBrowser === 'function' &&
-      ((online && $('body').data('server') === 0) || (!online && $('body').data('server') === 1))
+      ((online && body.dataset.server === '0') || (!online && body.dataset.server === '1'))
     ) {
       notifyBrowser(msg);
     }
+
     // Store new server status
-    $('body').data('server', online ? 1 : 0);
-    $img.prop('title', $img.prop('alt'));
+    body.dataset.server = online ? '1' : '0';
+    if (icons.length) {
+      for (const icon of icons) icon.title = icon.alt;
+    }
   };
 
   if (dotclear.dmOnline() === false) {
@@ -49,9 +64,14 @@ dotclear.ready(() => {
   if (!dotclear.dmHostingMonitor_Ping) {
     return;
   }
-  $('body').data('server', -1);
+
+  const body = document.querySelector('body');
+  if (!body) return;
+  body.dataset.server = '';
+
   // First pass
   dotclear.dmHostingMonitorPing();
+
   // Auto refresh requested (5 minutes interval by default between two pings)
   dotclear.dmHostingMonitor_Timer = setInterval(
     dotclear.dmHostingMonitorPing,
