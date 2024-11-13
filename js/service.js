@@ -44,7 +44,7 @@ dotclear.dmHostingMonitorPing = () => {
   );
 };
 
-$(() => {
+dotclear.ready(() => {
   Object.assign(dotclear, dotclear.getData('dm_hostingmonitor'));
   if (!dotclear.dmHostingMonitor_Ping) {
     return;
