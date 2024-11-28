@@ -453,7 +453,7 @@ class BackendBehaviors
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/service.js')),
                     App::version()->getVersion(My::id())
-                ) . "\n";
+                );
         }
 
         return '';
