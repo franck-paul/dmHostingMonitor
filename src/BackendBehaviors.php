@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief dmHostingMonitor, a plugin for Dotclear 2
  *
@@ -420,15 +421,15 @@ class BackendBehaviors
                     urldecode(Page::getPF(My::id() . '/css/style.css')),
                     'screen',
                     App::version()->getVersion(My::id())
-                ) . "\n" .
+                ) .
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/raphael.js')),
                     App::version()->getVersion(My::id())
-                ) . "\n" .
+                ) .
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/justgage.js')),
                     App::version()->getVersion(My::id())
-                ) . "\n";
+                );
             }
 
             return $ret;
