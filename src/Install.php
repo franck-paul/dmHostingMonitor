@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief dmHostingMonitor, a plugin for Dotclear 2
  *
@@ -41,19 +42,17 @@ class Install extends Process
 
             // Default prefs for hosting monitor
             $preferences = My::prefs();
-            if ($preferences) {
-                $preferences->put('activated', false, App::userWorkspace()::WS_BOOL, 'Activate Hosting Monitor', false, true);
-                $preferences->put('show_hd_info', true, App::userWorkspace()::WS_BOOL, 'Show hard-disk information', false, true);
-                $preferences->put('max_hd_size', 0, App::userWorkspace()::WS_INT, 'Size of allocated hard-disk (in Mb)', false, true);
-                $preferences->put('show_db_info', true, App::userWorkspace()::WS_BOOL, 'Show database information', false, true);
-                $preferences->put('max_db_size', 0, App::userWorkspace()::WS_INT, 'Size of allocated database file (in Mb)', false, true);
-                $preferences->put('first_threshold', 80, App::userWorkspace()::WS_INT, '1st alert threshold (in %)', false, true);
-                $preferences->put('second_threshold', 90, App::userWorkspace()::WS_INT, '2nd alert threshold (in %)', false, true);
-                $preferences->put('large', true, App::userWorkspace()::WS_BOOL, 'Large display', false, true);
-                $preferences->put('ping', true, App::userWorkspace()::WS_BOOL, 'Check server status', false, true);
-                $preferences->put('interval', 300, App::userWorkspace()::WS_INT, 'Interval between two refresh', false, true);
-                $preferences->put('show_gauges', false, App::userWorkspace()::WS_BOOL, 'Show gauges instead of bar graph', false, true);
-            }
+            $preferences->put('activated', false, App::userWorkspace()::WS_BOOL, 'Activate Hosting Monitor', false, true);
+            $preferences->put('show_hd_info', true, App::userWorkspace()::WS_BOOL, 'Show hard-disk information', false, true);
+            $preferences->put('max_hd_size', 0, App::userWorkspace()::WS_INT, 'Size of allocated hard-disk (in Mb)', false, true);
+            $preferences->put('show_db_info', true, App::userWorkspace()::WS_BOOL, 'Show database information', false, true);
+            $preferences->put('max_db_size', 0, App::userWorkspace()::WS_INT, 'Size of allocated database file (in Mb)', false, true);
+            $preferences->put('first_threshold', 80, App::userWorkspace()::WS_INT, '1st alert threshold (in %)', false, true);
+            $preferences->put('second_threshold', 90, App::userWorkspace()::WS_INT, '2nd alert threshold (in %)', false, true);
+            $preferences->put('large', true, App::userWorkspace()::WS_BOOL, 'Large display', false, true);
+            $preferences->put('ping', true, App::userWorkspace()::WS_BOOL, 'Check server status', false, true);
+            $preferences->put('interval', 300, App::userWorkspace()::WS_INT, 'Interval between two refresh', false, true);
+            $preferences->put('show_gauges', false, App::userWorkspace()::WS_BOOL, 'Show gauges instead of bar graph', false, true);
         } catch (Exception $exception) {
             App::error()->add($exception->getMessage());
         }
