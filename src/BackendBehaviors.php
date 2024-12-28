@@ -391,8 +391,6 @@ class BackendBehaviors
 
     /**
      * @param      ArrayObject<int, ArrayObject<int, string>>  $contents  The contents
-     *
-     * @return     string
      */
     public static function adminDashboardContents(ArrayObject $contents): string
     {
