@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief dmHostingMonitor, a plugin for Dotclear 2
  *
@@ -16,6 +17,7 @@ $this->registerModule(
     'Franck Paul',
     '4.8',
     [
+        'date'     => '2003-08-13T13:42:00+0100',
         'requires' => [
             ['core', '2.28'],
             ['dmHelper'],
