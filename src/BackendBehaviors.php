@@ -21,11 +21,16 @@ use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\Div;
 use Dotclear\Helper\Html\Form\Fieldset;
+use Dotclear\Helper\Html\Form\Img;
 use Dotclear\Helper\Html\Form\Label;
 use Dotclear\Helper\Html\Form\Legend;
+use Dotclear\Helper\Html\Form\None;
+use Dotclear\Helper\Html\Form\Note;
 use Dotclear\Helper\Html\Form\Number;
 use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Set;
 use Dotclear\Helper\Html\Form\Text;
 use Exception;
 
@@ -285,108 +290,171 @@ class BackendBehaviors
             $dbMaxPercent = self::getPercentageOf($dbSize, $dbMaxSize);
         }
 
-        $ret = '<div id="hosting-monitor" class="box ' . ($large ? 'medium' : 'small dm_hm_short_info') . '">' .
-        '<h3>' . '<img src="' . urldecode(Page::getPF('dmHostingMonitor/icon.svg')) . '" alt="">' . ' ' . __('Hosting Monitor') . '</h3>';
+        $json   = [];
+        $blocks = [];
         $legend = [];
-
-        $bar  = '';
-        $pie  = '';
-        $json = [];
 
         if ($preferences->show_hd_info) {
             /* Hard-disk free vs total information */
             if ($hdTotal > 0) {
-                $bar .= '<div class="graphe" title="' . __('Hard-disk free') . '">' .
-                '<strong class="barre ' . self::getLevelClass(100 - $hdPercent, $first_threshold, $second_threshold) .
-                '" style="width: ' . min($hdPercent, 100) . '%;">' . $hdPercent . '%</strong></div>';
-                if ($large) {
-                    $bar .= '<p class="graphe text">' . __('Hard-disk free:') . ' ' . self::readableSize($hdFree);
-                    if ($hdPercent > 0) {
-                        $bar .= ' (' . $hdPercent . '% ' . __('of') . ' ' . self::readableSize($hdTotal) . ')';
+                if ($bargraph) {
+                    $blocks[] = (new Div())
+                        ->class('graphe')
+                        ->title(__('Hard-disk free'))
+                        ->items([
+                            (new Text('strong', $hdPercent . '%'))
+                                ->class(['barre', self::getLevelClass(100 - $hdPercent, $first_threshold, $second_threshold)])
+                                ->extra('style="width: ' . min($hdPercent, 100) . '%;"'),
+                        ]);
+                    if ($large) {
+                        $blocks[] = (new Para())
+                            ->class(['graphe', 'text'])
+                            ->separator(' ')
+                            ->items([
+                                (new Text(null, __('Hard-disk free:'))),
+                                (new Text(null, self::readableSize($hdFree))),
+                                $hdPercent > 0 ?
+                                    (new Text(null, '(' . $hdPercent . '% ' . __('of') . ' ' . self::readableSize($hdTotal) . ')')) :
+                                    (new Text(null, '- ' . __('Hard-disk total:') . ' ' . self::readableSize($hdTotal))),
+                            ]);
                     } else {
-                        $bar .= ' - ' . __('Hard-disk total:') . ' ' . self::readableSize($hdTotal);
+                        $legend[] = __('HD Free');
                     }
-
-                    $bar .= '</p>';
                 } else {
-                    $legend[] = __('HD Free');
-                }
+                    $blocks[] = (new Div('hd-free'))
+                        ->class($large ? 'pie-large' : 'pie-small')
+                        ->items([
+                            (new Para())
+                                ->separator(' ')
+                                ->items([
+                                    (new Text(null, __('HD Free'))),
+                                    $large ?
+                                        (new Text(null, '(' . self::readableSize($hdFree) . ')')) :
+                                        (new None()),
+                                ]),
+                        ]);
 
-                $pie .= '<div id="hd-free" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
-                '<p>' . __('HD Free') . ($large ? ' (' . self::readableSize($hdFree) . ')' : '') . '</p>' .
-                '</div>';
-                $json['hd_free'] = 100 - $hdPercent;
+                    $json['hd_free'] = 100 - $hdPercent;
+                }
             }
 
             /* Dotclear used vs allocated space information */
             if ($hdUsed > 0) {
-                $bar .= '<div class="graphe" title="' . __('Hard-disk used') . '">' .
-                '<strong class="barre ' . self::getLevelClass($hdMaxPercent, $first_threshold, $second_threshold) .
-                '" style="width: ' . min($hdMaxPercent, 100) . '%;">' . $hdMaxPercent . '%</strong></div>';
-                if ($large) {
-                    $bar .= '<p class="graphe text">' . __('Hard-disk used:') . ' ' . self::readableSize($hdUsed);
-                    if ($hdMaxSize > 0) {
-                        if ($hdMaxPercent > 0) {
-                            $bar .= ' (' . $hdMaxPercent . '% ' . __('of') . ' ' . self::readableSize($hdMaxSize) . ')';
-                        } elseif ($hdMaxSize != $hdTotal) {
-                            $bar .= ' - ' . __('Hard-disk limit:') . ' ' . self::readableSize($hdMaxSize);
-                        }
+                if ($bargraph) {
+                    $blocks[] = (new Div())
+                        ->class('graphe')
+                        ->title(__('Hard-disk used'))
+                        ->items([
+                            (new Text('strong', $hdMaxPercent . '%'))
+                                ->class(['barre', self::getLevelClass($hdMaxPercent, $first_threshold, $second_threshold)])
+                                ->extra('style="width: ' . min($hdMaxPercent, 100) . '%;"'),
+                        ]);
+                    if ($large) {
+                        $blocks[] = (new Para())
+                            ->class(['graphe', 'text'])
+                            ->separator(' ')
+                            ->items([
+                                (new Text(null, __('Hard-disk used:'))),
+                                (new Text(null, self::readableSize($hdUsed))),
+                                ($hdMaxSize > 0) && ($hdMaxPercent > 0) ?
+                                    (new Text(null, '(' . $hdMaxPercent . '% ' . __('of') . ' ' . self::readableSize($hdMaxSize) . ')')) :
+                                    ($hdMaxSize > 0 ?
+                                        (new Text(null, '- ' . __('Hard-disk limit:') . ' ' . self::readableSize($hdMaxSize))) :
+                                        (new None())),
+                            ]);
+                    } else {
+                        $legend[] = __('HD Used');
                     }
-
-                    $bar .= '</p>';
                 } else {
-                    $legend[] = __('HD Used');
-                }
+                    $blocks[] = (new Div('hd-used'))
+                        ->class($large ? 'pie-large' : 'pie-small')
+                        ->items([
+                            (new Para())
+                                ->separator(' ')
+                                ->items([
+                                    (new Text(null, __('HD Used'))),
+                                    $large ?
+                                        (new Text(null, '(' . self::readableSize($hdUsed) . ')')) :
+                                        (new None()),
+                                ]),
+                        ]);
 
-                $pie .= '<div id="hd-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
-                '<p>' . __('HD Used') . ($large ? ' (' . self::readableSize($hdUsed) . ')' : '') . '</p>' .
-                '</div>';
-                $json['hd_used'] = $hdMaxSize > 0 ? $hdMaxPercent : 0;
+                    $json['hd_used'] = $hdMaxSize > 0 ? $hdMaxPercent : 0;
+                }
             }
         }
 
         /* Database information */
         if ($preferences->show_db_info && $dbSize > 0) {
-            $bar .= '<div class="graphe" title="' . __('Database size') . '">' .
-            '<strong class="barre ' . self::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold) .
-            '" style="width: ' . min($dbMaxPercent, 100) . '%;">' . $dbMaxPercent . '%</strong></div>';
-            if ($large) {
-                $bar .= '<p class="graphe text">' . __('Database size:') . ' ' . self::readableSize($dbSize);
-                if ($dbMaxSize > 0) {
-                    if ($dbMaxPercent > 0) {
-                        $bar .= ' (' . $dbMaxPercent . '% ' . __('of') . ' ' . self::readableSize($dbMaxSize) . ')';
-                    } else {
-                        $bar .= ' - ' . __('Database limit:') . ' ' . self::readableSize($dbMaxSize);
-                    }
+            if ($bargraph) {
+                $blocks[] = (new Div())
+                    ->class('graphe')
+                    ->title(__('Database size'))
+                    ->items([
+                        (new Text('strong', $dbMaxPercent . '%'))
+                            ->class(['barre', self::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold)])
+                            ->extra('style="width: ' . min($dbMaxPercent, 100) . '%;"'),
+                    ]);
+                if ($large) {
+                    $blocks[] = (new Para())
+                        ->class(['graphe', 'text'])
+                        ->separator(' ')
+                        ->items([
+                            (new Text(null, __('Database size:'))),
+                            (new Text(null, self::readableSize($dbSize))),
+                            ($dbMaxSize > 0) && ($dbMaxPercent > 0) ?
+                                (new Text(null, '(' . $dbMaxPercent . '% ' . __('of') . ' ' . self::readableSize($dbMaxSize) . ')')) :
+                                ($dbMaxSize > 0 ?
+                                    (new Text(null, '- ' . __('Database limit:') . ' ' . self::readableSize($dbMaxSize))) :
+                                    (new None())),
+                        ]);
+                } else {
+                    $legend[] = __('DB Size');
                 }
-
-                $bar .= '</p>';
             } else {
-                $legend[] = __('DB Size');
-            }
+                $blocks[] = (new Div('db-used'))
+                    ->class($large ? 'pie-large' : 'pie-small')
+                    ->items([
+                        (new Para())
+                            ->separator(' ')
+                            ->items([
+                                (new Text(null, __('DB Size'))),
+                                $large ?
+                                    (new Text(null, '(' . self::readableSize($dbSize) . ')')) :
+                                    (new None()),
+                            ]),
+                    ]);
 
-            $pie .= '<div id="db-used" class="' . ($large ? 'pie-large' : 'pie-small') . '">' .
-            '<p>' . __('DB Size') . ($large ? ' (' . self::readableSize($dbSize) . ')' : '') . '</p>' .
-            '</div>';
-            $json['db_used'] = $dbMaxSize > 0 ? $dbMaxPercent : 0;
+                $json['db_used'] = $dbMaxSize > 0 ? $dbMaxPercent : 0;
+            }
         }
 
         if ($legend !== []) {
-            $bar .= '<p class="graphe-legend">' . implode('; ', $legend) . '</p>';
+            $blocks[] = (new Note())
+                ->class('graphe-legend')
+                ->text(implode('; ', $legend));
         }
 
-        $ret .= ($bargraph ? $bar : $pie);
-        $ret .= '</div>';
-
-        if ($pie !== '') {
-            $ret .= Page::jsJson('dm_hostingmonitor_values', $json) .
+        $script = '';
+        if (!$bargraph) {
+            $script = Page::jsJson('dm_hostingmonitor_values', $json) .
                     Page::jsLoad(
                         urldecode(Page::getPF(My::id() . '/js/admin.js')),
                         App::version()->getVersion(My::id())
                     );
         }
 
-        return $ret;
+        return (new Set())
+            ->items([
+                (new Div('hosting-monitor'))
+                    ->class(['box', $large ? 'medium' : 'small dm_hm_short_info'])
+                    ->items([
+                        (new Text('h3', (new Img(urldecode(Page::getPF('dmHostingMonitor/icon.svg'))))->class('icon-small')->render() . ' ' . __('Hosting Monitor'))),
+                        ... $blocks,
+                    ]),
+                (new Text(null, $script)),
+            ])
+        ->render();
     }
 
     /**
