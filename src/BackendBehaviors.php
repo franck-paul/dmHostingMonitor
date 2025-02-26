@@ -132,8 +132,8 @@ class BackendBehaviors
             App::blog()->loadFromBlog($rs->blog_id);
             $publicPath = App::blog()->settings()->system->public_path;
             $themesPath = App::blog()->settings()->system->themes_path;
-            $stack[]    = (str_starts_with($publicPath, '/') ? $publicPath : '../' . $publicPath);
-            $stack[]    = (str_starts_with($themesPath, '/') ? $themesPath : '../' . $themesPath);
+            $stack[]    = (str_starts_with((string) $publicPath, '/') ? $publicPath : '../' . $publicPath);
+            $stack[]    = (str_starts_with((string) $themesPath, '/') ? $themesPath : '../' . $themesPath);
         }
 
         // Back to current blog
