@@ -31,6 +31,7 @@ use Dotclear\Helper\Html\Form\Note;
 use Dotclear\Helper\Html\Form\Number;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Set;
+use Dotclear\Helper\Html\Form\Strong;
 use Dotclear\Helper\Html\Form\Text;
 use Exception;
 
@@ -302,7 +303,7 @@ class BackendBehaviors
                         ->class('graphe')
                         ->title(__('Hard-disk free'))
                         ->items([
-                            (new Text('strong', $hdPercent . '%'))
+                            (new Strong($hdPercent . '%'))
                                 ->class(['barre', self::getLevelClass(100 - $hdPercent, $first_threshold, $second_threshold)])
                                 ->extra('style="width: ' . min($hdPercent, 100) . '%;"'),
                         ]);
@@ -345,7 +346,7 @@ class BackendBehaviors
                         ->class('graphe')
                         ->title(__('Hard-disk used'))
                         ->items([
-                            (new Text('strong', $hdMaxPercent . '%'))
+                            (new Strong($hdMaxPercent . '%'))
                                 ->class(['barre', self::getLevelClass($hdMaxPercent, $first_threshold, $second_threshold)])
                                 ->extra('style="width: ' . min($hdMaxPercent, 100) . '%;"'),
                         ]);
@@ -391,7 +392,7 @@ class BackendBehaviors
                     ->class('graphe')
                     ->title(__('Database size'))
                     ->items([
-                        (new Text('strong', $dbMaxPercent . '%'))
+                        (new Strong($dbMaxPercent . '%'))
                             ->class(['barre', self::getLevelClass($dbMaxPercent, $first_threshold, $second_threshold)])
                             ->extra('style="width: ' . min($dbMaxPercent, 100) . '%;"'),
                     ]);

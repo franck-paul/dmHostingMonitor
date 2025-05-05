@@ -19,7 +19,7 @@ $this->registerModule(
     [
         'date'     => '2025-02-26T16:08:42+0100',
         'requires' => [
-            ['core', '2.28'],
+            ['core', '2.34'],
             ['dmHelper'],
         ],
         'permissions' => 'My',
@@ -32,5 +32,6 @@ $this->registerModule(
         'details'    => 'https://open-time.net/?q=dmHostingMonitor',
         'support'    => 'https://github.com/franck-paul/dmHostingMonitor',
         'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/main/dcstore.xml',
+        'license'    => 'gpl2',
     ]
 );
