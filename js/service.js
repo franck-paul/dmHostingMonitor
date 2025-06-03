@@ -18,7 +18,7 @@ dotclear.ready(() => {
         // Server status has never been tested yet
         dotclear.dmHostingMonitor.alt = `${icons[0].alt} : `;
       }
-      dotclear.dmHostingMonitor.alt = dotclear.dmHostingMonitor.alt ?? '';
+      dotclear.dmHostingMonitor.alt ??= '';
 
       body.style.filter = online ? '' : 'grayscale(1)';
 
