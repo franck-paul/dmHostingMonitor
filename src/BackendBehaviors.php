@@ -487,11 +487,11 @@ class BackendBehaviors
                     App::version()->getVersion(My::id())
                 ) .
                 Page::jsLoad(
-                    urldecode(Page::getPF(My::id() . '/js/raphael.js')),
+                    urldecode(Page::getPF(My::id() . '/lib/raphael/raphael.min.js')),
                     App::version()->getVersion(My::id())
                 ) .
                 Page::jsLoad(
-                    urldecode(Page::getPF(My::id() . '/js/justgage.js')),
+                    urldecode(Page::getPF(My::id() . '/lib/justgage/justgage.min.js')),
                     App::version()->getVersion(My::id())
                 );
             }
@@ -509,10 +509,10 @@ class BackendBehaviors
         if ($preferences->activated && $preferences->ping) {
             echo
                 Page::jsJson('dm_hostingmonitor', [
-                    'dmHostingMonitor_Ping'     => $preferences->ping,
-                    'dmHostingMonitor_Offline'  => __('Server offline'),
-                    'dmHostingMonitor_Online'   => __('Server online'),
-                    'dmHostingMonitor_Interval' => ($preferences->interval ?? 300),
+                    'ping'     => $preferences->ping,
+                    'offline'  => __('Server offline'),
+                    'online'   => __('Server online'),
+                    'interval' => ($preferences->interval ?? 300),
                 ]) .
                 Page::jsLoad(
                     urldecode(Page::getPF(My::id() . '/js/service.js')),
