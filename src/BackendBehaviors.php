@@ -71,12 +71,12 @@ class BackendBehaviors
     {
         // Get current db size in bytes
         $dbSize = 0;
-        switch (App::con()->syntax()) {
+        switch (App::db()->con()->syntax()) {
             case 'sqlite':
                 break;
             case 'postgresql':
-                $sql = 'SELECT pg_database_size(\'' . App::con()->database() . '\') AS size';
-                $rs  = new MetaRecord(App::con()->select($sql));
+                $sql = 'SELECT pg_database_size(\'' . App::db()->con()->database() . '\') AS size';
+                $rs  = new MetaRecord(App::db()->con()->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += $rs->size;
                 }
@@ -84,7 +84,7 @@ class BackendBehaviors
                 break;
             case 'mysql':
                 $sql = 'SHOW TABLE STATUS';
-                $rs  = new MetaRecord(App::con()->select($sql));
+                $rs  = new MetaRecord(App::db()->con()->select($sql));
                 while ($rs->fetch()) {
                     $dbSize += (float) $rs->Data_length + (float) $rs->Index_length;
                 }
