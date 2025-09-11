@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief dmHostingMonitor, a plugin for Dotclear 2
  *
@@ -22,17 +23,17 @@ use Dotclear\Module\MyPlugin;
  */
 class My extends MyPlugin
 {
-    protected static function checkCustomContext(int $context): ?bool
+    protected static function checkCustomContext(int $context): bool
     {
         return match ($context) {
-            // Limit bakend to content admin and pages user
+            // Limit backend to admin
             self::BACKEND, self::MANAGE, self::MENU, self::WIDGETS => App::task()->checkContext('BACKEND')
                 && App::blog()->isDefined()
                 && App::auth()->check(App::auth()->makePermissions([
                     App::auth()::PERMISSION_ADMIN,
                 ]), App::blog()->id()),
 
-            default => null,
+            default => false,   // no rigths for non admin (as plugin does not exist)
         };
     }
 }
