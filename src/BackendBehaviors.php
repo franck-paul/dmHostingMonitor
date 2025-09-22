@@ -17,7 +17,6 @@ namespace Dotclear\Plugin\dmHostingMonitor;
 
 use ArrayObject;
 use Dotclear\App;
-use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\Html\Form\Checkbox;
@@ -438,9 +437,9 @@ class BackendBehaviors
 
         $script = '';
         if (!$bargraph) {
-            $script = Page::jsJson('dm_hostingmonitor_values', $json) .
-                    Page::jsLoad(
-                        urldecode(Page::getPF(My::id() . '/js/admin.js')),
+            $script = App::backend()->page()->jsJson('dm_hostingmonitor_values', $json) .
+                    App::backend()->page()->jsLoad(
+                        urldecode((string) App::backend()->page()->getPF(My::id() . '/js/admin.js')),
                         App::version()->getVersion(My::id())
                     );
         }
@@ -450,7 +449,7 @@ class BackendBehaviors
                 (new Div('hosting-monitor'))
                     ->class(['box', $large ? 'medium' : 'small dm_hm_short_info'])
                     ->items([
-                        (new Text('h3', (new Img(urldecode(Page::getPF('dmHostingMonitor/icon.svg'))))->class('icon-small')->render() . ' ' . __('Hosting Monitor'))),
+                        (new Text('h3', (new Img(urldecode((string) App::backend()->page()->getPF('dmHostingMonitor/icon.svg'))))->class('icon-small')->render() . ' ' . __('Hosting Monitor'))),
                         ... $blocks,
                     ]),
                 (new Text(null, $script)),
@@ -481,17 +480,17 @@ class BackendBehaviors
             $ret = '';
 
             if ($preferences->show_hd_info || $preferences->show_db_info) {
-                $ret .= Page::cssLoad(
-                    urldecode(Page::getPF(My::id() . '/css/style.css')),
+                $ret .= App::backend()->page()->cssLoad(
+                    urldecode((string) App::backend()->page()->getPF(My::id() . '/css/style.css')),
                     'screen',
                     App::version()->getVersion(My::id())
                 ) .
-                Page::jsLoad(
-                    urldecode(Page::getPF(My::id() . '/lib/raphael/raphael.min.js')),
+                App::backend()->page()->jsLoad(
+                    urldecode((string) App::backend()->page()->getPF(My::id() . '/lib/raphael/raphael.min.js')),
                     App::version()->getVersion(My::id())
                 ) .
-                Page::jsLoad(
-                    urldecode(Page::getPF(My::id() . '/lib/justgage/justgage.min.js')),
+                App::backend()->page()->jsLoad(
+                    urldecode((string) App::backend()->page()->getPF(My::id() . '/lib/justgage/justgage.min.js')),
                     App::version()->getVersion(My::id())
                 );
             }
@@ -508,14 +507,14 @@ class BackendBehaviors
 
         if ($preferences->activated && $preferences->ping) {
             echo
-                Page::jsJson('dm_hostingmonitor', [
+                App::backend()->page()->jsJson('dm_hostingmonitor', [
                     'ping'     => $preferences->ping,
                     'offline'  => __('Server offline'),
                     'online'   => __('Server online'),
                     'interval' => ($preferences->interval ?? 300),
                 ]) .
-                Page::jsLoad(
-                    urldecode(Page::getPF(My::id() . '/js/service.js')),
+                App::backend()->page()->jsLoad(
+                    urldecode((string) App::backend()->page()->getPF(My::id() . '/js/service.js')),
                     App::version()->getVersion(My::id())
                 );
         }
