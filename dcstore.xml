@@ -1,11 +1,11 @@
 <modules xmlns:da="http://dotaddict.org/da/">
   <module id="dmHostingMonitor">
     <name>Hosting Monitor Dashboard Module</name>
-    <version>6.1</version>
+    <version>6.2</version>
     <author>Franck Paul</author>
     <desc>Display server information on dashboard</desc>
-    <date>2025-09-11T10:00:53+0200</date>
-    <file>https://github.com/franck-paul/dmHostingMonitor/releases/download/6.1/plugin-dmHostingMonitor-6.1.zip</file>
+    <date>2025-09-22T10:34:28+0200</date>
+    <file>https://github.com/franck-paul/dmHostingMonitor/releases/download/6.2/plugin-dmHostingMonitor-6.2.zip</file>
     <da:dcmin>2.36</da:dcmin>
     <da:details>https://open-time.net/?q=dmHostingMonitor</da:details>
     <da:support>https://github.com/franck-paul/dmHostingMonitor</da:support>
