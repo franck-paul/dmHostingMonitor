@@ -34,6 +34,9 @@ use Dotclear\Helper\Html\Form\Strong;
 use Dotclear\Helper\Html\Form\Text;
 use Exception;
 
+/**
+ * @todo switch to SqlStatement
+ */
 class BackendBehaviors
 {
     private static function readableSize(int|float $size): string
@@ -449,7 +452,13 @@ class BackendBehaviors
                 (new Div('hosting-monitor'))
                     ->class(['box', $large ? 'medium' : 'small dm_hm_short_info'])
                     ->items([
-                        (new Text('h3', (new Img(urldecode((string) App::backend()->page()->getPF('dmHostingMonitor/icon.svg'))))->class('icon-small')->render() . ' ' . __('Hosting Monitor'))),
+                        (new Text(
+                            'h3',
+                            (new Img(urldecode((string) App::backend()->page()->getPF('dmHostingMonitor/icon.svg'))))
+                                ->alt('')
+                                ->class('icon-small')
+                            ->render() . ' ' . __('Hosting Monitor')
+                        )),
                         ... $blocks,
                     ]),
                 (new Text(null, $script)),
