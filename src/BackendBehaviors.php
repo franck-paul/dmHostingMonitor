@@ -211,12 +211,11 @@ class BackendBehaviors
 
     private static function getPercentageOf(float $part, float $total): float
     {
-        $percentage = 0;
         if (($part > 0) && ($total > 0)) {
-            $percentage = round($part / $total, 2) * 100;
+            return round($part / $total, 2) * 100;
         }
 
-        return $percentage;
+        return 0;
     }
 
     private static function getLevelClass(float $value, float $firstLevel, float $secondLevel): string
@@ -240,9 +239,13 @@ class BackendBehaviors
 
         if ($value < $firstLevel) {
             return 'percent_cool';
-        } elseif ($value < $secondLevel) {
+        }
+
+        if ($value < $secondLevel) {
             return 'percent_warning';
-        } elseif ($value <= 100) {
+        }
+
+        if ($value <= 100) {
             return 'percent_alert';
         }
 
