@@ -72,7 +72,7 @@ class BackendBehaviors
     private static function getDbSize(): float
     {
         // Get current db size in bytes
-        $dbSize = 0;
+        $db_size = 0.0;
         switch (App::db()->con()->syntax()) {
             case 'sqlite':
                 break;
@@ -80,7 +80,8 @@ class BackendBehaviors
                 $sql = 'SELECT pg_database_size(\'' . App::db()->con()->database() . '\') AS size';
                 $rs  = new MetaRecord(App::db()->con()->select($sql));
                 while ($rs->fetch()) {
-                    $dbSize += $rs->size;
+                    $size = is_numeric($size = $rs->size) ? (float) $rs->size : 0;
+                    $db_size += $size;
                 }
 
                 break;
@@ -88,13 +89,15 @@ class BackendBehaviors
                 $sql = 'SHOW TABLE STATUS';
                 $rs  = new MetaRecord(App::db()->con()->select($sql));
                 while ($rs->fetch()) {
-                    $dbSize += (float) $rs->Data_length + (float) $rs->Index_length;
+                    $data_length  = is_numeric($data_length = $rs->Data_length) ? (float) $data_length : 0.0;
+                    $index_length = is_numeric($index_length = $rs->Index_length) ? (float) $index_length : 0.0;
+                    $db_size += $data_length + $index_length;
                 }
 
                 break;
         }
 
-        return $dbSize;
+        return $db_size;
     }
 
     private static function getUsedSpace(): float
@@ -132,11 +135,20 @@ class BackendBehaviors
         // If not absolute (1st char <> /) then prefix with ../
         $rs = App::blogs()->getBlogs();
         while ($rs->fetch()) {
-            App::blog()->loadFromBlog($rs->blog_id);
-            $publicPath = App::blog()->settings()->system->public_path;
-            $themesPath = App::blog()->settings()->system->themes_path;
-            $stack[]    = (str_starts_with((string) $publicPath, '/') ? $publicPath : '../' . $publicPath);
-            $stack[]    = (str_starts_with((string) $themesPath, '/') ? $themesPath : '../' . $themesPath);
+            $blog_id = is_string($blog_id = $rs->blog_id) ? $blog_id : '';
+            if ($blog_id !== '') {
+                App::blog()->loadFromBlog($blog_id);
+
+                $public_path = is_string($public_path = App::blog()->settings()->system->public_path) ? $public_path : '';
+                if ($public_path !== '') {
+                    $stack[] = (str_starts_with($public_path, '/') ? $public_path : '../' . $public_path);
+                }
+
+                $themes_path = is_string($themes_path = App::blog()->settings()->system->themes_path) ? $themes_path : '';
+                if ($themes_path !== '') {
+                    $stack[] = (str_starts_with($themes_path, '/') ? $themes_path : '../' . $themes_path);
+                }
+            }
         }
 
         // Back to current blog
@@ -254,6 +266,10 @@ class BackendBehaviors
 
     private static function getInfos(): string
     {
+        // Variable data helpers
+        $_Bool = fn (mixed $var): bool => (bool) $var;
+        $_Int  = fn (mixed $var, int $default = 0): int => $var !== null && is_numeric($val = $var) ? (int) $val : $default;
+
         $preferences = My::prefs();
 
         $dbSize       = 0;
@@ -266,20 +282,20 @@ class BackendBehaviors
         $hdMaxSize    = 0;
         $hdMaxPercent = 0;
 
-        $first_threshold  = (int) $preferences->first_threshold;
-        $second_threshold = (int) $preferences->second_threshold;
+        $first_threshold  = $_Int($preferences->first_threshold);
+        $second_threshold = $_Int($preferences->second_threshold);
 
-        $bargraph = !(bool) $preferences->show_gauges;
-        $large    = $preferences->large;
+        $bargraph = !$_Bool($preferences->show_gauges);
+        $large    = $_Bool($preferences->large);
 
-        if ($preferences->show_hd_info) {
+        if ($_Bool($preferences->show_hd_info)) {
             $hdTotal   = self::getTotalSpace();
             $hdFree    = self::getFreeSpace();
             $hdPercent = self::getPercentageOf($hdFree, $hdTotal);
 
             $hdUsed    = self::getUsedSpace();
-            $hdMaxSize = $preferences->max_hd_size;
-            if ($hdMaxSize == 0) {
+            $hdMaxSize = $_Int($preferences->max_hd_size);
+            if ($hdMaxSize === 0) {
                 // Use total size of hard-disk
                 $hdMaxSize = $hdTotal;
             } else {
@@ -289,9 +305,9 @@ class BackendBehaviors
             $hdMaxPercent = self::getPercentageOf($hdUsed, $hdMaxSize);
         }
 
-        if ($preferences->show_db_info) {
+        if ($_Bool($preferences->show_db_info)) {
             $dbSize    = self::getDbSize();
-            $dbMaxSize = $preferences->max_db_size;
+            $dbMaxSize = $_Int($preferences->max_db_size);
             $dbMaxSize *= 1000 * 1000;
             $dbMaxPercent = self::getPercentageOf($dbSize, $dbMaxSize);
         }
@@ -300,7 +316,7 @@ class BackendBehaviors
         $blocks = [];
         $legend = [];
 
-        if ($preferences->show_hd_info) {
+        if ($_Bool($preferences->show_hd_info)) {
             /* Hard-disk free vs total information */
             if ($hdTotal > 0) {
                 if ($bargraph) {
@@ -391,7 +407,7 @@ class BackendBehaviors
         }
 
         /* Database information */
-        if ($preferences->show_db_info && $dbSize > 0) {
+        if ($_Bool($preferences->show_db_info) && $dbSize > 0) {
             if ($bargraph) {
                 $blocks[] = (new Div())
                     ->class('graphe')
@@ -536,22 +552,26 @@ class BackendBehaviors
 
     public static function adminAfterDashboardOptionsUpdate(): string
     {
-        $preferences = My::prefs();
-
         // Get and store user's prefs for plugin options
         try {
+            // Post data helpers
+            $_Bool = fn (string $name): bool => !empty($_POST[$name]);
+            $_Int  = fn (string $name, int $default = 0): int => isset($_POST[$name]) && is_numeric($val = $_POST[$name]) ? (int) $val : $default;
+
+            $preferences = My::prefs();
+
             // Hosting monitor options
-            $preferences->put('activated', !empty($_POST['dmhostingmonitor_activated']), App::userWorkspace()::WS_BOOL);
-            $preferences->put('show_hd_info', !empty($_POST['dmhostingmonitor_show_hd_info']), App::userWorkspace()::WS_BOOL);
-            $preferences->put('max_hd_size', (int) $_POST['dmhostingmonitor_max_hd_size'], App::userWorkspace()::WS_INT);
-            $preferences->put('show_db_info', !empty($_POST['dmhostingmonitor_show_db_info']), App::userWorkspace()::WS_BOOL);
-            $preferences->put('max_db_size', (int) $_POST['dmhostingmonitor_max_db_size'], App::userWorkspace()::WS_INT);
-            $preferences->put('first_threshold', (int) $_POST['dmhostingmonitor_first_threshold'], App::userWorkspace()::WS_INT);
-            $preferences->put('second_threshold', (int) $_POST['dmhostingmonitor_second_threshold'], App::userWorkspace()::WS_INT);
-            $preferences->put('large', empty($_POST['dmhostingmonitor_small']), App::userWorkspace()::WS_BOOL);
-            $preferences->put('show_gauges', !empty($_POST['dmhostingmonitor_show_gauges']), App::userWorkspace()::WS_BOOL);
-            $preferences->put('ping', !empty($_POST['dmhostingmonitor_ping']), App::userWorkspace()::WS_BOOL);
-            $preferences->put('interval', (int) $_POST['dmhostingmonitor_interval'], App::userWorkspace()::WS_INT);
+            $preferences->put('activated', $_Bool('dmhostingmonitor_activated'), App::userWorkspace()::WS_BOOL);
+            $preferences->put('show_hd_info', $_Bool('dmhostingmonitor_show_hd_info'), App::userWorkspace()::WS_BOOL);
+            $preferences->put('max_hd_size', $_Int('dmhostingmonitor_max_hd_size'), App::userWorkspace()::WS_INT);
+            $preferences->put('show_db_info', $_Bool('dmhostingmonitor_show_db_info'), App::userWorkspace()::WS_BOOL);
+            $preferences->put('max_db_size', $_Int('dmhostingmonitor_max_db_size'), App::userWorkspace()::WS_INT);
+            $preferences->put('first_threshold', $_Int('dmhostingmonitor_first_threshold'), App::userWorkspace()::WS_INT);
+            $preferences->put('second_threshold', $_Int('dmhostingmonitor_second_threshold'), App::userWorkspace()::WS_INT);
+            $preferences->put('large', !$_Bool('dmhostingmonitor_small'), App::userWorkspace()::WS_BOOL);
+            $preferences->put('show_gauges', $_Bool('dmhostingmonitor_show_gauges'), App::userWorkspace()::WS_BOOL);
+            $preferences->put('ping', $_Bool('dmhostingmonitor_ping'), App::userWorkspace()::WS_BOOL);
+            $preferences->put('interval', $_Int('dmhostingmonitor_interval'), App::userWorkspace()::WS_INT);
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
         }
@@ -561,6 +581,10 @@ class BackendBehaviors
 
     public static function adminDashboardOptionsForm(): string
     {
+        // Variable data helpers
+        $_Bool = fn (mixed $var): bool => (bool) $var;
+        $_Int  = fn (mixed $var, int $default = 0): int => $var !== null && is_numeric($val = $var) ? (int) $val : $default;
+
         $preferences = My::prefs();
 
         // Add fieldset for plugin options
@@ -569,57 +593,57 @@ class BackendBehaviors
         ->legend((new Legend(__('Hosting monitor on dashboard'))))
         ->fields([
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_activated', $preferences->activated))
+                (new Checkbox('dmhostingmonitor_activated', $_Bool($preferences->activated)))
                     ->value(1)
                     ->label((new Label(__('Activate module'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Text(null, '<hr>')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_show_hd_info', $preferences->show_hd_info))
+                (new Checkbox('dmhostingmonitor_show_hd_info', $_Bool($preferences->show_hd_info)))
                     ->value(1)
                     ->label((new Label(__('Show hard-disk information'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_max_hd_size', 0, 9_999_999, $preferences->max_hd_size))
+                (new Number('dmhostingmonitor_max_hd_size', 0, 9_999_999, $_Int($preferences->max_hd_size)))
                     ->label((new Label(__('Allocated hard-disk size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Text(null, '<hr>')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_show_db_info', $preferences->show_db_info))
+                (new Checkbox('dmhostingmonitor_show_db_info', $_Bool($preferences->show_db_info)))
                     ->value(1)
                     ->label((new Label(__('Show database information'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_max_db_size', 0, 9_999_999, $preferences->max_db_size))
+                (new Number('dmhostingmonitor_max_db_size', 0, 9_999_999, $_Int($preferences->max_db_size)))
                     ->label((new Label(__('Allocated database size (in Mb, leave empty for unlimited):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_first_threshold', 0, 9_999_999, $preferences->first_threshold))
+                (new Number('dmhostingmonitor_first_threshold', 0, 9_999_999, $_Int($preferences->first_threshold)))
                     ->label((new Label(__('1st threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_second_threshold', 0, 9_999_999, $preferences->second_threshold))
+                (new Number('dmhostingmonitor_second_threshold', 0, 9_999_999, $_Int($preferences->second_threshold)))
                     ->label((new Label(__('2nd threshold (in %, leave empty to ignore):'), Label::INSIDE_TEXT_BEFORE))),
             ]),
             (new Text(null, '<hr>')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_small', !$preferences->large))
+                (new Checkbox('dmhostingmonitor_small', !$_Bool($preferences->large)))
                     ->value(1)
                     ->label((new Label(__('Small screen'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_show_gauges', $preferences->show_gauges))
+                (new Checkbox('dmhostingmonitor_show_gauges', $_Bool($preferences->show_gauges)))
                     ->value(1)
                     ->label((new Label(__('Show gauges instead of bar graph'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Text(null, '<hr>')),
             (new Para())->items([
-                (new Checkbox('dmhostingmonitor_ping', $preferences->ping))
+                (new Checkbox('dmhostingmonitor_ping', $_Bool($preferences->ping)))
                     ->value(1)
                     ->label((new Label(__('Check server status'), Label::INSIDE_TEXT_AFTER))),
             ]),
             (new Para())->items([
-                (new Number('dmhostingmonitor_interval', 0, 9_999_999, $preferences->interval))
+                (new Number('dmhostingmonitor_interval', 0, 9_999_999, $_Int($preferences->interval)))
                     ->label((new Label(__('Interval in seconds between two pings:'), Label::INSIDE_TEXT_BEFORE))),
             ]),
         ])
