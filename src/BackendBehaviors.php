@@ -572,8 +572,8 @@ class BackendBehaviors
             $preferences->put('show_gauges', $_Bool('dmhostingmonitor_show_gauges'), App::userWorkspace()::WS_BOOL);
             $preferences->put('ping', $_Bool('dmhostingmonitor_ping'), App::userWorkspace()::WS_BOOL);
             $preferences->put('interval', $_Int('dmhostingmonitor_interval'), App::userWorkspace()::WS_INT);
-        } catch (Exception $e) {
-            App::error()->add($e->getMessage());
+        } catch (Exception $exception) {
+            App::error()->add($exception->getMessage());
         }
 
         return '';
