@@ -80,7 +80,7 @@ class BackendBehaviors
                 $sql = 'SELECT pg_database_size(\'' . App::db()->con()->database() . '\') AS size';
                 $rs  = new MetaRecord(App::db()->con()->select($sql));
                 while ($rs->fetch()) {
-                    $size = is_numeric($size = $rs->size) ? (float) $rs->size : 0;
+                    $size = (float) $rs->intField('size');
                     $db_size += $size;
                 }
 
@@ -89,8 +89,8 @@ class BackendBehaviors
                 $sql = 'SHOW TABLE STATUS';
                 $rs  = new MetaRecord(App::db()->con()->select($sql));
                 while ($rs->fetch()) {
-                    $data_length  = is_numeric($data_length = $rs->Data_length) ? (float) $data_length : 0.0;
-                    $index_length = is_numeric($index_length = $rs->Index_length) ? (float) $index_length : 0.0;
+                    $data_length  = (float) $rs->intField('Data_length');
+                    $index_length = (float) $rs->intField('Index_length');
                     $db_size += $data_length + $index_length;
                 }
 
