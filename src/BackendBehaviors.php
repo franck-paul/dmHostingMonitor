@@ -135,7 +135,7 @@ class BackendBehaviors
         // If not absolute (1st char <> /) then prefix with ../
         $rs = App::blogs()->getBlogs();
         while ($rs->fetch()) {
-            $blog_id = is_string($blog_id = $rs->blog_id) ? $blog_id : '';
+            $blog_id = $rs->strField('blog_id');
             if ($blog_id !== '') {
                 App::blog()->loadFromBlog($blog_id);
 
