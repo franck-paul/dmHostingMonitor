@@ -541,7 +541,8 @@ class BackendBehaviors
                 ]) .
                 App::backend()->page()->jsLoad(
                     urldecode((string) App::backend()->page()->getPF(My::id() . '/js/service.js')),
-                    App::version()->getVersion(My::id())
+                    App::version()->getVersion(My::id()),
+                    defer: true
                 );
         }
 

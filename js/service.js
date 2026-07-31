@@ -51,6 +51,7 @@ dotclear.ready(() => {
       showStatus(false);
       return;
     }
+
     dotclear.jsonServices(
       'dmHelperPing', // Provided by dmHelper plugin
       (payload) => {
