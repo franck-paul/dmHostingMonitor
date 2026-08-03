@@ -15,9 +15,9 @@ $this->registerModule(
     'Hosting Monitor Dashboard Module',
     'Display server information on dashboard',
     'Franck Paul',
-    '6.4',
+    '7.0',
     [
-        'date'     => '2026-04-09T18:49:10+0200',
+        'date'     => '2026-08-03T09:52:31+0200',
         'requires' => [
             ['core', '2.39'],
             ['dmHelper'],
