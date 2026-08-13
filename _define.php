@@ -11,27 +11,31 @@
  * @copyright Franck Paul contact@open-time.net
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-$this->registerModule(
-    'Hosting Monitor Dashboard Module',
-    'Display server information on dashboard',
-    'Franck Paul',
-    '7.0',
-    [
-        'date'     => '2026-08-03T09:52:31+0200',
-        'requires' => [
-            ['core', '2.39'],
-            ['dmHelper'],
-        ],
-        'permissions' => 'My',
-        'type'        => 'plugin',
-        'priority'    => 1001,     // Must be higher than dmHelper priority which should be 1000 (default)
-        'settings'    => [
-            'pref' => '#user-favorites.dmhostingmonitor',
-        ],
+declare(strict_types=1);
 
-        'details'    => 'https://open-time.net/?q=dmHostingMonitor',
-        'support'    => 'https://github.com/franck-paul/dmHostingMonitor',
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/main/dcstore.xml',
-        'license'    => 'gpl2',
-    ]
-);
+if (isset($this) && is_object($this) && method_exists($this, 'registerModule') && isset($this->id) && is_string($this->id)) {
+    $this->registerModule(
+        'Hosting Monitor Dashboard Module',
+        'Display server information on dashboard',
+        'Franck Paul',
+        '7.0',
+        [
+            'date'     => '2026-08-03T09:52:31+0200',
+            'requires' => [
+                ['core', '2.39'],
+                ['dmHelper'],
+            ],
+            'permissions' => 'My',
+            'type'        => 'plugin',
+            'priority'    => 1001,     // Must be higher than dmHelper priority which should be 1000 (default)
+            'settings'    => [
+                'pref' => '#user-favorites.dmhostingmonitor',
+            ],
+
+            'details'    => 'https://open-time.net/?q=dmHostingMonitor',
+            'support'    => 'https://github.com/franck-paul/dmHostingMonitor',
+            'repository' => 'https://raw.githubusercontent.com/franck-paul/dmHostingMonitor/main/dcstore.xml',
+            'license'    => 'gpl2',
+        ]
+    );
+}
