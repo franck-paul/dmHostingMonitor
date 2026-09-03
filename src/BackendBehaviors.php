@@ -482,9 +482,9 @@ class BackendBehaviors
     }
 
     /**
-     * @param      ArrayObject<int, ArrayObject<int, string>>  $contents  The contents
+     * @param      ArrayObject<int, ArrayObject<int, string>>  $arrayObject  The contents
      */
-    public static function adminDashboardContents(ArrayObject $contents): string
+    public static function adminDashboardContents(ArrayObject $arrayObject): string
     {
         $preferences = My::prefs();
 
@@ -492,7 +492,7 @@ class BackendBehaviors
         if ($preferences->getBool('activated')
             && ($preferences->getBool('show_hd_info') || $preferences->getBool('show_db_info'))
         ) {
-            $contents->append(new ArrayObject([self::getInfos()]));
+            $arrayObject->append(new ArrayObject([self::getInfos()]));
         }
 
         return '';
