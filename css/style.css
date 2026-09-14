@@ -1,19 +1,19 @@
 #hosting-monitor {
-  margin-bottom: 1em;
+  margin-block-end: 1em;
 }
 
 #hosting-monitor.dm_hm_short_info div {
-  margin-bottom: 0.5em;
+  margin-block-end: 0.5em;
 }
 
 .pie-small {
-  width: 140px;
-  height: 90px;
+  inline-size: 140px;
+  block-size: 90px;
 }
 
 .pie-large {
-  width: 200px;
-  height: 160px;
+  inline-size: 200px;
+  block-size: 160px;
 }
 
 .pie-large,
@@ -29,15 +29,18 @@
 .graphe {
   position: relative;
   /* IE hack */
-  width: 80%;
+  inline-size: 80%;
   /* 200px; */
   border: 1px solid #ccc;
   padding: 2px;
-  margin-left: 1em;
+  margin-inline-start: 1em;
 }
 
 .graphe.text {
-  margin: 0 0 0 1em;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 1em;
+  margin-inline-end: 0;
   border: none;
 }
 
@@ -47,7 +50,7 @@
   background: #b1d632;
   text-align: center;
   color: #333;
-  height: 2em;
+  block-size: 2em;
   line-height: 2em;
 }
 
@@ -70,6 +73,6 @@
 }
 
 .graphe-legend {
-  margin-left: 1em;
+  margin-inline-start: 1em;
   color: rgb(103, 110, 120);
 }
