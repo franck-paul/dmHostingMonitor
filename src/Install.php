@@ -37,7 +37,7 @@ class Install
         try {
             $old_version = App::version()->getVersion(My::id());
             // Rename preferences workspace
-            if (version_compare((string) $old_version, '2.1', '<') && App::auth()->prefs()->exists('dmhostingmonitor')) {
+            if (version_compare($old_version, '2.1', '<') && App::auth()->prefs()->exists('dmhostingmonitor')) {
                 App::auth()->prefs()->delWorkspace(My::id());
                 App::auth()->prefs()->renWorkspace('dmhostingmonitor', My::id());
             }

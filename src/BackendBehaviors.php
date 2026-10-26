@@ -122,7 +122,7 @@ class BackendBehaviors
         $stack[] = '..';
 
         // Plugins
-        $plugins = explode(PATH_SEPARATOR, (string) App::config()->pluginsRoot());
+        $plugins = explode(PATH_SEPARATOR, App::config()->pluginsRoot());
         $stack   = [...$stack, ...$plugins];
 
         // Cache
@@ -141,12 +141,12 @@ class BackendBehaviors
 
                 $public_path = App::blog()->settings()->get('system')->getStr('public_path', false);
                 if ($public_path !== '') {
-                    $stack[] = (str_starts_with((string) $public_path, '/') ? $public_path : '../' . $public_path);
+                    $stack[] = (str_starts_with($public_path, '/') ? $public_path : '../' . $public_path);
                 }
 
                 $themes_path = App::blog()->settings()->get('system')->getStr('themes_path', false);
                 if ($themes_path !== '') {
-                    $stack[] = (str_starts_with((string) $themes_path, '/') ? $themes_path : '../' . $themes_path);
+                    $stack[] = (str_starts_with($themes_path, '/') ? $themes_path : '../' . $themes_path);
                 }
             }
         }
@@ -457,7 +457,7 @@ class BackendBehaviors
         if (!$bargraph) {
             $script = App::backend()->page()->jsJson('dm_hostingmonitor_values', $json) .
                     App::backend()->page()->jsLoad(
-                        urldecode((string) App::backend()->page()->getPF(My::id() . '/js/admin.js')),
+                        urldecode(App::backend()->page()->getPF(My::id() . '/js/admin.js')),
                         App::version()->getVersion(My::id())
                     );
         }
@@ -469,7 +469,7 @@ class BackendBehaviors
                     ->items([
                         (new Text(
                             'h3',
-                            (new Img(urldecode((string) App::backend()->page()->getPF('dmHostingMonitor/icon.svg'))))
+                            (new Img(urldecode(App::backend()->page()->getPF('dmHostingMonitor/icon.svg'))))
                                 ->alt('')
                                 ->class('icon-small')
                             ->render() . ' ' . __('Hosting Monitor')
@@ -507,16 +507,16 @@ class BackendBehaviors
 
             if ($preferences->getBool('show_hd_info') || $preferences->getBool('show_db_info')) {
                 $ret .= App::backend()->page()->cssLoad(
-                    urldecode((string) App::backend()->page()->getPF(My::id() . '/css/style.css')),
+                    urldecode(App::backend()->page()->getPF(My::id() . '/css/style.css')),
                     'screen',
                     App::version()->getVersion(My::id())
                 ) .
                 App::backend()->page()->jsLoad(
-                    urldecode((string) App::backend()->page()->getPF(My::id() . '/lib/raphael/raphael.min.js')),
+                    urldecode(App::backend()->page()->getPF(My::id() . '/lib/raphael/raphael.min.js')),
                     App::version()->getVersion(My::id())
                 ) .
                 App::backend()->page()->jsLoad(
-                    urldecode((string) App::backend()->page()->getPF(My::id() . '/lib/justgage/justgage.min.js')),
+                    urldecode(App::backend()->page()->getPF(My::id() . '/lib/justgage/justgage.min.js')),
                     App::version()->getVersion(My::id())
                 );
             }
@@ -540,7 +540,7 @@ class BackendBehaviors
                     'interval' => ($preferences->getInt('interval', false) ?: 300),
                 ]) .
                 App::backend()->page()->jsLoad(
-                    urldecode((string) App::backend()->page()->getPF(My::id() . '/js/service.js')),
+                    urldecode(App::backend()->page()->getPF(My::id() . '/js/service.js')),
                     App::version()->getVersion(My::id()),
                     defer: true
                 );
