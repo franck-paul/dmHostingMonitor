@@ -182,7 +182,7 @@ class BackendBehaviors
                 ++$index;
             }
 
-            if ($realPath != '') {
+            if ($realPath !== '') {
                 $dir[] = $realPath;
                 sort($dir);
             }
@@ -232,16 +232,16 @@ class BackendBehaviors
 
     private static function getLevelClass(float $value, float $firstLevel, float $secondLevel): string
     {
-        if ($firstLevel == 0 && $secondLevel == 0) {
+        if ($firstLevel === 0.0 && $secondLevel === 0.0) {
             // No threshold -> always cool
             return 'percent_cool';
         }
 
-        if ($secondLevel == 0) {
+        if ($secondLevel === 0.0) {
             $secondLevel = $firstLevel;
         }
 
-        if ($firstLevel == 0) {
+        if ($firstLevel === 0.0) {
             $firstLevel = $secondLevel;
         }
 
