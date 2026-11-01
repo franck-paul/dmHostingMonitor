@@ -159,7 +159,7 @@ class BackendBehaviors
         foreach ($stack as $path) {
             // Get real path
             $realPath = Path::real($path);
-            if (!$realPath) {
+            if ($realPath === false) {
                 continue;
             }
 
@@ -489,8 +489,8 @@ class BackendBehaviors
         $preferences = My::prefs();
 
         // Add module to the contents stack
-        if ($preferences->getBool('activated')
-            && ($preferences->getBool('show_hd_info') || $preferences->getBool('show_db_info'))
+        if ($preferences->getBool('activated', false)
+            && ($preferences->getBool('show_hd_info', false) || $preferences->getBool('show_db_info', false))
         ) {
             $arrayObject->append(new ArrayObject([self::getInfos()]));
         }
@@ -502,10 +502,10 @@ class BackendBehaviors
     {
         $preferences = My::prefs();
 
-        if ($preferences->getBool('activated')) {
+        if ($preferences->getBool('activated', false)) {
             $ret = '';
 
-            if ($preferences->getBool('show_hd_info') || $preferences->getBool('show_db_info')) {
+            if ($preferences->getBool('show_hd_info', false) || $preferences->getBool('show_db_info', false)) {
                 $ret .= App::backend()->page()->cssLoad(
                     urldecode(App::backend()->page()->getPF(My::id() . '/css/style.css')),
                     'screen',
@@ -531,7 +531,7 @@ class BackendBehaviors
     {
         $preferences = My::prefs();
 
-        if ($preferences->getBool('activated') && $preferences->getBool('ping')) {
+        if ($preferences->getBool('activated', false) && $preferences->getBool('ping', false)) {
             echo
                 App::backend()->page()->jsJson('dm_hostingmonitor', [
                     'ping'     => $preferences->getBool('ping'),
