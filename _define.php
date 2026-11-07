@@ -18,9 +18,9 @@ if (isset($this) && is_object($this) && method_exists($this, 'registerModule') &
         'Hosting Monitor Dashboard Module',
         'Display server information on dashboard',
         'Franck Paul',
-        '7.0',
+        '7.1',
         [
-            'date'     => '2026-08-03T09:52:31+0200',
+            'date'     => '2026-11-07T16:45:02+0100',
             'requires' => [
                 ['core', '2.39'],
                 ['dmHelper'],
